@@ -693,6 +693,14 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
           </div>
         </div>
 
+        <div class="settings-card" id="adminExportCard" style="display:none;">
+          <div class="settings-card-header"><h3>Export to Excel</h3></div>
+          <div class="settings-card-body">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Admin can download quotations, customers, and projects in one Excel file.</div>
+            <button class="btn-main btn-gold" style="width:100%;justify-content:center;" onclick="exportDataToExcel()">Download Excel File</button>
+          </div>
+        </div>
+
         <!-- OneDrive -->
         <div class="settings-card" style="grid-column:span 2;">
           <div class="settings-card-header"><h3>☁️ Cloud Storage</h3></div>
@@ -1069,6 +1077,13 @@ function findDefaultUser(username) {
 function getCurrentUserProfile() {
   if (!currentUser || !currentUser.username) return null;
   return findUser(currentUser.username) || findDefaultUser(currentUser.username) || null;
+}
+function syncAdminControls() {
+  const isAdmin = !!(currentUser && currentUser.role === 'admin');
+  const btnAddUser = document.getElementById('btnAddUser');
+  const adminExportCard = document.getElementById('adminExportCard');
+  if (btnAddUser) btnAddUser.style.display = isAdmin ? 'flex' : 'none';
+  if (adminExportCard) adminExportCard.style.display = isAdmin ? 'block' : 'none';
 }
 function renderMyContactDetails() {
   const profile = getCurrentUserProfile() || currentUser || {};
@@ -1458,9 +1473,8 @@ function launchApp() {
   wireCustomerFieldListeners();
   renderCustomerDropdown();
   renderCustomersView();
-  // Show/hide admin features
-  document.getElementById('btnAddUser').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
-      showView('db');
+  syncAdminControls();
+  showView('db');
   renderUserList();
   // Auto-sync from cloud on every login
   if (backendMode) return;
@@ -1774,6 +1788,152 @@ function downloadTextFile(content, filename, mimeType='text/plain;charset=utf-8'
   setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
+function excelXmlEscape(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function excelCell(value) {
+  return '<Cell><Data ss:Type="String">' + excelXmlEscape(value) + '</Data></Cell>';
+}
+
+function excelRow(values) {
+  return '<Row>' + values.map(excelCell).join('') + '</Row>';
+}
+
+function buildExcelWorksheet(name, headers, rows) {
+  return '<Worksheet ss:Name="' + excelXmlEscape(name) + '"><Table>' +
+    excelRow(headers) +
+    rows.map(excelRow).join('') +
+    '</Table></Worksheet>';
+}
+
+function buildQuotationExportRows() {
+  return dbLoad().map(q => [
+    q.quoteNo || '',
+    q.quoteDate || '',
+    q.custCompany || '',
+    q.custName || '',
+    q.custPhone || '',
+    q.custEmail || '',
+    q.custGST || '',
+    q.subTotal || 0,
+    q.gstRate || '',
+    q.grandTotal || 0,
+    q.savedBy || '',
+    q.userPhone || '',
+    q.userEmail || '',
+    q.savedAt || '',
+    (q.rows || []).length
+  ]);
+}
+
+function buildQuotationItemRows() {
+  const rows = [];
+  dbLoad().forEach(q => {
+    (q.rows || []).forEach((item, index) => {
+      rows.push([
+        q.quoteNo || '',
+        index + 1,
+        item.desc || '',
+        item.cavity || '',
+        item.rate || '',
+        (parseFloat(item.cavity) || 0) * (parseFloat(item.rate) || 0)
+      ]);
+    });
+  });
+  return rows;
+}
+
+function buildCustomerExportRows() {
+  return customersLoad().map(c => [
+    c.company || '',
+    c.name || '',
+    c.phone || '',
+    c.email || '',
+    c.gst || '',
+    c.address || ''
+  ]);
+}
+
+function buildProjectExportRows() {
+  return projectsLoad().map(p => [
+    p.projectNo || '',
+    p.customerCompany || '',
+    p.customerContact || '',
+    p.customerPhone || '',
+    p.orderRef || '',
+    p.orderDate || '',
+    p.quoteRef || '',
+    p.status || '',
+    p.updatedBy || '',
+    p.updatedAt || '',
+    (p.bom || []).length
+  ]);
+}
+
+function buildProjectBomRows() {
+  const rows = [];
+  projectsLoad().forEach(project => {
+    const progressMap = {};
+    (project.progress || []).forEach(entry => { progressMap[entry.partId] = entry; });
+    (project.bom || []).forEach((item, index) => {
+      const progress = progressMap[item.id] || {};
+      rows.push([
+        project.projectNo || '',
+        index + 1,
+        item.partName || '',
+        item.rawMaterial || '',
+        item.finishSize || '',
+        item.quantity || '',
+        progress.stage || '',
+        progress.stageDate || ''
+      ]);
+    });
+  });
+  return rows;
+}
+
+function exportDataToExcel() {
+  if (!currentUser || currentUser.role !== 'admin') {
+    showNotif('Only admin can export Excel data.', 'error');
+    return;
+  }
+  const workbook = [
+    '<?xml version="1.0"?>',
+    '<?mso-application progid="Excel.Sheet"?>',
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
+    buildExcelWorksheet('Quotations',
+      ['Quote No', 'Date', 'Company', 'Contact', 'Phone', 'Email', 'GST No', 'Sub Total', 'GST %', 'Grand Total', 'Saved By', 'User Phone', 'User Email', 'Saved At', 'Items'],
+      buildQuotationExportRows()
+    ),
+    buildExcelWorksheet('Quotation Items',
+      ['Quote No', 'Sr', 'Description', 'No. Of Cavity', 'Rate Per Cavity', 'Line Total'],
+      buildQuotationItemRows()
+    ),
+    buildExcelWorksheet('Customers',
+      ['Company', 'Contact', 'Phone', 'Email', 'GST No', 'Address'],
+      buildCustomerExportRows()
+    ),
+    buildExcelWorksheet('Projects',
+      ['Project No', 'Customer Company', 'Customer Contact', 'Customer Phone', 'Order Ref', 'Order Date', 'Quote Ref', 'Status', 'Updated By', 'Updated At', 'BOM Parts'],
+      buildProjectExportRows()
+    ),
+    buildExcelWorksheet('Project BOM',
+      ['Project No', 'Sr', 'Part Name', 'Raw Material', 'Finish Size', 'Quantity', 'Stage', 'Stage Date'],
+      buildProjectBomRows()
+    ),
+    '</Workbook>'
+  ].join('');
+  const fileName = 'Hexamech-Export-' + new Date().toISOString().slice(0, 10) + '.xls';
+  downloadTextFile(workbook, fileName, 'application/vnd.ms-excel;charset=utf-8');
+  showNotif('Excel export downloaded.');
+}
+
 function exportConfiguredApp() {
   const clientId = localStorage.getItem('hx_od_clientid');
   const tokens = loadTokens();
@@ -1947,7 +2107,8 @@ async function saveUser() {
       saveUsers(users);
       if (currentUser && currentUser.username === updatedUser.username) {
         currentUser = { ...currentUser, role: updatedUser.role, canProjectAccess: updatedUser.canProjectAccess };
-                      }
+        syncAdminControls();
+      }
       renderUserList();
       closeUserModal();
       showNotif('User updated: ' + (displayName || username));
@@ -2329,7 +2490,7 @@ function showView(v) {
   if (v === 'new') { document.getElementById('newView').style.display = 'block'; }
   if (v === 'db')  { document.getElementById('dbView').style.display = 'block';  document.getElementById('navDB').classList.add('active'); renderDB(); }
   if (v === 'customers') { document.getElementById('customersView').style.display = 'block'; document.getElementById('navCustomers').classList.add('active'); renderCustomersView(); }
-  if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(cloudConnected); const _gti=document.getElementById('ghTokenInput'); if(_gti&&'') _gti.value=''; }
+if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(cloudConnected); syncAdminControls(); const _gti=document.getElementById('ghTokenInput'); if(_gti&&'') _gti.value=''; }
 }
 
 // ═══════════════════════════════════════════
