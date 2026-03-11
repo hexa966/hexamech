@@ -704,14 +704,11 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
 
         <!-- OneDrive -->
         <div class="settings-card" style="grid-column:span 2;">
-          <div class="settings-card-header"><h3>☁️ OneDrive Connection</h3></div>
+          <div class="settings-card-header"><h3>☁️ Cloud Storage</h3></div>
           <div class="settings-card-body">
             <div id="odStatusBox"></div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn-main btn-navy" >⚙️ Setup / Change Client ID</button>
-              <button class="btn-main btn-green" onclick="syncFromOneDrive()" id="btnSyncSettings" style="display:none;">↻ Sync Now</button>
-              <button class="btn-main" id="btnExportApp" onclick="exportConfiguredApp()" style="background:#7b2d8b;color:#fff;display:none;">📦 Export App for Other Users</button>
-              <button class="btn-main btn-red" onclick="disconnectOneDrive()" id="btnDisconnect" style="display:none;">✕ Disconnect OneDrive</button>
+              <button class="btn-main btn-green" onclick="syncFromOneDrive()" style="justify-content:center;">↻ Sync Now</button>
             </div>
           </div>
         </div>
@@ -817,112 +814,42 @@ const CORNER_LOGO_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA5C
 // ═══════════════════════════════════════════
 const USERS_KEY = 'hx_users';
 // ═══════════════════════════════════════════════════════════════
-// CLOUD STORAGE — GitHub Private Repo
-// Token is fine-grained: read+write to hexamech-data repo only
-// Works from any PC, any browser, incognito — forever
+// CLOUD STORAGE — Firebase Realtime Database
+// Just a URL — no tokens, no OAuth, nothing expires ever
+// Works from any PC, any browser, one click forever
 // ═══════════════════════════════════════════════════════════════
-const GH_TOKEN  = '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';   // github_pat_...
-const GH_OWNER  = 'hexa966';
-const GH_REPO   = 'hexamech-data';             // your private data repo
-const GH_FILE   = 'data.json';
-const GH_API    = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+const FB_URL = 'https://hexamech-2c6f5-default-rtdb.firebaseio.com/hexamech';
+// Example: 'https://your-app-default-rtdb.firebaseio.com/hexamech'
 
-let ghFileSha    = null;   // GitHub needs the SHA to update a file
 let cloudConnected = false;
 
 async function cloudRead() {
-  const _setStorageError = (msg) => {
-    const ss = document.getElementById('statStorage');
-    const sss = document.getElementById('statStorageSub');
-    if (ss)  ss.textContent  = 'Error';
-    if (sss) sss.textContent = msg;
-  };
   try {
-    const res = await fetch(GH_API + '?t=' + Date.now(), {
-      headers: {
-        'Authorization': 'Bearer ' + GH_TOKEN,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    if (res.status === 404) {
-      cloudConnected = true; ghFileSha = null;
-      return { quotations: [], users: [], customers: [] };
-    }
-    const body = await res.text();
-    if (!res.ok) {
-      let errDetail = '';
-      try { errDetail = JSON.parse(body).message || body.slice(0,100); } catch(x) { errDetail = body.slice(0,100); }
-      const msg = 'HTTP ' + res.status + ': ' + errDetail;
-      _setStorageError(msg);
-      // Also store for debug
-      window._ghLastError = msg;
-      throw new Error(msg);
-    }
-    const j = JSON.parse(body);
-    ghFileSha = j.sha;
+    const res = await fetch(FB_URL + '/data.json');
+    if (!res.ok) throw new Error('Firebase read ' + res.status);
+    const data = await res.json();
     cloudConnected = true;
-    return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, '')))));
+    // Firebase returns null if no data yet
+    return data || { quotations: [], users: [], customers: [] };
   } catch(e) {
-    console.error('cloudRead error:', e.message);
-    window._ghLastError = e.message;
+    console.error('cloudRead:', e.message);
     cloudConnected = false;
     return null;
   }
 }
 
-// Debug helper — open browser console and type: testGitHub()
-window.testGitHub = async function() {
-  console.log('Testing GitHub API...');
-  console.log('URL:', GH_API);
-  console.log('Token starts with:', GH_TOKEN.slice(0, 20) + '...');
-  try {
-    const res = await fetch(GH_API + '?t=' + Date.now(), {
-      headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    const body = await res.text();
-    console.log('Status:', res.status);
-    console.log('Response:', body.slice(0, 500));
-    alert('GitHub Status: ' + res.status + '\n\n' + body.slice(0, 400));
-  } catch(e) {
-    console.error('Network error:', e);
-    alert('Network error: ' + e.message);
-  }
-};
-
 async function cloudWrite(data) {
   try {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-    const body = {
-      message: 'data update ' + new Date().toISOString().slice(0, 16).replace('T', ' '),
-      content: content
-    };
-    if (ghFileSha) body.sha = ghFileSha;  // required for updates, omit for first write
-
-    const res = await fetch(GH_API, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + GH_TOKEN,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
+    const res = await fetch(FB_URL + '/data.json', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(data)
     });
-
-    if (res.status === 409 || res.status === 422) {
-      // SHA conflict (two writes raced) — re-read SHA and retry once
-      console.warn('cloudWrite SHA conflict — retrying...');
-      const fresh = await cloudRead();
-      if (fresh === null) return false;
-      return await cloudWrite(data);   // retry with fresh SHA
-    }
-
-    if (!res.ok) throw new Error('GitHub write ' + res.status);
-    const j = await res.json();
-    if (j.content && j.content.sha) ghFileSha = j.content.sha;
+    if (!res.ok) throw new Error('Firebase write ' + res.status);
     cloudConnected = true;
     return true;
   } catch(e) {
-    console.error('cloudWrite error:', e);
+    console.error('cloudWrite:', e.message);
     cloudConnected = false;
     return false;
   }
@@ -930,13 +857,13 @@ async function cloudWrite(data) {
 
 async function cloudSync() {
   updateSyncBadge('syncing');
-  const ss = document.getElementById('statStorage');
+  const ss  = document.getElementById('statStorage');
   const sss = document.getElementById('statStorageSub');
   const data = await cloudRead();
   if (!data) {
     updateSyncBadge('error');
     if (ss)  ss.textContent  = 'Error';
-    if (sss) sss.textContent = 'Cannot reach GitHub — check internet';
+    if (sss) sss.textContent = 'Cannot reach Firebase';
     return false;
   }
   if (data.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
@@ -944,8 +871,8 @@ async function cloudSync() {
     localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
   if (data.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
   updateSyncBadge('synced');
-  if (ss)  ss.textContent  = 'GitHub ✓';
-  if (sss) sss.textContent = GH_OWNER + '/' + GH_REPO;
+  if (ss)  ss.textContent  = 'Cloud ✓';
+  if (sss) sss.textContent = 'Firebase synced';
   return true;
 }
 
@@ -966,7 +893,7 @@ async function ghRead() {
   try {
     const res = await fetch(GH_API + '?t=' + Date.now(), {
       headers: {
-        'Authorization': 'Bearer ' + GH_TOKEN,
+        // no token needed,
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -997,7 +924,7 @@ async function ghWrite(data) {
     const res = await fetch(GH_API, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + GH_TOKEN,
+        // no token needed,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
@@ -2482,7 +2409,7 @@ function showView(v) {
   if (v === 'new') { document.getElementById('newView').style.display = 'block'; }
   if (v === 'db')  { document.getElementById('dbView').style.display = 'block';  document.getElementById('navDB').classList.add('active'); renderDB(); }
   if (v === 'customers') { document.getElementById('customersView').style.display = 'block'; document.getElementById('navCustomers').classList.add('active'); renderCustomersView(); }
-  if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(!!msalAccount); }
+  if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(cloudConnected); const _gti=document.getElementById('ghTokenInput'); if(_gti&&'') _gti.value=''; }
 }
 
 // ═══════════════════════════════════════════
