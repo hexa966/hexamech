@@ -2404,9 +2404,6 @@ function showView(v) {
   if (v === 'new') { document.getElementById('newView').style.display = 'block'; }
   if (v === 'db')  { document.getElementById('dbView').style.display = 'block';  document.getElementById('navDB').classList.add('active'); renderDB(); }
   if (v === 'customers') { document.getElementById('customersView').style.display = 'block'; document.getElementById('navCustomers').classList.add('active'); renderCustomersView(); }
-      document.getElementById('projectsView').style.display = 'block';
-    
-  }
   if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(!!msalAccount); }
 }
 
@@ -2822,7 +2819,7 @@ function renderPrintDoc(d, mode='quotation'){
         <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
         <li><strong>Mold Components as Spares Along with Mold</strong>
           <div class="pd-subpoints">
-            \${(d.moldSpares || 'Thermocouple - 2 Nos\nCore, Cavity and Neck - 1 Set\nTip Insulator - 2 Nos\nNozzle Heaters - 2 Nos\nFasteners - Sufficient\nEjector Rods - 1 Set\nTeflon Tape - 2 Nos\nLatch Plate - 1 Set\nHeaters - 2 Nos\nBaffle O-Ring - 1 Set\nHot Runner Standard Seal - 2 Nos\nToolbox (Bolts, Keys, etc.) - 1 No').split('\n').filter(l=>l.trim()).map(l=>\`<div class="pd-subpoint">\${esc(l.trim())}</div>\`).join('')}
+            ${(d.moldSpares || 'Thermocouple - 2 Nos\nCore, Cavity and Neck - 1 Set\nTip Insulator - 2 Nos\nNozzle Heaters - 2 Nos\nFasteners - Sufficient\nEjector Rods - 1 Set\nTeflon Tape - 2 Nos\nLatch Plate - 1 Set\nHeaters - 2 Nos\nBaffle O-Ring - 1 Set\nHot Runner Standard Seal - 2 Nos\nToolbox (Bolts, Keys, etc.) - 1 No').split('\n').filter(l=>l.trim()).map(l=>`<div class="pd-subpoint">${esc(l.trim())}</div>`).join('')}
           </div>
         </li>
       </ul></div>
@@ -2885,7 +2882,9 @@ function showNotif(msg,type='success'){
 
 // Close on backdrop
 ['printModal','setupModal','userModal','customerModal','confirmModal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){
+  const _mel = document.getElementById(id);
+  if(!_mel) return;
+  _mel.addEventListener('click',function(e){
     if(e.target===this){
       if(id==='printModal')closePreview();
       else if(id==='setupModal')closeSetupModal();
