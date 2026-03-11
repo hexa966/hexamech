@@ -438,7 +438,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       <button class="tnb" id="navSettings" onclick="showView('settings')">⚙️ Settings</button>
     </div>
     <div class="topbar-actions">
-      <div id="syncBadge" class="sync-badge local" onclick="openSetupModal()" title="OneDrive status">
+      <div id="syncBadge" class="sync-badge local" title="OneDrive sync status" style="cursor:default;">
         <span id="syncIcon">💾</span><span id="syncText">Local only</span>
       </div>
       <div class="topbar-user">Hi, <strong id="loggedUser"></strong></div>
@@ -449,41 +449,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   <!-- NEW QUOTATION VIEW -->
   <div id="newView">
     <div class="app-main">
-      <div class="od-banner" id="odBanner" style="display:none;">
-        <div class="od-banner-left">
-          <div class="od-banner-icon">☁️</div>
-          <div class="od-banner-text">
-            <h4>Save to OneDrive — Your data, your cloud</h4>
-            <p>Connect Microsoft OneDrive to auto-sync all quotations. One-time 5-minute setup.</p>
-          </div>
-        </div>
-        <button class="btn-od-connect" onclick="openSetupModal()">Connect OneDrive →</button>
-      </div>
-      <div class="action-bar">
-        <h2 id="formTitle">New Quotation</h2>
-        <div class="action-bar-right">
-          <button class="btn-main btn-navy" onclick="openPreview()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Preview & Print
-          </button>
-          <button class="btn-main btn-green" onclick="openPreview('proforma')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8"/><path d="M8 17h8"/></svg>
-            Proforma Invoice PDF
-          </button>
-          <button class="btn-main btn-gold" onclick="saveQuotation()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save Quotation
-          </button>
-        </div>
-      </div>
-      <div class="section-card">
-        <div class="section-header"><div class="s-num">1</div><h3>Quotation Details</h3></div>
-        <div class="section-body">
-          <div class="meta-row">
-            <div class="fg2"><label>Quotation Number <span style="color:var(--accent);font-size:10px;">(Auto)</span></label><input type="text" id="quoteNo" class="qno-input" placeholder="e.g. Q26001" readonly></div>
-            <div class="fg2"><label>Quotation Date</label><input type="date" id="quoteDate"></div>
-          </div>
-        </div>
+      
       </div>
       <div class="section-card">
         <div class="section-header"><div class="s-num">2</div><h3>Customer Details</h3></div>
@@ -829,7 +795,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           <div class="settings-card-body">
             <div id="odStatusBox"></div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn-main btn-navy" onclick="openSetupModal()">⚙️ Setup / Change Client ID</button>
+              <button class="btn-main btn-navy" >⚙️ Setup / Change Client ID</button>
               <button class="btn-main btn-green" onclick="syncFromOneDrive()" id="btnSyncSettings" style="display:none;">↻ Sync Now</button>
               <button class="btn-main" id="btnExportApp" onclick="exportConfiguredApp()" style="background:#7b2d8b;color:#fff;display:none;">📦 Export App for Other Users</button>
               <button class="btn-main btn-red" onclick="disconnectOneDrive()" id="btnDisconnect" style="display:none;">✕ Disconnect OneDrive</button>
@@ -853,55 +819,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       </div>
     </div>
     <div id="printDoc"></div>
-  </div>
-</div>
-
-<!-- ONEDRIVE SETUP MODAL -->
-<div id="setupModal" class="modal-backdrop">
-  <div class="modal-card" style="max-width:620px;">
-    <div class="modal-header" style="background:var(--od);">
-      <h3>☁️ Connect Microsoft OneDrive</h3>
-      <button class="modal-close" onclick="closeSetupModal()">×</button>
-    </div>
-    <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
-      <div id="odAlreadyConnected" style="display:none;">
-        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-          <span style="font-size:22px;">✅</span>
-          <div style="font-size:13px;color:#1b5e20;"><strong id="odConnectedUser" style="display:block;font-size:14px;margin-bottom:2px;"></strong>Quotations auto-sync to OneDrive → <code>HexamechQuotations/data.json</code></div>
-        </div>
-      </div>
-      <div id="odSetupSteps">
-        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">One-time 5-minute Azure setup. Your password is never stored — Microsoft handles login securely.</p>
-        <div class="setup-step">
-          <div class="step-num">1</div>
-          <div class="step-body"><h4>Go to Azure Portal</h4><p>Open <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> → sign in with your Microsoft/OneDrive account.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">2</div>
-          <div class="step-body"><h4>Register a New App</h4><p>Search <strong>"App registrations"</strong> → <strong>"New registration"</strong> → Name: <code>HexamechQuotations</code> → Supported account types: <strong>"Accounts in any organizational directory and personal Microsoft accounts"</strong> → Click <strong>Register</strong>.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">3</div>
-          <div class="step-body"><h4>Add Redirect URI</h4><p>In your app → <strong>Authentication</strong> → <strong>Add a platform</strong> → <strong>Single-page application</strong> → Redirect URI:</p>
-          <code id="redirectUriHint" style="display:block;padding:8px 12px;margin:8px 0;word-break:break-all;"></code>
-          <p>Enable <strong>"Access tokens"</strong> and <strong>"ID tokens"</strong> → Click <strong>Configure</strong>.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">4</div>
-          <div class="step-body"><h4>Add Files.ReadWrite Permission</h4><p><strong>API permissions</strong> → <strong>Add a permission</strong> → <strong>Microsoft Graph</strong> → <strong>Delegated</strong> → expand <strong>Files</strong> → tick <code>Files.ReadWrite</code> → <strong>Add permissions</strong>.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">5</div>
-          <div class="step-body"><h4>Paste your Client ID below</h4><p>App <strong>Overview</strong> → copy <strong>Application (client) ID</strong></p>
-          <input type="text" class="step-input" id="clientIdInput" placeholder="e.g. 9abd9532-b7c6-41b1-99bc-fb601f40714f"></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-main btn-navy" onclick="clearODData()">🗑 Clear & Reset</button>
-      <button class="btn-main btn-navy" onclick="closeSetupModal()">Cancel</button>
-      <button class="btn-main" style="background:var(--od);color:#fff;" onclick="saveClientId()">Connect & Sign In to OneDrive →</button>
-    </div>
   </div>
 </div>
 
@@ -1544,7 +1461,9 @@ async function doLogin() {
     }
   }
 
-  await ensureUsersLoadedFromOneDrive();
+  try {
+    await Promise.race([ensureUsersLoadedFromOneDrive(), new Promise(r=>setTimeout(r,5000))]);
+  } catch(e) {}
 
   let user = findUser(u);
   let matched = user ? await isPasswordMatch(user, p) : false;
@@ -1608,15 +1527,25 @@ function launchApp() {
   showView('db');
   renderUserList();
   renderProjectsView();
-  // Reconnect OneDrive silently in background after UI is ready
+  // Auto-connect OneDrive silently — retry 3 times
   if (backendMode) return;
-  setTimeout(async () => {
+  (async () => {
     const clientId = localStorage.getItem('hx_od_clientid');
-    if (clientId && !msalAccount) {
+    if (!clientId) { updateSyncBadge('local'); return; }
+    updateSyncBadge('syncing');
+    for (let i = 1; i <= 3; i++) {
+      await new Promise(r => setTimeout(r, i * 600));
+      if (msalAccount) break;
       try { await initMsal(); } catch(e) {}
     }
-    checkODSetup();
-  }, 100);
+    if (msalAccount) {
+      checkODSetup();
+    } else {
+      updateSyncBadge('error');
+      // Show small reconnect bar at bottom
+      if (typeof showReconnectBar === 'function') showReconnectBar();
+    }
+  })();
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
@@ -1837,35 +1766,15 @@ async function initMsal() {
 // ═══════════════════════════════════════════
 function checkODSetup() {
   const clientId = localStorage.getItem('hx_od_clientid');
-  const banner = document.getElementById('odBanner');
-  const syncBtn = document.getElementById('btnSyncNow');
-  const syncBtnSettings = document.getElementById('btnSyncSettings');
-  const disconnectBtn = document.getElementById('btnDisconnect');
-  const exportBtn = document.getElementById('btnExportApp');
-
+  // Safely update any optional UI elements
+  const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
+  const show = (id,d='flex') => { const el=document.getElementById(id); if(el) el.style.display=d; };
+  hide('odBanner');
   if (clientId && msalAccount) {
-    banner.style.display = 'none';
-    syncBtn.style.display = 'flex';
-    syncBtnSettings.style.display = 'flex';
-    disconnectBtn.style.display = 'flex';
-    if (exportBtn) exportBtn.style.display = 'flex';
     updateSyncBadge('synced');
     updateODStatusBox(true);
     syncFromOneDrive();
-  } else if (clientId && !msalAccount) {
-    banner.style.display = 'none';
-    syncBtn.style.display = 'none';
-    syncBtnSettings.style.display = 'none';
-    disconnectBtn.style.display = 'none';
-    if (exportBtn) exportBtn.style.display = 'none';
-    updateSyncBadge('local');
-    updateODStatusBox(false);
   } else {
-    banner.style.display = 'flex';
-    syncBtn.style.display = 'none';
-    syncBtnSettings.style.display = 'none';
-    disconnectBtn.style.display = 'none';
-    if (exportBtn) exportBtn.style.display = 'none';
     updateSyncBadge('local');
     updateODStatusBox(false);
   }
@@ -1875,9 +1784,9 @@ function updateODStatusBox(connected) {
   const box = document.getElementById('odStatusBox');
   if (!box) return;
   if (connected && msalAccount) {
-    box.innerHTML = `<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>${msalAccount.name || msalAccount.username}</strong>Connected — syncing to OneDrive → <code>HexamechQuotations/data.json</code></div></div>`;
+    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>' + (msalAccount.name || msalAccount.username) + '</strong>Connected — auto-syncing all quotations to OneDrive.</div></div>';
   } else {
-    box.innerHTML = `<div class="od-disconnected-box"><div class="ocb-text"><strong>Not connected to OneDrive.</strong>Click "Setup / Change Client ID" to connect.</div></div>`;
+    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:20px;">⚠️</span><div style="font-size:13px;color:#e65100;"><strong style="display:block;">OneDrive not connected.</strong>Quotations are saving locally. Click Sync Now to reconnect.</div></div>';
   }
 }
 
@@ -3046,6 +2955,31 @@ function renderPrintDoc(d, mode='quotation'){
 }
 
 // ═══════════════════════════════════════════
+
+function showReconnectBar() {
+  if (document.getElementById('reconnectBar')) return;
+  const bar = document.createElement('div');
+  bar.id = 'reconnectBar';
+  bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1b3a5c;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9997;font-size:13px;font-family:Barlow,sans-serif;gap:12px;';
+  bar.innerHTML = '<span>⚠️ OneDrive not connected — saving locally only.</span><button onclick="retryODConnect()" style="background:#e8a020;color:#0d1b2a;border:none;padding:7px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-family:Barlow,sans-serif;">↻ Reconnect OneDrive</button>';
+  document.body.appendChild(bar);
+}
+function hideReconnectBar() {
+  const b = document.getElementById('reconnectBar'); if(b) b.remove();
+}
+async function retryODConnect() {
+  const bar = document.getElementById('reconnectBar');
+  if (bar) bar.querySelector('button').textContent = 'Connecting...';
+  updateSyncBadge('syncing');
+  try {
+    await initMsal();
+    if (msalAccount) { hideReconnectBar(); checkODSetup(); showNotif('OneDrive connected!', 'success'); return; }
+  } catch(e) {}
+  if (bar) bar.querySelector('button').textContent = '↻ Reconnect OneDrive';
+  updateSyncBadge('error');
+  showNotif('Could not connect. Check internet and try again.', 'error');
+}
+
 // NOTIFICATION
 // ═══════════════════════════════════════════
 let notifTimer;
