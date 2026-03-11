@@ -834,7 +834,7 @@ async function cloudRead() {
   try {
     const res = await fetch(GH_API + '?t=' + Date.now(), {
       headers: {
-        'Authorization': 'token ' + GH_TOKEN,
+        'Authorization': 'Bearer ' + GH_TOKEN,
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -869,7 +869,7 @@ async function cloudWrite(data) {
     const res = await fetch(GH_API, {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + GH_TOKEN,
+        'Authorization': 'Bearer ' + GH_TOKEN,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
@@ -934,7 +934,7 @@ async function ghRead() {
   try {
     const res = await fetch(GH_API + '?t=' + Date.now(), {
       headers: {
-        'Authorization': 'token ' + GH_TOKEN,
+        'Authorization': 'Bearer ' + GH_TOKEN,
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -965,7 +965,7 @@ async function ghWrite(data) {
     const res = await fetch(GH_API, {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + GH_TOKEN,
+        'Authorization': 'Bearer ' + GH_TOKEN,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
