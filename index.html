@@ -831,6 +831,12 @@ let ghFileSha    = null;   // GitHub needs the SHA to update a file
 let cloudConnected = false;
 
 async function cloudRead() {
+  const _setStorageError = (msg) => {
+    const ss = document.getElementById('statStorage');
+    const sss = document.getElementById('statStorageSub');
+    if (ss)  ss.textContent  = 'Error';
+    if (sss) sss.textContent = msg;
+  };
   try {
     const res = await fetch(GH_API + '?t=' + Date.now(), {
       headers: {
@@ -844,9 +850,12 @@ async function cloudRead() {
     }
     const body = await res.text();
     if (!res.ok) {
-      // Show exact GitHub error in UI so we can diagnose
-      const msg = 'GitHub ' + res.status + ': ' + body.slice(0, 300);
-      showNotif('Sync error — ' + msg, 'error');
+      let errDetail = '';
+      try { errDetail = JSON.parse(body).message || body.slice(0,100); } catch(x) { errDetail = body.slice(0,100); }
+      const msg = 'HTTP ' + res.status + ': ' + errDetail;
+      _setStorageError(msg);
+      // Also store for debug
+      window._ghLastError = msg;
       throw new Error(msg);
     }
     const j = JSON.parse(body);
@@ -854,11 +863,31 @@ async function cloudRead() {
     cloudConnected = true;
     return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, '')))));
   } catch(e) {
-    console.error('cloudRead error:', e);
+    console.error('cloudRead error:', e.message);
+    window._ghLastError = e.message;
     cloudConnected = false;
     return null;
   }
 }
+
+// Debug helper — open browser console and type: testGitHub()
+window.testGitHub = async function() {
+  console.log('Testing GitHub API...');
+  console.log('URL:', GH_API);
+  console.log('Token starts with:', GH_TOKEN.slice(0, 20) + '...');
+  try {
+    const res = await fetch(GH_API + '?t=' + Date.now(), {
+      headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    const body = await res.text();
+    console.log('Status:', res.status);
+    console.log('Response:', body.slice(0, 500));
+    alert('GitHub Status: ' + res.status + '\n\n' + body.slice(0, 400));
+  } catch(e) {
+    console.error('Network error:', e);
+    alert('Network error: ' + e.message);
+  }
+};
 
 async function cloudWrite(data) {
   try {
