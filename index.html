@@ -621,7 +621,7 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
       </div>
       <div class="db-stats" style="grid-template-columns:repeat(2,1fr);">
         <div class="db-stat"><div class="dsl">Total Quotations</div><div class="dsv" id="statTotal">0</div></div>
-        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Local</div><div class="dssub" id="statStorageSub">Connect OneDrive to sync</div></div>
+        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Syncing…</div><div class="dssub" id="statStorageSub">Connecting to GitHub…</div></div>
       </div>
       <div class="db-table-wrap">
         <table class="db-table">
@@ -844,7 +844,7 @@ async function cloudRead() {
       ghFileSha = null;
       return { quotations: [], users: [], customers: [] };
     }
-    if (!res.ok) throw new Error('GitHub read ' + res.status);
+    if (!res.ok) { const body = await res.text(); throw new Error('GitHub read ' + res.status + ': ' + body.slice(0,200)); }
     const j = await res.json();
     ghFileSha = j.sha;
     cloudConnected = true;
@@ -898,9 +898,13 @@ async function cloudWrite(data) {
 
 async function cloudSync() {
   updateSyncBadge('syncing');
+  const ss = document.getElementById('statStorage');
+  const sss = document.getElementById('statStorageSub');
   const data = await cloudRead();
   if (!data) {
     updateSyncBadge('error');
+    if (ss)  ss.textContent  = 'Error';
+    if (sss) sss.textContent = 'Cannot reach GitHub — check internet';
     return false;
   }
   if (data.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
@@ -908,6 +912,8 @@ async function cloudSync() {
     localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
   if (data.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
   updateSyncBadge('synced');
+  if (ss)  ss.textContent  = 'GitHub ✓';
+  if (sss) sss.textContent = GH_OWNER + '/' + GH_REPO;
   return true;
 }
 
@@ -936,7 +942,7 @@ async function ghRead() {
       ghConnected = true;
       return { quotations: [], users: [], customers: [] };
     }
-    if (!res.ok) throw new Error('GitHub read ' + res.status);
+    if (!res.ok) { const body = await res.text(); throw new Error('GitHub read ' + res.status + ': ' + body.slice(0,200)); }
     const j = await res.json();
     ghSha = j.sha;
     ghConnected = true;
@@ -1587,8 +1593,12 @@ function launchApp() {
       renderUserList(); renderCustomerDropdown(); renderCustomersView();
       updateODStatusBox(true);
     } else {
-      updateSyncBadge('local');
-      showNotif('Working offline — data syncs when internet is available.', 'info');
+      updateSyncBadge('error');
+      const ss2 = document.getElementById('statStorage');
+      const sss2 = document.getElementById('statStorageSub');
+      if (ss2)  ss2.textContent  = 'Error';
+      if (sss2) sss2.textContent = 'GitHub sync failed';
+      showNotif('⚠️ Could not sync with GitHub. Check: 1) hexamech-data repo exists 2) Token is correct 3) Internet connected', 'error');
     }
   })();
 }
