@@ -669,6 +669,7 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
           <div class="settings-card-body">
             <ul class="user-list" id="userList"></ul>
             <button class="btn-main btn-green" style="margin-top:16px;width:100%;justify-content:center;" onclick="openAddUserModal()" id="btnAddUser">＋ Add New User</button>
+            <button class="btn-main btn-gold" style="margin-top:10px;width:100%;justify-content:center;display:none;" onclick="exportDataToExcel()" id="btnExportExcel">Download Excel File</button>
           </div>
         </div>
 
@@ -1081,8 +1082,10 @@ function getCurrentUserProfile() {
 function syncAdminControls() {
   const isAdmin = !!(currentUser && currentUser.role === 'admin');
   const btnAddUser = document.getElementById('btnAddUser');
+  const btnExportExcel = document.getElementById('btnExportExcel');
   const adminExportCard = document.getElementById('adminExportCard');
   if (btnAddUser) btnAddUser.style.display = isAdmin ? 'flex' : 'none';
+  if (btnExportExcel) btnExportExcel.style.display = isAdmin ? 'flex' : 'none';
   if (adminExportCard) adminExportCard.style.display = isAdmin ? 'block' : 'none';
 }
 function renderMyContactDetails() {
