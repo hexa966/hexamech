@@ -703,7 +703,7 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
           <div class="settings-card-body">
             <div id="odStatusBox"></div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn-main btn-navy" >⚙️ Setup / Change Client ID</button>
+              <button class="btn-main btn-navy" onclick="msalSignIn()">⚙️ Setup / Change Client ID</button>
               <button class="btn-main btn-green" onclick="syncFromOneDrive()" id="btnSyncSettings" style="display:none;">↻ Sync Now</button>
               <button class="btn-main" id="btnExportApp" onclick="exportConfiguredApp()" style="background:#7b2d8b;color:#fff;display:none;">📦 Export App for Other Users</button>
               <button class="btn-main btn-red" onclick="disconnectOneDrive()" id="btnDisconnect" style="display:none;">✕ Disconnect OneDrive</button>
@@ -2914,10 +2914,12 @@ async function retryODConnect() {
   try {
     await initMsal();
     if (msalAccount) { hideReconnectBar(); checkODSetup(); showNotif('OneDrive connected!', 'success'); return; }
+    await msalSignIn();
+    return;
   } catch(e) {}
   if (bar) bar.querySelector('button').textContent = '↻ Reconnect OneDrive';
   updateSyncBadge('error');
-  showNotif('Could not connect. Check internet and try again.', 'error');
+  showNotif('OneDrive session expired. Please sign in to Microsoft again.', 'error');
 }
 
 function canAccessProjects(){ return false; }
