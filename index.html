@@ -409,15 +409,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     <div class="fg"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="username"></div>
     <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password"></div>
     <button class="btn-login" onclick="doLogin()">Sign In →</button>
-    <div class="login-divider" id="loginDivider">or sync with OneDrive</div>
-    <button class="btn-ms" id="msSignInBtn" onclick="msalSignIn()">
-      <div class="ms-grid">
-        <span style="background:#f25022;"></span><span style="background:#7fba00;"></span>
-        <span style="background:#00a4ef;"></span><span style="background:#ffb900;"></span>
-      </div>
-      Sign in with Microsoft (OneDrive)
-    </button>
-    <div class="login-cloud-status" id="loginCloudStatus" style="display:none;"></div>
     <div class="login-error" id="loginError">Invalid username or password.</div>
   </div>
 </div>
@@ -438,7 +429,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       <button class="tnb" id="navSettings" onclick="showView('settings')">⚙️ Settings</button>
     </div>
     <div class="topbar-actions">
-      <div id="syncBadge" class="sync-badge local" title="GitHub sync status" style="cursor:default;">
+<div id="syncBadge" class="sync-badge local" title="Cloud sync status" style="cursor:default;">
         <span id="syncIcon">💾</span><span id="syncText">Local only</span>
       </div>
       <div class="topbar-user">Hi, <strong id="loggedUser"></strong></div>
@@ -621,7 +612,7 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
       </div>
       <div class="db-stats" style="grid-template-columns:repeat(2,1fr);">
         <div class="db-stat"><div class="dsl">Total Quotations</div><div class="dsv" id="statTotal">0</div></div>
-        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Syncing…</div><div class="dssub" id="statStorageSub">Connecting to GitHub…</div></div>
+        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Syncing…</div><div class="dssub" id="statStorageSub">Connecting to Firebase…</div></div>
       </div>
       <div class="db-table-wrap">
         <table class="db-table">
@@ -830,7 +821,7 @@ async function cloudRead() {
     const data = await res.json();
     cloudConnected = true;
     // Firebase returns null if no data yet
-    return data || { quotations: [], users: [], customers: [] };
+    return data || { quotations: [], users: [], customers: [], projects: [] };
   } catch(e) {
     console.error('cloudRead:', e.message);
     cloudConnected = false;
@@ -859,17 +850,28 @@ async function cloudSync() {
   updateSyncBadge('syncing');
   const ss  = document.getElementById('statStorage');
   const sss = document.getElementById('statStorageSub');
-  const data = await cloudRead();
+  let data = await cloudRead();
   if (!data) {
     updateSyncBadge('error');
     if (ss)  ss.textContent  = 'Error';
     if (sss) sss.textContent = 'Cannot reach Firebase';
     return false;
   }
+  const localState = getStateSnapshot();
+  if (shouldImportLocalState(data, localState)) {
+    data = {
+      quotations: Array.isArray(localState.quotations) ? localState.quotations : [],
+      users: await secureUsers(localState.users),
+      customers: Array.isArray(localState.customers) ? localState.customers : [],
+      projects: Array.isArray(localState.projects) ? localState.projects : []
+    };
+    await cloudWrite(data);
+  }
   if (data.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
   if (data.users && data.users.length > 0)
     localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
   if (data.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
+  if (data.projects)   localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects));
   updateSyncBadge('synced');
   if (ss)  ss.textContent  = 'Cloud ✓';
   if (sss) sss.textContent = 'Firebase synced';
@@ -880,7 +882,8 @@ async function cloudPush() {
   const data = {
     quotations: dbLoad(),
     users:      await secureUsers(getUsers()),
-    customers:  customersLoad()
+    customers:  customersLoad(),
+    projects:   projectsLoad()
   };
   const ok = await cloudWrite(data);
   updateSyncBadge(ok ? 'synced' : 'error');
@@ -889,93 +892,10 @@ async function cloudPush() {
 
 // ═══════════════════════════════════════════
 
-async function ghRead() {
-  try {
-    const res = await fetch(GH_API + '?t=' + Date.now(), {
-      headers: {
-        // no token needed,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    if (res.status === 404) {
-      ghConnected = true;
-      return { quotations: [], users: [], customers: [] };
-    }
-    if (!res.ok) { const body = await res.text(); throw new Error('GitHub read ' + res.status + ': ' + body.slice(0,200)); }
-    const j = await res.json();
-    ghSha = j.sha;
-    ghConnected = true;
-    return JSON.parse(atob(j.content.replace(/\n/g,'')));
-  } catch(e) {
-    console.error('ghRead error:', e);
-    ghConnected = false;
-    return null;
-  }
-}
-
-async function ghWrite(data) {
-  try {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-    const body = {
-      message: 'Quotation update ' + new Date().toISOString().slice(0,16),
-      content: content
-    };
-    if (ghSha) body.sha = ghSha;
-    const res = await fetch(GH_API, {
-      method: 'PUT',
-      headers: {
-        // no token needed,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-    if (!res.ok) {
-      // SHA conflict - re-fetch and retry once
-      if (res.status === 409 || res.status === 422) {
-        const fresh = await ghRead();
-        if (fresh === null) return false;
-        return await ghWrite(data);
-      }
-      throw new Error('GitHub write ' + res.status);
-    }
-    const j = await res.json();
-    if (j.content) ghSha = j.content.sha;
-    ghConnected = true;
-    return true;
-  } catch(e) {
-    console.error('ghWrite error:', e);
-    ghConnected = false;
-    return false;
-  }
-}
-
-async function ghSync() {
-  updateSyncBadge('syncing');
-  const data = await ghRead();
-  if (data === null) {
-    updateSyncBadge('error');
-    showNotif('Could not reach GitHub storage.', 'error');
-    return false;
-  }
-  if (data.quotations)  localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
-  if (data.users && data.users.length > 0)
-                        localStorage.setItem(USERS_KEY,     JSON.stringify(await secureUsers(data.users)));
-  if (data.customers)   localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
-  updateSyncBadge('synced');
-  return true;
-}
-
-async function ghPush() {
-  const data = {
-    quotations: dbLoad(),
-    users:      await secureUsers(getUsers()),
-    customers:  customersLoad()
-  };
-  const ok = await ghWrite(data);
-  updateSyncBadge(ok ? 'synced' : 'error');
-  return ok;
-}
+async function ghRead() { return await cloudRead(); }
+async function ghWrite(data) { return await cloudWrite(data); }
+async function ghSync() { return await cloudSync(); }
+async function ghPush() { return await cloudPush(); }
 
 const DEFAULT_SPARES = `Thermocouple - 2 Nos
 Core, Cavity and Neck - 1 Set
@@ -1556,8 +1476,8 @@ function launchApp() {
       const ss2 = document.getElementById('statStorage');
       const sss2 = document.getElementById('statStorageSub');
       if (ss2)  ss2.textContent  = 'Error';
-      if (sss2) sss2.textContent = 'GitHub sync failed';
-      showNotif('⚠️ Could not sync with GitHub. Check: 1) hexamech-data repo exists 2) Token is correct 3) Internet connected', 'error');
+      if (sss2) sss2.textContent = 'Firebase sync failed';
+      showNotif('Cloud sync failed. Check internet or Firebase rules, then try again.', 'error');
     }
   })();
 }
@@ -1793,9 +1713,9 @@ function updateODStatusBox(connected) {
   const box = document.getElementById('odStatusBox');
   if (!box) return;
   if (connected) {
-    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>Cloud Storage Active</strong>All quotations sync automatically — accessible from any PC, any browser, anywhere.</div></div>';
+    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>Firebase Connected</strong>All quotations, customers, users and projects sync automatically from any PC.</div></div>';
   } else {
-    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px 16px;"><strong>⚠️ Cloud not reachable</strong><p style="margin:6px 0 0;">Check internet. Data is saved locally and will sync when connection is restored.</p></div>';
+    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px 16px;"><strong>⚠️ Firebase not reachable</strong><p style="margin:6px 0 0;">Data is saving locally right now. Click Sync Now after internet or Firebase is working again.</p></div>';
   }
 }
 
@@ -2870,7 +2790,7 @@ function showReconnectBar() {
   const bar = document.createElement('div');
   bar.id = 'reconnectBar';
   bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1b3a5c;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9997;font-size:13px;font-family:Barlow,sans-serif;gap:12px;';
-  bar.innerHTML = '<span>⚠️ OneDrive not connected — saving locally only.</span><button onclick="retryODConnect()" style="background:#e8a020;color:#0d1b2a;border:none;padding:7px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-family:Barlow,sans-serif;">↻ Reconnect OneDrive</button>';
+  bar.innerHTML = '<span>⚠️ Firebase not connected — saving locally only.</span><button onclick="retryODConnect()" style="background:#e8a020;color:#0d1b2a;border:none;padding:7px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-family:Barlow,sans-serif;">↻ Retry Sync</button>';
   document.body.appendChild(bar);
 }
 function hideReconnectBar() {
