@@ -286,6 +286,9 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pd-title-bar{text-align:center;margin-bottom:18px;}
 .pd-title-bar span{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;letter-spacing:.18em;color:var(--navy);border-bottom:3px solid var(--accent);padding-bottom:5px;}
 .pd-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--navy);}
+.pd-brand{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 14px;margin-bottom:5px;}
+.pd-brand-mark{width:30px;height:30px;display:block;flex:0 0 30px;}
+.pd-brand-word{font-family:Arial,'Barlow',sans-serif;font-size:18px;font-weight:800;letter-spacing:.08em;color:var(--navy);line-height:1;}
 .pd-company-info{font-size:12px;color:var(--muted);line-height:1.7;text-align:right;}
 .pd-company-info strong{color:var(--navy);font-size:13px;}
 .pd-meta-strip{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
@@ -2946,9 +2949,13 @@ function renderPrintDoc(d, mode='quotation'){
     <div class="pd-corner-logo"><img src="${CORNER_LOGO_SRC}" alt="Hexamech mark"></div>
     <div class="pd-title-bar"><span>${cfg.documentTitle}</span></div>
     <div class="pd-header">
-      <div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 13px;display:inline-flex;align-items:center;margin-bottom:5px;">
-          <img src="${LOGO_SRC}" alt="Hexamech" style="height:44px;display:block;object-fit:contain;">
+            <div>
+        <div class="pd-brand" aria-label="Hexamech logo">
+          <svg class="pd-brand-mark" viewBox="0 0 48 48" role="img" aria-hidden="true">
+            <polygon points="24,3 40,12 40,30 24,39 8,30 8,12" fill="none" stroke="#c8a06b" stroke-width="4" stroke-linejoin="round"></polygon>
+            <path d="M18 16v10M30 22v10M18 26l12-8" fill="none" stroke="#c8a06b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <div class="pd-brand-word">HEXAMECH</div>
         </div>
         <div style="font-size:11px;color:var(--steel);font-weight:600;letter-spacing:.04em;">Technology Pvt Ltd</div>
       </div>
@@ -3176,6 +3183,8 @@ document.addEventListener('DOMContentLoaded', startup);
 </script>
 </body>
 </html>
+
+
 
 
 
