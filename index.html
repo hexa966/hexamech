@@ -380,8 +380,10 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   #printContainer .pd-box-flow .pd-list li{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-footer{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-product-block{page-break-inside:auto;break-inside:auto;}
-  #printContainer .pd-product-shell{display:block;min-height:auto;}
-  #printContainer .pd-table-wrap{flex:none;}
+  #printContainer .pd-product-shell{display:block !important;min-height:0 !important;height:auto !important;overflow:visible !important;border-radius:0 !important;}
+  #printContainer .pd-table-wrap{display:block !important;flex:none !important;overflow:visible !important;}
+  #printContainer .pd-table{page-break-inside:auto;break-inside:auto;}
+  #printContainer .pd-table tbody{page-break-inside:auto;break-inside:auto;}
   #printContainer .pd-totals-wrap{page-break-inside:avoid;break-inside:avoid;page-break-before:avoid;break-before:avoid;}
   #printContainer .pd-table thead{display:table-header-group;}
   #printContainer .pd-table tr{page-break-inside:avoid;break-inside:avoid;}
