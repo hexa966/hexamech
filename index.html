@@ -589,7 +589,7 @@ Hot Runner Standard Seal - 2 Nos
 Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
             </li>
           </ul>
-          <div class="spec-note">Only Delivery Period and Payment Terms are editable.</div>
+          <div class="spec-note">Delivery Period, Payment Terms, and Mold Components as Spares are editable.</div>
         </div>
       </div>
       <div class="section-card">
@@ -2541,7 +2541,8 @@ function gatherData(){
     savedAt:new Date().toISOString(),
     savedBy: currentUser?.displayName || currentUser?.username || 'Unknown',
     userPhone: currentUser?.contactPhone || '',
-    userEmail: currentUser?.contactEmail || ''
+    userEmail: currentUser?.contactEmail || '',
+    moldSpares: document.getElementById('moldSpares')?.value || ''
   };
 }
 
