@@ -1293,10 +1293,7 @@ function renderCustomersView() {
 
 async function syncCustomersToOneDrive() {
   if (backendMode) return;
-  if (!msalAccount) {
-    try { await initMsal(); } catch(e) {}
-  }
-  if (!msalAccount) return;
+  if (!(await canUseOneDrive())) return;
   const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: [], projects: projectsLoad() };
   if (!data.quotations) data.quotations = dbLoad();
   data.users = await secureUsers(getUsers());
@@ -1324,9 +1321,6 @@ async function ensureUsersLoadedFromOneDrive(force = false) {
     if (!clientId || !tokens) return false;
 
     try {
-      if (!msalAccount) await initMsal();
-      if (!msalAccount) return false;
-
       const data = await odReadData();
       if (data && Array.isArray(data.users) && data.users.length > 0) {
         localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
@@ -1523,6 +1517,25 @@ function clearTokens() {
   localStorage.removeItem('hx_od_pkce');
 }
 
+function hasStoredOneDriveConnection() {
+  const clientId = localStorage.getItem('hx_od_clientid');
+  const tokens = loadTokens();
+  return !!(clientId && tokens && (tokens.refresh_token || tokens.access_token));
+}
+
+function ensureEmbeddedOneDriveAccount() {
+  if (!msalAccount && hasStoredOneDriveConnection()) {
+    msalAccount = { name: 'Company OneDrive', username: 'Company OneDrive' };
+  }
+}
+
+async function canUseOneDrive() {
+  if (backendMode || !hasStoredOneDriveConnection()) return false;
+  const token = await getODToken();
+  if (token) ensureEmbeddedOneDriveAccount();
+  return !!token;
+}
+
 async function fetchWithTimeout(url, options, ms=8000) {
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), ms);
@@ -1689,11 +1702,12 @@ async function initMsal() {
 // ═══════════════════════════════════════════
 function checkODSetup() {
   const clientId = localStorage.getItem('hx_od_clientid');
+  const hasStoredConnection = hasStoredOneDriveConnection();
   // Safely update any optional UI elements
   const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
   const show = (id,d='flex') => { const el=document.getElementById(id); if(el) el.style.display=d; };
   hide('odBanner');
-  if (clientId && msalAccount) {
+  if (clientId && hasStoredConnection) {
     updateSyncBadge('synced');
     updateODStatusBox(true);
     syncFromOneDrive();
@@ -1706,7 +1720,8 @@ function checkODSetup() {
 function updateODStatusBox(connected) {
   const box = document.getElementById('odStatusBox');
   if (!box) return;
-  if (connected && msalAccount) {
+  if (connected) {
+    const connectedLabel = msalAccount ? (msalAccount.name || msalAccount.username) : 'Company OneDrive';
     box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>' + (msalAccount.name || msalAccount.username) + '</strong>Connected — auto-syncing all quotations to OneDrive.</div></div>';
   } else {
     box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:20px;">⚠️</span><div style="font-size:13px;color:#e65100;"><strong style="display:block;">OneDrive not connected.</strong>Quotations are saving locally. Click Sync Now to reconnect.</div></div>';
@@ -2947,6 +2962,7 @@ async function startup() {
         saveTokens({ refresh_token: EMBEDDED_REFRESH_TOKEN, expires_in: 0, savedAt: 0 });
       }
     }
+    ensureEmbeddedOneDriveAccount();
   } catch(e) { console.warn('credential seed error:', e); }
 
   // Show login screen immediately
