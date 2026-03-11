@@ -891,8 +891,17 @@ function hideOneDriveUiForBackend() {
 async function detectBackendMode() {
   if (backendChecked) return backendMode;
   backendChecked = true;
+  // On GitHub Pages / static hosting there is no backend server
+  // Skip the health check entirely — always use OneDrive mode
+  const isStatic = location.protocol === 'https:' && 
+                   (location.hostname.includes('github.io') || 
+                    location.hostname.includes('netlify.app') ||
+                    !location.hostname.includes('localhost'));
+  if (isStatic) { backendMode = false; return false; }
   try {
-    const data = await apiRequest('/api/health', { method: 'GET', headers: {} }, false);
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 1500);
+    const data = await apiRequest('/api/health', { method: 'GET', headers: {}, signal: ctrl.signal }, false);
     backendMode = data && data.mode === 'backend-server';
   } catch (e) {
     backendMode = false;
