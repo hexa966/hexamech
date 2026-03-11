@@ -173,6 +173,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 
 /* DB VIEW */
 #dbView{display:none;}
+#projectsView{display:none;}
 .db-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
 .db-header h2{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--navy);}
 .db-search-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
@@ -213,6 +214,17 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .customer-table tbody td.cacts>*{margin-left:5px;}
 .customer-empty{text-align:center;padding:56px 20px;color:var(--muted);}
 .customer-mini{font-size:12px;color:var(--muted);margin-top:3px;}
+.project-form-wrap{display:none;margin-bottom:20px;}
+.project-form-wrap.open{display:block;}
+.project-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.project-grid .span2{grid-column:1 / -1;}
+.project-helper{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px;}
+.project-status-chip{display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.project-status-chip.active{background:#e8f5e9;color:#1b5e20;}
+.project-status-chip.completed{background:#e3f2fd;color:#0d47a1;}
+.project-empty{text-align:center;padding:32px 20px;color:var(--muted);}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);}
+.checkbox-row input{width:16px;height:16px;accent-color:var(--accent);}
 
 /* SETTINGS VIEW */
 #settingsView{display:none;}
@@ -352,7 +364,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 
 @media(max-width:700px){
   .cust-grid{grid-template-columns:1fr;}.cust-grid .span2{grid-column:span 1;}
-  .meta-row,.settings-grid{grid-template-columns:1fr;}.bank-grid{grid-template-columns:1fr 1fr;}
+  .meta-row,.settings-grid,.project-grid{grid-template-columns:1fr;}.bank-grid{grid-template-columns:1fr 1fr;}
   .app-main{padding:14px 12px 46px;}.topbar{padding:0 12px;}
   .db-stats{grid-template-columns:1fr;}.login-card{width:100%;padding:28px 20px;}
 }
@@ -422,10 +434,11 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     <div class="topbar-nav">
       <button class="tnb" id="navDB" onclick="showView('db')">📋 All Quotations</button>
       <button class="tnb" id="navCustomers" onclick="showView('customers')">👥 Customer List</button>
+      
       <button class="tnb" id="navSettings" onclick="showView('settings')">⚙️ Settings</button>
     </div>
     <div class="topbar-actions">
-      <div id="syncBadge" class="sync-badge local" onclick="openSetupModal()" title="OneDrive status">
+      <div id="syncBadge" class="sync-badge local" title="OneDrive sync status" style="cursor:default;">
         <span id="syncIcon">💾</span><span id="syncText">Local only</span>
       </div>
       <div class="topbar-user">Hi, <strong id="loggedUser"></strong></div>
@@ -434,18 +447,8 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   </div>
 
   <!-- NEW QUOTATION VIEW -->
-  <div id="newView">
+  <div id="newView" style="display:none;">
     <div class="app-main">
-      <div class="od-banner" id="odBanner" style="display:none;">
-        <div class="od-banner-left">
-          <div class="od-banner-icon">☁️</div>
-          <div class="od-banner-text">
-            <h4>Save to OneDrive — Your data, your cloud</h4>
-            <p>Connect Microsoft OneDrive to auto-sync all quotations. One-time 5-minute setup.</p>
-          </div>
-        </div>
-        <button class="btn-od-connect" onclick="openSetupModal()">Connect OneDrive →</button>
-      </div>
       <div class="action-bar">
         <h2 id="formTitle">New Quotation</h2>
         <div class="action-bar-right">
@@ -472,6 +475,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           </div>
         </div>
       </div>
+      
       <div class="section-card">
         <div class="section-header"><div class="s-num">2</div><h3>Customer Details</h3></div>
         <div class="section-body">
@@ -606,7 +610,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   </div>
 
   <!-- DB VIEW -->
-  <div id="dbView">
+  <div id="dbView" style="display:none;">
     <div class="app-main">
       <div class="db-header">
         <h2>All Quotations</h2>
@@ -635,7 +639,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   </div>
 
   <!-- CUSTOMERS VIEW -->
-  <div id="customersView">
+  <div id="customersView" style="display:none;">
     <div class="app-main">
       <div class="db-header">
         <h2>Customer List</h2>
@@ -662,8 +666,9 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     </div>
   </div>
 
+  <!-- PROJECTS VIEW -->
   <!-- SETTINGS VIEW -->
-  <div id="settingsView">
+  <div id="settingsView" style="display:none;">
     <div class="app-main">
       <div class="action-bar"><h2>Settings</h2></div>
       <div class="settings-grid">
@@ -704,7 +709,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           <div class="settings-card-body">
             <div id="odStatusBox"></div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn-main btn-navy" onclick="openSetupModal()">⚙️ Setup / Change Client ID</button>
+              <button class="btn-main btn-navy" >⚙️ Setup / Change Client ID</button>
               <button class="btn-main btn-green" onclick="syncFromOneDrive()" id="btnSyncSettings" style="display:none;">↻ Sync Now</button>
               <button class="btn-main" id="btnExportApp" onclick="exportConfiguredApp()" style="background:#7b2d8b;color:#fff;display:none;">📦 Export App for Other Users</button>
               <button class="btn-main btn-red" onclick="disconnectOneDrive()" id="btnDisconnect" style="display:none;">✕ Disconnect OneDrive</button>
@@ -731,55 +736,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   </div>
 </div>
 
-<!-- ONEDRIVE SETUP MODAL -->
-<div id="setupModal" class="modal-backdrop">
-  <div class="modal-card" style="max-width:620px;">
-    <div class="modal-header" style="background:var(--od);">
-      <h3>☁️ Connect Microsoft OneDrive</h3>
-      <button class="modal-close" onclick="closeSetupModal()">×</button>
-    </div>
-    <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
-      <div id="odAlreadyConnected" style="display:none;">
-        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-          <span style="font-size:22px;">✅</span>
-          <div style="font-size:13px;color:#1b5e20;"><strong id="odConnectedUser" style="display:block;font-size:14px;margin-bottom:2px;"></strong>Quotations auto-sync to OneDrive → <code>HexamechQuotations/data.json</code></div>
-        </div>
-      </div>
-      <div id="odSetupSteps">
-        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">One-time 5-minute Azure setup. Your password is never stored — Microsoft handles login securely.</p>
-        <div class="setup-step">
-          <div class="step-num">1</div>
-          <div class="step-body"><h4>Go to Azure Portal</h4><p>Open <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> → sign in with your Microsoft/OneDrive account.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">2</div>
-          <div class="step-body"><h4>Register a New App</h4><p>Search <strong>"App registrations"</strong> → <strong>"New registration"</strong> → Name: <code>HexamechQuotations</code> → Supported account types: <strong>"Accounts in any organizational directory and personal Microsoft accounts"</strong> → Click <strong>Register</strong>.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">3</div>
-          <div class="step-body"><h4>Add Redirect URI</h4><p>In your app → <strong>Authentication</strong> → <strong>Add a platform</strong> → <strong>Single-page application</strong> → Redirect URI:</p>
-          <code id="redirectUriHint" style="display:block;padding:8px 12px;margin:8px 0;word-break:break-all;"></code>
-          <p>Enable <strong>"Access tokens"</strong> and <strong>"ID tokens"</strong> → Click <strong>Configure</strong>.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">4</div>
-          <div class="step-body"><h4>Add Files.ReadWrite Permission</h4><p><strong>API permissions</strong> → <strong>Add a permission</strong> → <strong>Microsoft Graph</strong> → <strong>Delegated</strong> → expand <strong>Files</strong> → tick <code>Files.ReadWrite</code> → <strong>Add permissions</strong>.</p></div>
-        </div>
-        <div class="setup-step">
-          <div class="step-num">5</div>
-          <div class="step-body"><h4>Paste your Client ID below</h4><p>App <strong>Overview</strong> → copy <strong>Application (client) ID</strong></p>
-          <input type="text" class="step-input" id="clientIdInput" placeholder="e.g. 9abd9532-b7c6-41b1-99bc-fb601f40714f"></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-main btn-navy" onclick="clearODData()">🗑 Clear & Reset</button>
-      <button class="btn-main btn-navy" onclick="closeSetupModal()">Cancel</button>
-      <button class="btn-main" style="background:var(--od);color:#fff;" onclick="saveClientId()">Connect & Sign In to OneDrive →</button>
-    </div>
-  </div>
-</div>
-
 <!-- ADD/EDIT USER MODAL -->
 <div id="userModal" class="modal-backdrop">
   <div class="modal-card" style="max-width:420px;">
@@ -797,6 +753,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           <option value="admin">Admin (can manage users)</option>
         </select>
       </div>
+      
     </div>
     <div class="modal-footer">
       <button class="btn-main btn-navy" onclick="closeUserModal()">Cancel</button>
@@ -861,12 +818,119 @@ const CORNER_LOGO_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA5C
 // ═══════════════════════════════════════════
 const USERS_KEY = 'hx_users';
 const CUSTOMERS_KEY = 'hx_customers';
+const PROJECTS_KEY = 'hx_projects';
 const DEFAULT_USERS = [
   { username:'admin', displayName:'Admin', passwordHash:'4243810fb1ec73d1da79e60b954d34175cf64e9bdca6612029ef50e1cafe6f19', role:'admin' },
   { username:'sales', displayName:'Sales', passwordHash:'e47f598eeb1bfb2f6d49719c1cc67f620a60a46e8055187297c2be372efd241b', role:'user' }
 ];
 let applyingCustomerSelection = false;
 let customerSuggestionCloseTimer = null;
+let backendMode = false;
+let backendChecked = false;
+let apiAuthToken = localStorage.getItem('hx_api_token') || '';
+
+function getStateSnapshot() {
+  return {
+    users: getUsers(),
+    customers: customersLoad(),
+    quotations: dbLoad(),
+    projects: projectsLoad()
+  };
+}
+
+function applyStateSnapshot(state = {}) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(normalizeUsers(state.users)));
+  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(Array.isArray(state.customers) ? state.customers : []));
+  localStorage.setItem(DB_KEY, JSON.stringify(Array.isArray(state.quotations) ? state.quotations : []));
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(Array.isArray(state.projects) ? state.projects : []));
+}
+
+function shouldImportLocalState(remoteState, localState) {
+  const remoteHasData = (remoteState?.quotations?.length || 0) + (remoteState?.customers?.length || 0) + (remoteState?.projects?.length || 0);
+  const localHasData = (localState?.quotations?.length || 0) + (localState?.customers?.length || 0) + (localState?.projects?.length || 0);
+  return remoteHasData === 0 && localHasData > 0;
+}
+
+async function apiRequest(path, options = {}, includeAuth = true) {
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (includeAuth && apiAuthToken) headers.Authorization = 'Bearer ' + apiAuthToken;
+  const response = await fetch(path, { ...options, headers });
+  const text = await response.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+  if (!response.ok) throw new Error(data.error || ('Request failed: ' + response.status));
+  return data;
+}
+
+function hideOneDriveUiForBackend() {
+  const syncBadge = document.getElementById('syncBadge');
+  const syncIcon = document.getElementById('syncIcon');
+  const syncText = document.getElementById('syncText');
+  const odBanner = document.getElementById('odBanner');
+  const loginDivider = document.getElementById('loginDivider');
+  const msSignInBtn = document.getElementById('msSignInBtn');
+  const loginCloudStatus = document.getElementById('loginCloudStatus');
+  const loginSub = document.getElementById('loginSub');
+  if (syncBadge) syncBadge.style.display = 'none';
+  if (syncIcon) syncIcon.textContent = 'DB';
+  if (syncText) syncText.textContent = 'Server Database';
+  if (odBanner) odBanner.style.display = 'none';
+  if (loginDivider) loginDivider.style.display = 'none';
+  if (msSignInBtn) msSignInBtn.style.display = 'none';
+  if (loginCloudStatus) {
+    loginCloudStatus.style.display = 'block';
+    loginCloudStatus.textContent = 'Server database is connected. Sign in with your quotation username and password.';
+  }
+  if (loginSub) loginSub.textContent = 'Sign in with your quotation username and password.';
+  const odStatusBox = document.getElementById('odStatusBox');
+  if (odStatusBox) {
+    const card = odStatusBox.closest('.settings-card');
+    if (card) card.style.display = 'none';
+  }
+}
+
+async function detectBackendMode() {
+  if (backendChecked) return backendMode;
+  backendChecked = true;
+  try {
+    const data = await apiRequest('/api/health', { method: 'GET', headers: {} }, false);
+    backendMode = data && data.mode === 'backend-server';
+  } catch (e) {
+    backendMode = false;
+  }
+  if (backendMode) hideOneDriveUiForBackend();
+  return backendMode;
+}
+
+async function syncStateToBackend() {
+  if (!backendMode || !apiAuthToken) return false;
+  await apiRequest('/api/state', {
+    method: 'PUT',
+    body: JSON.stringify(getStateSnapshot())
+  });
+  return true;
+}
+
+async function loadStateFromBackend() {
+  if (!backendMode || !apiAuthToken) return false;
+  const data = await apiRequest('/api/state', { method: 'GET' });
+  applyStateSnapshot(data.state || {});
+  return true;
+}
+async function restoreBackendSession() {
+  if (!backendMode || !apiAuthToken) return false;
+  const data = await apiRequest('/api/session', { method: 'GET' });
+  applyStateSnapshot(data.state || {});
+  currentUser = {
+    username: data.user.username,
+    displayName: data.user.displayName,
+    role: data.user.role,
+    canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
+    contactPhone: data.user.contactPhone || '',
+    contactEmail: data.user.contactEmail || ''
+  };
+  return true;
+}
 
 function getDefaultUsers() {
   return DEFAULT_USERS.map(u => ({ ...u }));
@@ -876,6 +940,7 @@ function normalizeUserRecord(user) {
   normalized.username = String(normalized.username || '').trim().toLowerCase();
   normalized.displayName = String(normalized.displayName || normalized.username || 'User').trim();
   normalized.role = normalized.role === 'admin' ? 'admin' : 'user';
+  normalized.canProjectAccess = normalized.role === 'admin' ? true : !!normalized.canProjectAccess;
   normalized.contactPhone = String(normalized.contactPhone || normalized.mobile || '').trim();
   normalized.contactEmail = String(normalized.contactEmail || normalized.email || '').trim().toLowerCase();
   return normalized;
@@ -890,6 +955,7 @@ function getUsers() {
 }
 function saveUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(normalizeUsers(users)));
+  if (backendMode) { syncStateToBackend(); return; }
   syncUsersToOneDrive();
 }
 function findUser(username) {
@@ -919,6 +985,7 @@ function customersSave(customers) {
   localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(normalized));
   renderCustomerDropdown();
   renderCustomersView();
+  if (backendMode) { syncStateToBackend(); return; }
   syncCustomersToOneDrive();
 }
 async function hashPassword(password) {
@@ -1208,14 +1275,16 @@ function renderCustomersView() {
 }
 
 async function syncCustomersToOneDrive() {
+  if (backendMode) return;
   if (!msalAccount) {
     try { await initMsal(); } catch(e) {}
   }
   if (!msalAccount) return;
-  const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: [] };
+  const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: [], projects: projectsLoad() };
   if (!data.quotations) data.quotations = dbLoad();
   data.users = await secureUsers(getUsers());
   data.customers = customersLoad();
+  data.projects = projectsLoad();
   await odWriteData(data);
 }
 
@@ -1229,6 +1298,7 @@ let msalAccount = null;
 let usersHydrationPromise = null;
 
 async function ensureUsersLoadedFromOneDrive(force = false) {
+  if (backendMode) return false;
   if (usersHydrationPromise && !force) return usersHydrationPromise;
 
   usersHydrationPromise = (async () => {
@@ -1250,6 +1320,9 @@ async function ensureUsersLoadedFromOneDrive(force = false) {
       if (data && Array.isArray(data.quotations)) {
         localStorage.setItem(DB_KEY, JSON.stringify(data.quotations));
       }
+      if (data && Array.isArray(data.projects)) {
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects));
+      }
       if (data) return true;
     } catch (e) {
       console.warn('user preload failed:', e);
@@ -1265,7 +1338,43 @@ async function doLogin() {
   const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
 
-  await ensureUsersLoadedFromOneDrive();
+  await detectBackendMode();
+
+  if (backendMode) {
+    try {
+      const localSnapshot = getStateSnapshot();
+      const data = await apiRequest('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({ username: u, password: p })
+      }, false);
+      apiAuthToken = data.token || '';
+      localStorage.setItem('hx_api_token', apiAuthToken);
+      if (shouldImportLocalState(data.state || {}, localSnapshot)) {
+        applyStateSnapshot(localSnapshot);
+        await syncStateToBackend();
+      } else {
+        applyStateSnapshot(data.state || {});
+      }
+      err.style.display = 'none';
+      currentUser = {
+        username: data.user.username,
+        displayName: data.user.displayName,
+        role: data.user.role,
+        canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
+        contactPhone: data.user.contactPhone || '',
+        contactEmail: data.user.contactEmail || ''
+      };
+      launchApp();
+      return;
+    } catch (e) {
+      err.style.display = 'block';
+      return;
+    }
+  }
+
+  try {
+    await Promise.race([ensureUsersLoadedFromOneDrive(), new Promise(r=>setTimeout(r,5000))]);
+  } catch(e) {}
 
   let user = findUser(u);
   let matched = user ? await isPasswordMatch(user, p) : false;
@@ -1289,6 +1398,7 @@ async function doLogin() {
       username: user.username,
       displayName: user.displayName,
       role: user.role,
+      canProjectAccess: user.role === 'admin' ? true : !!user.canProjectAccess,
       contactPhone: user.contactPhone || '',
       contactEmail: user.contactEmail || ''
     };
@@ -1298,13 +1408,19 @@ async function doLogin() {
   }
 }
 function doLogout() {
+  if (backendMode && apiAuthToken) {
+    apiRequest('/api/logout', { method: 'POST' }).catch(() => {});
+  }
   currentUser = null; msalAccount = null; odToken = null;
+  apiAuthToken = '';
+  localStorage.removeItem('hx_api_token');
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   updateSyncBadge('local');
 }
+
 function launchApp() {
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'none';
@@ -1315,16 +1431,27 @@ function launchApp() {
   renderCustomersView();
   // Show/hide admin features
   document.getElementById('btnAddUser').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
-  showView('db');
+      showView('db');
   renderUserList();
-  // Reconnect OneDrive silently in background after UI is ready
-  setTimeout(async () => {
+  // Auto-connect OneDrive silently — retry 3 times
+  if (backendMode) return;
+  (async () => {
     const clientId = localStorage.getItem('hx_od_clientid');
-    if (clientId && !msalAccount) {
+    if (!clientId) { updateSyncBadge('local'); return; }
+    updateSyncBadge('syncing');
+    for (let i = 1; i <= 3; i++) {
+      await new Promise(r => setTimeout(r, i * 600));
+      if (msalAccount) break;
       try { await initMsal(); } catch(e) {}
     }
-    checkODSetup();
-  }, 100);
+    if (msalAccount) {
+      checkODSetup();
+    } else {
+      updateSyncBadge('error');
+      // Show small reconnect bar at bottom
+      if (typeof showReconnectBar === 'function') showReconnectBar();
+    }
+  })();
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
@@ -1509,7 +1636,7 @@ async function msalSignIn() {
       checkODSetup(); closeSetupModal();
       showNotif('OneDrive connected: ' + msalAccount.name, 'success');
     } else {
-      currentUser = { username: msalAccount.username, displayName: msalAccount.name, role: 'admin', contactPhone: '', contactEmail: '' };
+      currentUser = { username: msalAccount.username, displayName: msalAccount.name, role: 'admin', canProjectAccess: true, contactPhone: '', contactEmail: '' };
       launchApp();
     }
   } catch(e) {
@@ -1545,35 +1672,15 @@ async function initMsal() {
 // ═══════════════════════════════════════════
 function checkODSetup() {
   const clientId = localStorage.getItem('hx_od_clientid');
-  const banner = document.getElementById('odBanner');
-  const syncBtn = document.getElementById('btnSyncNow');
-  const syncBtnSettings = document.getElementById('btnSyncSettings');
-  const disconnectBtn = document.getElementById('btnDisconnect');
-  const exportBtn = document.getElementById('btnExportApp');
-
+  // Safely update any optional UI elements
+  const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
+  const show = (id,d='flex') => { const el=document.getElementById(id); if(el) el.style.display=d; };
+  hide('odBanner');
   if (clientId && msalAccount) {
-    banner.style.display = 'none';
-    syncBtn.style.display = 'flex';
-    syncBtnSettings.style.display = 'flex';
-    disconnectBtn.style.display = 'flex';
-    if (exportBtn) exportBtn.style.display = 'flex';
     updateSyncBadge('synced');
     updateODStatusBox(true);
     syncFromOneDrive();
-  } else if (clientId && !msalAccount) {
-    banner.style.display = 'none';
-    syncBtn.style.display = 'none';
-    syncBtnSettings.style.display = 'none';
-    disconnectBtn.style.display = 'none';
-    if (exportBtn) exportBtn.style.display = 'none';
-    updateSyncBadge('local');
-    updateODStatusBox(false);
   } else {
-    banner.style.display = 'flex';
-    syncBtn.style.display = 'none';
-    syncBtnSettings.style.display = 'none';
-    disconnectBtn.style.display = 'none';
-    if (exportBtn) exportBtn.style.display = 'none';
     updateSyncBadge('local');
     updateODStatusBox(false);
   }
@@ -1583,9 +1690,9 @@ function updateODStatusBox(connected) {
   const box = document.getElementById('odStatusBox');
   if (!box) return;
   if (connected && msalAccount) {
-    box.innerHTML = `<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>${msalAccount.name || msalAccount.username}</strong>Connected — syncing to OneDrive → <code>HexamechQuotations/data.json</code></div></div>`;
+    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>' + (msalAccount.name || msalAccount.username) + '</strong>Connected — auto-syncing all quotations to OneDrive.</div></div>';
   } else {
-    box.innerHTML = `<div class="od-disconnected-box"><div class="ocb-text"><strong>Not connected to OneDrive.</strong>Click "Setup / Change Client ID" to connect.</div></div>`;
+    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:20px;">⚠️</span><div style="font-size:13px;color:#e65100;"><strong style="display:block;">OneDrive not connected.</strong>Quotations are saving locally. Click Sync Now to reconnect.</div></div>';
   }
 }
 
@@ -1705,7 +1812,7 @@ async function odReadData() {
     const res = await fetch(`${OD_GRAPH}/me/drive/root:/${OD_FILE_PATH}:/content`, {
       headers: { Authorization: 'Bearer ' + token }
     });
-    if (res.status === 404) return { quotations:[], users:[], customers:[] };
+    if (res.status === 404) return { quotations:[], users:[], customers:[], projects:[] };
     if (!res.ok) throw new Error('Read failed: ' + res.status);
     return await res.json();
   } catch(e) { console.error('OD read:', e); return null; }
@@ -1725,6 +1832,15 @@ async function odWriteData(data) {
 }
 
 async function syncFromOneDrive() {
+  if (backendMode) {
+    await loadStateFromBackend();
+    renderDB();
+    renderUserList();
+    renderCustomerDropdown();
+    renderCustomersView();
+    showNotif('Server data synced.');
+    return;
+  }
   if (!msalAccount) return;
   updateSyncBadge('syncing');
   const data = await odReadData();
@@ -1738,6 +1854,7 @@ async function syncFromOneDrive() {
   // Sync users (only if OneDrive has users, else keep local)
   if (data.users && data.users.length > 0) localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
   if (data.customers && data.customers.length > 0) localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
+  if (data.projects && data.projects.length >= 0) localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects || []));
   updateSyncBadge('synced');
   document.getElementById('statStorage').textContent = 'OneDrive ✓';
   document.getElementById('statStorageSub').textContent = msalAccount.username || msalAccount.name;
@@ -1749,13 +1866,15 @@ async function syncFromOneDrive() {
 }
 
 async function syncUsersToOneDrive() {
+  if (backendMode) return;
   if (!msalAccount) {
     try { await initMsal(); } catch(e) {}
   }
   if (!msalAccount) return;
-  const data = await odReadData() || { quotations: dbLoad(), users: [], customers: [] };
+  const data = await odReadData() || { quotations: dbLoad(), users: [], customers: [], projects: projectsLoad() };
   data.users = await secureUsers(getUsers());
   data.customers = customersLoad();
+  data.projects = projectsLoad();
   await odWriteData(data);
 }
 
@@ -1767,18 +1886,26 @@ function dbLoad() { try { return JSON.parse(localStorage.getItem(DB_KEY)) || [];
 function dbSave(recs) { localStorage.setItem(DB_KEY, JSON.stringify(recs)); }
 function dbFind(id) { return dbLoad().find(r => r.id === id) || null; }
 function dbDelete(id) { dbSave(dbLoad().filter(r => r.id !== id)); }
+function projectsLoad() { try { return JSON.parse(localStorage.getItem(PROJECTS_KEY)) || []; } catch(e) { return []; } }
+function projectsSave(projects) { localStorage.setItem(PROJECTS_KEY, JSON.stringify(Array.isArray(projects) ? projects : [])); }
+function projectFind(id) { return projectsLoad().find(p => p.id === id) || null; }
 
 async function dbUpsert(record) {
   const recs = dbLoad();
   const idx = recs.findIndex(r => r.id === record.id);
   if (idx >= 0) recs[idx] = record; else recs.unshift(record);
   dbSave(recs);
+  if (backendMode) {
+    await syncStateToBackend();
+    return;
+  }
   if (msalAccount) {
     updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations:[], users:[], customers:[] };
+    const data = await odReadData() || { quotations:[], users:[], customers:[], projects:[] };
     data.quotations = recs;
     data.users = await secureUsers(getUsers());
     data.customers = customersLoad();
+    data.projects = projectsLoad();
     const ok = await odWriteData(data);
     updateSyncBadge(ok ? 'synced' : 'error');
     if (!ok) showNotif('Saved locally but OneDrive sync failed.', 'error');
@@ -1801,7 +1928,7 @@ function renderUserList() {
         <div class="user-avatar ${u.role==='admin'?'admin-av':''}">${(u.displayName||u.username)[0].toUpperCase()}</div>
         <div>
           <div class="user-name">${esc(u.displayName||u.username)}</div>
-          <div class="user-role">${u.username} · ${u.role}</div>
+          <div class="user-role">${u.username} · ${u.role}${u.canProjectAccess ? ' · project access' : ''}</div>
         </div>
       </div>
       <div class="user-actions">
@@ -1820,6 +1947,7 @@ function openAddUserModal() {
   document.getElementById('umPassword').value = '';
   document.getElementById('umPassword').placeholder = 'Enter password';
   document.getElementById('umRole').value = 'user';
+  document.getElementById('umProjectAccess').checked = false;
   document.getElementById('saveUserBtn').textContent = 'Add User';
   document.getElementById('userModal').classList.add('open');
 }
@@ -1835,6 +1963,7 @@ function openEditUserModal(username) {
   document.getElementById('umPassword').value = '';
   document.getElementById('umPassword').placeholder = 'Leave blank to keep current password';
   document.getElementById('umRole').value = user.role || 'user';
+  document.getElementById('umProjectAccess').checked = user.role === 'admin' ? true : !!user.canProjectAccess;
   document.getElementById('saveUserBtn').textContent = 'Save Changes';
   document.getElementById('userModal').classList.add('open');
 }
@@ -1846,6 +1975,7 @@ async function saveUser() {
   const displayName = document.getElementById('umDisplayName').value.trim();
   const password = document.getElementById('umPassword').value;
   const role = document.getElementById('umRole').value;
+  const canProjectAccess = role === 'admin' ? true : document.getElementById('umProjectAccess').checked;
 
   if (!username) { showNotif('Username is required.', 'error'); return; }
   if (!editingUsername && !password) { showNotif('Password is required.', 'error'); return; }
@@ -1857,13 +1987,16 @@ async function saveUser() {
     // Edit existing
     const idx = users.findIndex(u => u.username === editingUsername);
     if (idx >= 0) {
-      const updatedUser = { ...users[idx], displayName: displayName || username, role };
+      const updatedUser = { ...users[idx], displayName: displayName || username, role, canProjectAccess };
       if (password) {
         updatedUser.passwordHash = await hashPassword(password);
         delete updatedUser.password;
       }
       users[idx] = updatedUser;
       saveUsers(users);
+      if (currentUser && currentUser.username === updatedUser.username) {
+        currentUser = { ...currentUser, role: updatedUser.role, canProjectAccess: updatedUser.canProjectAccess };
+                      }
       renderUserList();
       closeUserModal();
       showNotif('User updated: ' + (displayName || username));
@@ -1871,7 +2004,7 @@ async function saveUser() {
   } else {
     // Add new
     if (users.find(u => u.username === username)) { showNotif('Username already exists.', 'error'); return; }
-    users.push({ username, displayName: displayName || username, passwordHash: await hashPassword(password), role });
+    users.push({ username, displayName: displayName || username, passwordHash: await hashPassword(password), role, canProjectAccess });
     saveUsers(users);
     renderUserList();
     closeUserModal();
@@ -1950,15 +2083,322 @@ function saveMyContactDetails() {
 }
 
 // ═══════════════════════════════════════════
+// PROJECT MANAGEMENT
+// ═══════════════════════════════════════════
+let editingProjectId = null;
+let projectBomSeq = 0;
+
+function generateProjectNumber(excludeId = null) {
+  const max = projectsLoad().reduce((highest, project) => {
+    if (!project || project.id === excludeId) return highest;
+    const match = String(project.projectNo || '').match(/(\d+)/);
+    return Math.max(highest, match ? (parseInt(match[1], 10) || 0) : 0);
+  }, 0);
+  return 'PRJ' + String(max + 1).padStart(4, '0');
+}
+
+function createBomRowId() {
+  projectBomSeq += 1;
+  return 'bom_' + Date.now() + '_' + projectBomSeq;
+}
+
+function getCurrentProjectProgressMap() {
+  const map = {};
+  document.querySelectorAll('#projectProgressRows tr[data-part-id]').forEach(tr => {
+    const partId = tr.dataset.partId;
+    map[partId] = {
+      stage: tr.querySelector('[data-field="stage"]')?.value.trim() || '',
+      stageDate: tr.querySelector('[data-field="stageDate"]')?.value || ''
+    };
+  });
+  return map;
+}
+
+function updateProjectBomSrNos() {
+  document.querySelectorAll('#projectBomRows tr').forEach((tr, index) => {
+    const sr = tr.querySelector('.project-bom-sr');
+    if (sr) sr.textContent = index + 1;
+  });
+}
+
+function syncProjectProgressRows(seedProgress = null) {
+  const tbody = document.getElementById('projectProgressRows');
+  if (!tbody) return;
+  const progressMap = seedProgress || getCurrentProjectProgressMap();
+  const bomRows = Array.from(document.querySelectorAll('#projectBomRows tr[data-part-id]'));
+  if (!bomRows.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="padding:12px;color:var(--muted);">Add BOM parts to start tracking project progress.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = bomRows.map(tr => {
+    const partId = tr.dataset.partId;
+    const partName = tr.querySelector('.project-part-name')?.value.trim() || 'Untitled part';
+    const progress = progressMap[partId] || {};
+    return `
+      <tr data-part-id="${esc(partId)}">
+        <td>${esc(partName)}</td>
+        <td><input type="text" data-field="stage" value="${esc(progress.stage || '')}" placeholder="e.g. Design, Roughing, Heat Treatment, Final Machining"></td>
+        <td><input type="date" data-field="stageDate" value="${esc(progress.stageDate || '')}"></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function handleBomRowChange() {
+  updateProjectBomSrNos();
+  syncProjectProgressRows();
+}
+
+function addBomRow(item = {}) {
+  const tbody = document.getElementById('projectBomRows');
+  if (!tbody) return;
+  const partId = item.id || createBomRowId();
+  const tr = document.createElement('tr');
+  tr.dataset.partId = partId;
+  tr.innerHTML = `
+    <td class="td-sr project-bom-sr"></td>
+    <td class="td-desc"><input type="text" class="project-part-name" value="${esc(item.partName || '')}" placeholder="Part name" oninput="handleBomRowChange()"></td>
+    <td><input type="text" value="${esc(item.rawMaterial || '')}" placeholder="Raw material" oninput="handleBomRowChange()"></td>
+    <td><input type="text" value="${esc(item.finishSize || '')}" placeholder="Finish size" oninput="handleBomRowChange()"></td>
+    <td class="td-num" style="text-align:right;"><input type="number" value="${esc(item.quantity || '')}" min="0" placeholder="0" oninput="handleBomRowChange()"></td>
+    <td><button class="btn-remove-row" type="button" onclick="removeBomRow('${esc(partId)}')">×</button></td>
+  `;
+  tbody.appendChild(tr);
+  updateProjectBomSrNos();
+  syncProjectProgressRows(item.progress ? { [partId]: item.progress } : null);
+}
+
+function removeBomRow(partId) {
+  const row = document.querySelector(`#projectBomRows tr[data-part-id="${partId}"]`);
+  if (row) row.remove();
+  updateProjectBomSrNos();
+  syncProjectProgressRows();
+}
+
+function clearProjectForm() {
+  editingProjectId = null;
+  projectBomSeq = 0;
+  document.getElementById('projectFormTitle').textContent = 'New Project';
+  document.getElementById('projectNo').value = generateProjectNumber();
+  document.getElementById('projectOrderDate').valueAsDate = new Date();
+  ['projectCustomerCompany','projectCustomerContact','projectCustomerPhone','projectOrderRef','projectQuoteRef'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('projectOrderDetails').value = '';
+  document.getElementById('projectStatus').value = 'active';
+  document.getElementById('projectBomRows').innerHTML = '';
+  document.getElementById('projectProgressRows').innerHTML = '';
+  addBomRow();
+}
+
+function closeProjectForm() {
+  document.getElementById('projectFormWrap').classList.remove('open');
+  editingProjectId = null;
+}
+
+function openProjectForm(id = null) {
+  const wrap = document.getElementById('projectFormWrap');
+  wrap.classList.add('open');
+  if (!id) {
+    clearProjectForm();
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  const project = projectFind(id);
+  if (!project) return;
+  editingProjectId = id;
+  projectBomSeq = 0;
+  document.getElementById('projectFormTitle').textContent = 'Editing: ' + (project.projectNo || id);
+  document.getElementById('projectNo').value = project.projectNo || '';
+  document.getElementById('projectOrderDate').value = project.orderDate || '';
+  document.getElementById('projectCustomerCompany').value = project.customerCompany || '';
+  document.getElementById('projectCustomerContact').value = project.customerContact || '';
+  document.getElementById('projectCustomerPhone').value = project.customerPhone || '';
+  document.getElementById('projectOrderRef').value = project.orderRef || '';
+  document.getElementById('projectQuoteRef').value = project.quoteRef || '';
+  document.getElementById('projectOrderDetails').value = project.orderDetails || '';
+  document.getElementById('projectStatus').value = project.status || 'active';
+  document.getElementById('projectBomRows').innerHTML = '';
+  document.getElementById('projectProgressRows').innerHTML = '';
+  const progressMap = {};
+  (project.progress || []).forEach(entry => { progressMap[entry.partId] = entry; });
+  (project.bom || []).forEach(item => addBomRow({ ...item, progress: progressMap[item.id] || null }));
+  if (!(project.bom || []).length) addBomRow();
+  syncProjectProgressRows(progressMap);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function gatherProjectData() {
+  const bom = Array.from(document.querySelectorAll('#projectBomRows tr[data-part-id]')).map(tr => {
+    const inputs = tr.querySelectorAll('input');
+    return {
+      id: tr.dataset.partId,
+      partName: inputs[0]?.value.trim() || '',
+      rawMaterial: inputs[1]?.value.trim() || '',
+      finishSize: inputs[2]?.value.trim() || '',
+      quantity: inputs[3]?.value.trim() || ''
+    };
+  }).filter(item => item.partName || item.rawMaterial || item.finishSize || item.quantity);
+
+  const progress = bom.map(item => {
+    const row = document.querySelector(`#projectProgressRows tr[data-part-id="${item.id}"]`);
+    return {
+      partId: item.id,
+      partName: item.partName,
+      stage: row?.querySelector('[data-field="stage"]')?.value.trim() || '',
+      stageDate: row?.querySelector('[data-field="stageDate"]')?.value || ''
+    };
+  });
+
+  const existing = editingProjectId ? projectFind(editingProjectId) : null;
+  const status = document.getElementById('projectStatus').value;
+  return {
+    id: editingProjectId || ('proj_' + Date.now()),
+    projectNo: document.getElementById('projectNo').value.trim() || generateProjectNumber(editingProjectId),
+    customerCompany: document.getElementById('projectCustomerCompany').value.trim(),
+    customerContact: document.getElementById('projectCustomerContact').value.trim(),
+    customerPhone: document.getElementById('projectCustomerPhone').value.trim(),
+    orderRef: document.getElementById('projectOrderRef').value.trim(),
+    orderDate: document.getElementById('projectOrderDate').value,
+    quoteRef: document.getElementById('projectQuoteRef').value.trim(),
+    orderDetails: document.getElementById('projectOrderDetails').value.trim(),
+    status,
+    bom,
+    progress,
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    completedAt: status === 'completed' ? (existing?.completedAt || new Date().toISOString()) : '',
+    updatedAt: new Date().toISOString(),
+    updatedBy: currentUser?.displayName || currentUser?.username || 'Unknown'
+  };
+}
+
+async function projectUpsert(project) {
+  const projects = projectsLoad();
+  const idx = projects.findIndex(p => p.id === project.id);
+  if (idx >= 0) projects[idx] = project; else projects.unshift(project);
+  projectsSave(projects);
+  if (backendMode) {
+    await syncStateToBackend();
+    return;
+  }
+  if (msalAccount) {
+    updateSyncBadge('syncing');
+    const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: customersLoad(), projects: [] };
+    data.quotations = dbLoad();
+    data.users = await secureUsers(getUsers());
+    data.customers = customersLoad();
+    data.projects = projects;
+    const ok = await odWriteData(data);
+    updateSyncBadge(ok ? 'synced' : 'error');
+    if (!ok) showNotif('Project saved locally but OneDrive sync failed.', 'error');
+  }
+}
+
+async function saveProject() {
+  const project = gatherProjectData();
+  if (!project.customerCompany) { showNotif('Customer company is required.', 'error'); return; }
+  if (!project.orderRef) { showNotif('Order reference is required.', 'error'); return; }
+  if (!project.bom.length) { showNotif('Add at least one BOM part.', 'error'); return; }
+  await projectUpsert(project);
+  editingProjectId = project.id;
+  document.getElementById('projectFormTitle').textContent = 'Editing: ' + project.projectNo;
+  showNotif('Project saved: ' + project.projectNo);
+}
+
+async function updateProjectStatus(id, status) {
+  const project = projectFind(id);
+  if (!project) return;
+  project.status = status;
+  project.completedAt = status === 'completed' ? (project.completedAt || new Date().toISOString()) : '';
+  project.updatedAt = new Date().toISOString();
+  project.updatedBy = currentUser?.displayName || currentUser?.username || 'Unknown';
+  await projectUpsert(project);
+}
+
+async function deleteProject(id) {
+  const project = projectFind(id);
+  if (!project) return;
+  if (!window.confirm(`Delete project "${project.projectNo}"?`)) return;
+  const projects = projectsLoad().filter(item => item.id !== id);
+  projectsSave(projects);
+  if (backendMode) {
+    await syncStateToBackend();
+  } else if (msalAccount) {
+    updateSyncBadge('syncing');
+    const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: customersLoad(), projects: [] };
+    data.quotations = dbLoad();
+    data.users = await secureUsers(getUsers());
+    data.customers = customersLoad();
+    data.projects = projects;
+    await odWriteData(data);
+    updateSyncBadge('synced');
+  }
+  showNotif('Project deleted.', 'info');
+}
+
+function renderProjectRows(targetId, projects, emptyId, completed = false) {
+  const tbody = document.getElementById(targetId);
+  const empty = document.getElementById(emptyId);
+  if (!tbody || !empty) return;
+  if (!projects.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = projects.map(project => `
+    <tr>
+      <td class="mono" style="font-weight:700;color:var(--navy);">${esc(project.projectNo || '—')}</td>
+      <td><strong>${esc(project.customerCompany || '—')}</strong><div class="customer-mini">${esc(project.customerContact || '')}</div></td>
+      <td>${esc(project.orderRef || '—')}</td>
+      <td class="mono">${completed ? fmtDateShort(project.completedAt || project.updatedAt) : fmtDateShort(project.orderDate)}</td>
+      <td style="text-align:center;">${(project.bom || []).length}</td>
+      <td><span class="project-status-chip ${project.status === 'completed' ? 'completed' : 'active'}">${esc(project.status || 'active')}</span></td>
+      <td class="acts">
+        <button class="btn-edit-s" onclick="openProjectForm('${project.id}')">✏ Edit</button>
+        ${completed ? `<button class="btn-sm btn-ol" onclick="updateProjectStatus('${project.id}','active')">Reopen</button>` : `<button class="btn-sm btn-acc" onclick="updateProjectStatus('${project.id}','completed')">Complete</button>`}
+        <button class="btn-del" onclick="deleteProject('${project.id}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderProjectsView() {
+  const records = projectsLoad();
+  const q = String(document.getElementById('projectSearch')?.value || '').trim().toLowerCase();
+  const filtered = q ? records.filter(project => (
+    String(project.projectNo || '').toLowerCase().includes(q) ||
+    String(project.customerCompany || '').toLowerCase().includes(q) ||
+    String(project.customerContact || '').toLowerCase().includes(q) ||
+    String(project.orderRef || '').toLowerCase().includes(q) ||
+    String(project.quoteRef || '').toLowerCase().includes(q)
+  )) : records;
+  const active = filtered.filter(project => project.status !== 'completed');
+  const completed = filtered.filter(project => project.status === 'completed');
+  document.getElementById('projectStatActive').textContent = records.filter(project => project.status !== 'completed').length;
+  document.getElementById('projectStatCompleted').textContent = records.filter(project => project.status === 'completed').length;
+  document.getElementById('projectStatParts').textContent = records.reduce((sum, project) => sum + ((project.bom || []).length), 0);
+  renderProjectRows('activeProjectsBody', active, 'activeProjectsEmpty', false);
+  renderProjectRows('completedProjectsBody', completed, 'completedProjectsEmpty', true);
+}
+
+// ═══════════════════════════════════════════
 // VIEWS
 // ═══════════════════════════════════════════
 let editingId = null;
 function showView(v) {
   ['newView','dbView','customersView','settingsView'].forEach(id => document.getElementById(id).style.display = 'none');
-  ['navDB','navCustomers','navSettings'].forEach(id => document.getElementById(id).classList.remove('active'));
+  ['navDB','navCustomers','navSettings'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
   if (v === 'new') { document.getElementById('newView').style.display = 'block'; }
   if (v === 'db')  { document.getElementById('dbView').style.display = 'block';  document.getElementById('navDB').classList.add('active'); renderDB(); }
   if (v === 'customers') { document.getElementById('customersView').style.display = 'block'; document.getElementById('navCustomers').classList.add('active'); renderCustomersView(); }
+      document.getElementById('projectsView').style.display = 'block';
+    
+  }
   if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(!!msalAccount); }
 }
 
@@ -2187,11 +2627,14 @@ function confirmDeleteQ(id,qno){
   document.getElementById('confirmModal').classList.add('open');
   document.getElementById('confirmOkBtn').onclick=async function(){
     dbDelete(pendingDelId);
-    if(msalAccount){
+    if(backendMode){
+      await syncStateToBackend();
+    } else if(msalAccount){
       updateSyncBadge('syncing');
-      const data=await odReadData()||{quotations:[],users:getUsers(),customers:customersLoad()};
+      const data=await odReadData()||{quotations:[],users:getUsers(),customers:customersLoad(),projects:projectsLoad()};
       data.quotations=dbLoad();
       data.customers=customersLoad();
+      data.projects=projectsLoad();
       const ok=await odWriteData(data);
       updateSyncBadge(ok?'synced':'error');
     }
@@ -2407,6 +2850,33 @@ function renderPrintDoc(d, mode='quotation'){
 }
 
 // ═══════════════════════════════════════════
+
+function showReconnectBar() {
+  if (document.getElementById('reconnectBar')) return;
+  const bar = document.createElement('div');
+  bar.id = 'reconnectBar';
+  bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1b3a5c;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9997;font-size:13px;font-family:Barlow,sans-serif;gap:12px;';
+  bar.innerHTML = '<span>⚠️ OneDrive not connected — saving locally only.</span><button onclick="retryODConnect()" style="background:#e8a020;color:#0d1b2a;border:none;padding:7px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-family:Barlow,sans-serif;">↻ Reconnect OneDrive</button>';
+  document.body.appendChild(bar);
+}
+function hideReconnectBar() {
+  const b = document.getElementById('reconnectBar'); if(b) b.remove();
+}
+async function retryODConnect() {
+  const bar = document.getElementById('reconnectBar');
+  if (bar) bar.querySelector('button').textContent = 'Connecting...';
+  updateSyncBadge('syncing');
+  try {
+    await initMsal();
+    if (msalAccount) { hideReconnectBar(); checkODSetup(); showNotif('OneDrive connected!', 'success'); return; }
+  } catch(e) {}
+  if (bar) bar.querySelector('button').textContent = '↻ Reconnect OneDrive';
+  updateSyncBadge('error');
+  showNotif('Could not connect. Check internet and try again.', 'error');
+}
+
+function canAccessProjects(){ return false; }
+
 // NOTIFICATION
 // ═══════════════════════════════════════════
 let notifTimer;
@@ -2432,8 +2902,10 @@ function showNotif(msg,type='success'){
 // ═══════════════════════════════════════════
 // STARTUP — handle MSAL redirect first
 // ═══════════════════════════════════════════
-// Startup — purely synchronous, no network, instant
-function startup() {
+// Startup — fast local boot with optional backend session restore
+async function startup() {
+  if (window.__hexamechStartupDone) return;
+  window.__hexamechStartupDone = true;
   try {
     // Seed embedded credentials if present
     if (EMBEDDED_CLIENT_ID && EMBEDDED_REFRESH_TOKEN) {
@@ -2485,6 +2957,22 @@ function startup() {
       if (editingId) return;
       setAutoQuotationNumber(this.value || new Date());
     });
+  }
+
+  await detectBackendMode();
+  if (backendMode) {
+    try {
+      const restored = await restoreBackendSession();
+      if (restored) {
+        launchApp();
+        return;
+      }
+    } catch(e) {
+      apiAuthToken = '';
+      localStorage.removeItem('hx_api_token');
+    }
+    hideOneDriveUiForBackend();
+    return;
   }
 
   ensureUsersLoadedFromOneDrive();
