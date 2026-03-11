@@ -7,6 +7,7 @@
 <title>Hexamech — Quotation System</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root{
   --navy:#0d1b2a;--steel:#1b3a5c;--accent:#e8a020;--accent2:#f0c060;
@@ -2723,7 +2724,8 @@ function renderDB(){
     <td class="acts">
       <button class="btn-edit-s" onclick="editQ('${r.id}')">✏ Edit</button>
       <button class="btn-sm btn-acc" onclick="previewFromDB('${r.id}')">👁 Preview</button>
-      <button class="btn-sm btn-ol" onclick="previewFromDB('${r.id}','proforma')">PI PDF</button>
+      <button class="btn-edit-s" type="button" onclick="downloadPdfFromDB('${r.id}')">PDF</button>
+      <button class="btn-sm btn-ol" onclick="downloadPdfFromDB('${r.id}','proforma')">PI PDF</button>
       <button class="btn-del" onclick="confirmDeleteQ('${r.id}','${esc(r.quoteNo||'')}')">🗑</button>
     </td>
   </tr>`).join('');
@@ -2833,6 +2835,56 @@ function doPrint(){
   document.title=originalTitle;
   pc.innerHTML='';
 }
+
+async function downloadPdfForRecord(record, mode='quotation'){
+  if (typeof html2pdf === 'undefined') {
+    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
+    return;
+  }
+  const cfg = getPrintModeConfig(mode);
+  const cleanRecord = Object.assign({}, record || {});
+  cleanRecord.moldSpares = cleanRecord.moldSpares || DEFAULT_SPARES;
+  const source = document.createElement('div');
+  source.style.position = 'fixed';
+  source.style.left = '-100000px';
+  source.style.top = '0';
+  source.style.width = '210mm';
+  source.style.background = '#fff';
+  source.innerHTML = renderPrintDoc(cleanRecord, mode);
+  document.body.appendChild(source);
+  const documentNumber = cfg.mode === 'proforma'
+    ? String(cleanRecord.quoteNo || 'Document').replace(/^Q/i, 'PI')
+    : String(cleanRecord.quoteNo || 'Document');
+  const filename = safeDownloadName(documentNumber + '-' + cfg.fileLabel) + '.pdf';
+  try {
+    await html2pdf().set({
+      margin: [8, 8, 8, 8],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    }).from(source).save();
+    showNotif('PDF downloaded.');
+  } catch (e) {
+    console.error('PDF download failed:', e);
+    showNotif('Could not download PDF.', 'error');
+  } finally {
+    source.remove();
+  }
+}
+
+async function downloadPdfFromDB(id, mode='quotation'){
+  const r = dbFind(id);
+  if (!r) {
+    showNotif('Quotation not found.', 'error');
+    return;
+  }
+  const record = Object.assign({}, r);
+  record.moldSpares = r.moldSpares || DEFAULT_SPARES;
+  await downloadPdfForRecord(record, mode);
+}
+
 function renderPrintDoc(d, mode='quotation'){
   const cfg=getPrintModeConfig(mode);
   let sub=0;(d.rows||[]).forEach(r=>{sub+=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);});
@@ -2852,7 +2904,7 @@ function renderPrintDoc(d, mode='quotation'){
     <td style="text-align:right;font-family:'DM Mono',monospace;">₹${fmtNum(parseFloat(r.rate)||0)}</td>
     <td>₹${fmtNum(t)}</td></tr>`;
   }).join('');
-  document.getElementById('printDoc').innerHTML=`
+  const html=`
     <div class="pd-corner-logo"><img src="${CORNER_LOGO_SRC}" alt="Hexamech mark"></div>
     <div class="pd-title-bar"><span>${cfg.documentTitle}</span></div>
     <div class="pd-header">
@@ -2976,6 +3028,8 @@ function renderPrintDoc(d, mode='quotation'){
         <div><div class="pd-sig-line">Authorised Signatory — Hexamech Technology Pvt Ltd</div></div>
       </div>
     </div>`;
+  document.getElementById('printDoc').innerHTML=html;
+  return html;
 }
 
 // ═══════════════════════════════════════════
