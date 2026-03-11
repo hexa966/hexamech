@@ -380,10 +380,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   #printContainer .pd-box-flow .pd-list li{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-footer{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-product-block{page-break-inside:auto;break-inside:auto;}
-  #printContainer .pd-product-shell{display:block !important;min-height:0 !important;height:auto !important;overflow:visible !important;border-radius:0 !important;}
-  #printContainer .pd-table-wrap{display:block !important;flex:none !important;overflow:visible !important;}
-  #printContainer .pd-table{page-break-inside:auto;break-inside:auto;}
-  #printContainer .pd-table tbody{page-break-inside:auto;break-inside:auto;}
   #printContainer .pd-totals-wrap{page-break-inside:avoid;break-inside:avoid;page-break-before:avoid;break-before:avoid;}
   #printContainer .pd-table thead{display:table-header-group;}
   #printContainer .pd-table tr{page-break-inside:avoid;break-inside:avoid;}
@@ -413,6 +409,15 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     <div class="fg"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="username"></div>
     <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password"></div>
     <button class="btn-login" onclick="doLogin()">Sign In →</button>
+    <div class="login-divider" id="loginDivider">or sync with OneDrive</div>
+    <button class="btn-ms" id="msSignInBtn" onclick="msalSignIn()">
+      <div class="ms-grid">
+        <span style="background:#f25022;"></span><span style="background:#7fba00;"></span>
+        <span style="background:#00a4ef;"></span><span style="background:#ffb900;"></span>
+      </div>
+      Sign in with Microsoft (OneDrive)
+    </button>
+    <div class="login-cloud-status" id="loginCloudStatus" style="display:none;"></div>
     <div class="login-error" id="loginError">Invalid username or password.</div>
   </div>
 </div>
@@ -433,7 +438,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       <button class="tnb" id="navSettings" onclick="showView('settings')">⚙️ Settings</button>
     </div>
     <div class="topbar-actions">
-      <div id="syncBadge" class="sync-badge local" title="OneDrive sync status" style="cursor:default;">
+      <div id="syncBadge" class="sync-badge local" title="GitHub sync status" style="cursor:default;">
         <span id="syncIcon">💾</span><span id="syncText">Local only</span>
       </div>
       <div class="topbar-user">Hi, <strong id="loggedUser"></strong></div>
@@ -703,7 +708,7 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
           <div class="settings-card-body">
             <div id="odStatusBox"></div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn-main btn-navy" onclick="msalSignIn()">⚙️ Setup / Change Client ID</button>
+              <button class="btn-main btn-navy" >⚙️ Setup / Change Client ID</button>
               <button class="btn-main btn-green" onclick="syncFromOneDrive()" id="btnSyncSettings" style="display:none;">↻ Sync Now</button>
               <button class="btn-main" id="btnExportApp" onclick="exportConfiguredApp()" style="background:#7b2d8b;color:#fff;display:none;">📦 Export App for Other Users</button>
               <button class="btn-main btn-red" onclick="disconnectOneDrive()" id="btnDisconnect" style="display:none;">✕ Disconnect OneDrive</button>
@@ -795,8 +800,8 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
 <div class="notif" id="notif"></div>
 
 <script>
-const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";
-const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";
+const EMBEDDED_CLIENT_ID = "";
+const EMBEDDED_REFRESH_TOKEN = "";
 // ═══════════════════════════════════════════
 // LOGO
 // ═══════════════════════════════════════════
@@ -811,6 +816,202 @@ const CORNER_LOGO_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA5C
 // USER MANAGEMENT (cached in browser, synced to OneDrive when connected)
 // ═══════════════════════════════════════════
 const USERS_KEY = 'hx_users';
+// ═══════════════════════════════════════════════════════════════
+// CLOUD STORAGE — GitHub Private Repo
+// Token is fine-grained: read+write to hexamech-data repo only
+// Works from any PC, any browser, incognito — forever
+// ═══════════════════════════════════════════════════════════════
+const GH_TOKEN  = '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';   // github_pat_...
+const GH_OWNER  = 'hexa966';
+const GH_REPO   = 'hexamech-data';             // your private data repo
+const GH_FILE   = 'data.json';
+const GH_API    = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+
+let ghFileSha    = null;   // GitHub needs the SHA to update a file
+let cloudConnected = false;
+
+async function cloudRead() {
+  try {
+    const res = await fetch(GH_API + '?t=' + Date.now(), {
+      headers: {
+        'Authorization': 'token ' + GH_TOKEN,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (res.status === 404) {
+      // File doesn't exist yet — that's fine, start fresh
+      cloudConnected = true;
+      ghFileSha = null;
+      return { quotations: [], users: [], customers: [] };
+    }
+    if (!res.ok) throw new Error('GitHub read ' + res.status);
+    const j = await res.json();
+    ghFileSha = j.sha;
+    cloudConnected = true;
+    // GitHub returns content as base64
+    return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, '')))));
+  } catch(e) {
+    console.error('cloudRead error:', e);
+    cloudConnected = false;
+    return null;
+  }
+}
+
+async function cloudWrite(data) {
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const body = {
+      message: 'data update ' + new Date().toISOString().slice(0, 16).replace('T', ' '),
+      content: content
+    };
+    if (ghFileSha) body.sha = ghFileSha;  // required for updates, omit for first write
+
+    const res = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + GH_TOKEN,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (res.status === 409 || res.status === 422) {
+      // SHA conflict (two writes raced) — re-read SHA and retry once
+      console.warn('cloudWrite SHA conflict — retrying...');
+      const fresh = await cloudRead();
+      if (fresh === null) return false;
+      return await cloudWrite(data);   // retry with fresh SHA
+    }
+
+    if (!res.ok) throw new Error('GitHub write ' + res.status);
+    const j = await res.json();
+    if (j.content && j.content.sha) ghFileSha = j.content.sha;
+    cloudConnected = true;
+    return true;
+  } catch(e) {
+    console.error('cloudWrite error:', e);
+    cloudConnected = false;
+    return false;
+  }
+}
+
+async function cloudSync() {
+  updateSyncBadge('syncing');
+  const data = await cloudRead();
+  if (!data) {
+    updateSyncBadge('error');
+    return false;
+  }
+  if (data.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
+  if (data.users && data.users.length > 0)
+    localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
+  if (data.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
+  updateSyncBadge('synced');
+  return true;
+}
+
+async function cloudPush() {
+  const data = {
+    quotations: dbLoad(),
+    users:      await secureUsers(getUsers()),
+    customers:  customersLoad()
+  };
+  const ok = await cloudWrite(data);
+  updateSyncBadge(ok ? 'synced' : 'error');
+  return ok;
+}
+
+// ═══════════════════════════════════════════
+
+async function ghRead() {
+  try {
+    const res = await fetch(GH_API + '?t=' + Date.now(), {
+      headers: {
+        'Authorization': 'token ' + GH_TOKEN,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (res.status === 404) {
+      ghConnected = true;
+      return { quotations: [], users: [], customers: [] };
+    }
+    if (!res.ok) throw new Error('GitHub read ' + res.status);
+    const j = await res.json();
+    ghSha = j.sha;
+    ghConnected = true;
+    return JSON.parse(atob(j.content.replace(/\n/g,'')));
+  } catch(e) {
+    console.error('ghRead error:', e);
+    ghConnected = false;
+    return null;
+  }
+}
+
+async function ghWrite(data) {
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const body = {
+      message: 'Quotation update ' + new Date().toISOString().slice(0,16),
+      content: content
+    };
+    if (ghSha) body.sha = ghSha;
+    const res = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + GH_TOKEN,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      // SHA conflict - re-fetch and retry once
+      if (res.status === 409 || res.status === 422) {
+        const fresh = await ghRead();
+        if (fresh === null) return false;
+        return await ghWrite(data);
+      }
+      throw new Error('GitHub write ' + res.status);
+    }
+    const j = await res.json();
+    if (j.content) ghSha = j.content.sha;
+    ghConnected = true;
+    return true;
+  } catch(e) {
+    console.error('ghWrite error:', e);
+    ghConnected = false;
+    return false;
+  }
+}
+
+async function ghSync() {
+  updateSyncBadge('syncing');
+  const data = await ghRead();
+  if (data === null) {
+    updateSyncBadge('error');
+    showNotif('Could not reach GitHub storage.', 'error');
+    return false;
+  }
+  if (data.quotations)  localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
+  if (data.users && data.users.length > 0)
+                        localStorage.setItem(USERS_KEY,     JSON.stringify(await secureUsers(data.users)));
+  if (data.customers)   localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
+  updateSyncBadge('synced');
+  return true;
+}
+
+async function ghPush() {
+  const data = {
+    quotations: dbLoad(),
+    users:      await secureUsers(getUsers()),
+    customers:  customersLoad()
+  };
+  const ok = await ghWrite(data);
+  updateSyncBadge(ok ? 'synced' : 'error');
+  return ok;
+}
+
 const DEFAULT_SPARES = `Thermocouple - 2 Nos
 Core, Cavity and Neck - 1 Set
 Tip Insulator - 2 Nos
@@ -823,8 +1024,6 @@ Heaters - 2 Nos
 Baffle O-Ring - 1 Set
 Hot Runner Standard Seal - 2 Nos
 Toolbox (Bolts, Keys, etc.) - 1 No`;
-const DEFAULT_PAYMENT = '50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory.';
-const DEFAULT_DELIVERY = '35–40 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval.';
 const CUSTOMERS_KEY = 'hx_customers';
 const PROJECTS_KEY = 'hx_projects';
 const DEFAULT_USERS = [
@@ -1291,16 +1490,7 @@ function renderCustomersView() {
     </tr>`).join('');
 }
 
-async function syncCustomersToOneDrive() {
-  if (backendMode) return;
-  if (!(await canUseOneDrive())) return;
-  const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: [], projects: projectsLoad() };
-  if (!data.quotations) data.quotations = dbLoad();
-  data.users = await secureUsers(getUsers());
-  data.customers = customersLoad();
-  data.projects = projectsLoad();
-  await odWriteData(data);
-}
+async function syncCustomersToOneDrive() { if (!backendMode) await cloudPush(); }
 
 // ═══════════════════════════════════════════
 // AUTH
@@ -1314,33 +1504,9 @@ let usersHydrationPromise = null;
 async function ensureUsersLoadedFromOneDrive(force = false) {
   if (backendMode) return false;
   if (usersHydrationPromise && !force) return usersHydrationPromise;
-
   usersHydrationPromise = (async () => {
-    const clientId = localStorage.getItem('hx_od_clientid');
-    const tokens = loadTokens();
-    if (!clientId || !tokens) return false;
-
-    try {
-      const data = await odReadData();
-      if (data && Array.isArray(data.users) && data.users.length > 0) {
-        localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
-      }
-      if (data && Array.isArray(data.customers) && data.customers.length > 0) {
-        localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
-      }
-      if (data && Array.isArray(data.quotations)) {
-        localStorage.setItem(DB_KEY, JSON.stringify(data.quotations));
-      }
-      if (data && Array.isArray(data.projects)) {
-        localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects));
-      }
-      if (data) return true;
-    } catch (e) {
-      console.warn('user preload failed:', e);
-    }
-    return false;
+    try { return await cloudSync(); } catch(e) { return false; }
   })();
-
   return usersHydrationPromise;
 }
 
@@ -1349,42 +1515,9 @@ async function doLogin() {
   const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
 
-  await detectBackendMode();
-
-  if (backendMode) {
-    try {
-      const localSnapshot = getStateSnapshot();
-      const data = await apiRequest('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ username: u, password: p })
-      }, false);
-      apiAuthToken = data.token || '';
-      localStorage.setItem('hx_api_token', apiAuthToken);
-      if (shouldImportLocalState(data.state || {}, localSnapshot)) {
-        applyStateSnapshot(localSnapshot);
-        await syncStateToBackend();
-      } else {
-        applyStateSnapshot(data.state || {});
-      }
-      err.style.display = 'none';
-      currentUser = {
-        username: data.user.username,
-        displayName: data.user.displayName,
-        role: data.user.role,
-        canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
-        contactPhone: data.user.contactPhone || '',
-        contactEmail: data.user.contactEmail || ''
-      };
-      launchApp();
-      return;
-    } catch (e) {
-      err.style.display = 'block';
-      return;
-    }
-  }
-
+  // Pull latest users from cloud (5s timeout so login is never stuck)
   try {
-    await Promise.race([ensureUsersLoadedFromOneDrive(), new Promise(r=>setTimeout(r,5000))]);
+    await Promise.race([cloudSync(), new Promise(r => setTimeout(r, 5000))]);
   } catch(e) {}
 
   let user = findUser(u);
@@ -1444,23 +1577,18 @@ function launchApp() {
   document.getElementById('btnAddUser').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
       showView('db');
   renderUserList();
-  // Auto-connect OneDrive silently — retry 3 times
+  // Auto-sync from cloud on every login
   if (backendMode) return;
   (async () => {
-    const clientId = localStorage.getItem('hx_od_clientid');
-    if (!clientId) { updateSyncBadge('local'); return; }
     updateSyncBadge('syncing');
-    for (let i = 1; i <= 3; i++) {
-      await new Promise(r => setTimeout(r, i * 600));
-      if (msalAccount) break;
-      try { await initMsal(); } catch(e) {}
-    }
-    if (msalAccount) {
-      checkODSetup();
+    const ok = await cloudSync();
+    if (ok) {
+      if (document.getElementById('dbView').style.display !== 'none') renderDB();
+      renderUserList(); renderCustomerDropdown(); renderCustomersView();
+      updateODStatusBox(true);
     } else {
-      updateSyncBadge('error');
-      // Show small reconnect bar at bottom
-      if (typeof showReconnectBar === 'function') showReconnectBar();
+      updateSyncBadge('local');
+      showNotif('Working offline — data syncs when internet is available.', 'info');
     }
   })();
 }
@@ -1515,25 +1643,6 @@ function loadTokens() {
 function clearTokens() {
   localStorage.removeItem('hx_od_tokens');
   localStorage.removeItem('hx_od_pkce');
-}
-
-function hasStoredOneDriveConnection() {
-  const clientId = localStorage.getItem('hx_od_clientid');
-  const tokens = loadTokens();
-  return !!(clientId && tokens && (tokens.refresh_token || tokens.access_token));
-}
-
-function ensureEmbeddedOneDriveAccount() {
-  if (!msalAccount && hasStoredOneDriveConnection()) {
-    msalAccount = { name: 'Company OneDrive', username: 'Company OneDrive' };
-  }
-}
-
-async function canUseOneDrive() {
-  if (backendMode || !hasStoredOneDriveConnection()) return false;
-  const token = await getODToken();
-  if (token) ensureEmbeddedOneDriveAccount();
-  return !!token;
 }
 
 async function fetchWithTimeout(url, options, ms=8000) {
@@ -1701,30 +1810,23 @@ async function initMsal() {
 // ONEDRIVE SETUP
 // ═══════════════════════════════════════════
 function checkODSetup() {
-  const clientId = localStorage.getItem('hx_od_clientid');
-  const hasStoredConnection = hasStoredOneDriveConnection();
-  // Safely update any optional UI elements
-  const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
-  const show = (id,d='flex') => { const el=document.getElementById(id); if(el) el.style.display=d; };
-  hide('odBanner');
-  if (clientId && hasStoredConnection) {
-    updateSyncBadge('synced');
-    updateODStatusBox(true);
-    syncFromOneDrive();
-  } else {
-    updateSyncBadge('local');
-    updateODStatusBox(false);
-  }
+  (async () => {
+    const ok = await cloudSync();
+    updateODStatusBox(ok);
+    if (ok) {
+      if (document.getElementById('dbView').style.display !== 'none') renderDB();
+      renderUserList(); renderCustomerDropdown(); renderCustomersView();
+    }
+  })();
 }
 
 function updateODStatusBox(connected) {
   const box = document.getElementById('odStatusBox');
   if (!box) return;
   if (connected) {
-    const connectedLabel = msalAccount ? (msalAccount.name || msalAccount.username) : 'Company OneDrive';
-    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>' + (msalAccount.name || msalAccount.username) + '</strong>Connected — auto-syncing all quotations to OneDrive.</div></div>';
+    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>Cloud Storage Active</strong>All quotations sync automatically — accessible from any PC, any browser, anywhere.</div></div>';
   } else {
-    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:20px;">⚠️</span><div style="font-size:13px;color:#e65100;"><strong style="display:block;">OneDrive not connected.</strong>Quotations are saving locally. Click Sync Now to reconnect.</div></div>';
+    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px 16px;"><strong>⚠️ Cloud not reachable</strong><p style="margin:6px 0 0;">Check internet. Data is saved locally and will sync when connection is restored.</p></div>';
   }
 }
 
@@ -1804,17 +1906,17 @@ function exportConfiguredApp() {
 
   let html = document.documentElement.outerHTML;
 
-  const clientLine = 'const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";';
-  const refreshLine = 'const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";';
+  const clientLine = 'const EMBEDDED_CLIENT_ID = "";';
+  const refreshLine = 'const EMBEDDED_REFRESH_TOKEN = "";';
 
-  if (/const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";/.test(html)) {
-    html = html.replace(/const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";/, clientLine);
+  if (/const EMBEDDED_CLIENT_ID = "";/.test(html)) {
+    html = html.replace(/const EMBEDDED_CLIENT_ID = "";/, clientLine);
   } else {
     html = html.replace('<script>', '<script>\n' + clientLine);
   }
 
-  if (/const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";/.test(html)) {
-    html = html.replace(/const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";/, refreshLine);
+  if (/const EMBEDDED_REFRESH_TOKEN = "";/.test(html)) {
+    html = html.replace(/const EMBEDDED_REFRESH_TOKEN = "";/, refreshLine);
   } else {
     html = html.replace('<script>', '<script>\n' + refreshLine);
   }
@@ -1829,7 +1931,7 @@ function updateSyncBadge(state) {
   const icon = document.getElementById('syncIcon');
   const text = document.getElementById('syncText');
   b.className = 'sync-badge ' + state;
-  const map = { local:{i:'💾',t:'Local only'}, syncing:{i:'↻',t:'Syncing…'}, synced:{i:'☁️',t:'OneDrive ✓'}, error:{i:'⚠️',t:'Sync error'} };
+  const map = { local:{i:'💾',t:'Local only'}, syncing:{i:'↻',t:'Syncing…'}, synced:{i:'☁️',t:'Cloud ✓'}, error:{i:'⚠️',t:'Sync error'} };
   icon.textContent = map[state].i;
   text.textContent = map[state].t;
 }
@@ -1837,78 +1939,18 @@ function updateSyncBadge(state) {
 // ═══════════════════════════════════════════
 // ONEDRIVE READ / WRITE
 // ═══════════════════════════════════════════
-async function odReadData() {
-  const token = await getODToken();
-  if (!token) return null;
-  try {
-    const res = await fetch(`${OD_GRAPH}/me/drive/root:/${OD_FILE_PATH}:/content`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    if (res.status === 404) return { quotations:[], users:[], customers:[], projects:[] };
-    if (!res.ok) throw new Error('Read failed: ' + res.status);
-    return await res.json();
-  } catch(e) { console.error('OD read:', e); return null; }
-}
+async function odReadData() { return await cloudRead(); }
 
-async function odWriteData(data) {
-  const token = await getODToken();
-  if (!token) return false;
-  try {
-    const res = await fetch(`${OD_GRAPH}/me/drive/root:/${OD_FILE_PATH}:/content`, {
-      method: 'PUT',
-      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(data, null, 2)
-    });
-    return res.ok;
-  } catch(e) { console.error('OD write:', e); return false; }
-}
+async function odWriteData(data) { return await cloudWrite(data); }
 
 async function syncFromOneDrive() {
-  if (backendMode) {
-    await loadStateFromBackend();
-    renderDB();
-    renderUserList();
-    renderCustomerDropdown();
-    renderCustomersView();
-    showNotif('Server data synced.');
-    return;
-  }
-  if (!msalAccount) return;
-  updateSyncBadge('syncing');
-  const data = await odReadData();
-  if (data === null) {
-    updateSyncBadge('error');
-    showNotif('Could not read from OneDrive. Check connection.', 'error');
-    return;
-  }
-  // Sync quotations
-  if (data.quotations) localStorage.setItem(DB_KEY, JSON.stringify(data.quotations));
-  // Sync users (only if OneDrive has users, else keep local)
-  if (data.users && data.users.length > 0) localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
-  if (data.customers && data.customers.length > 0) localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
-  if (data.projects && data.projects.length >= 0) localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects || []));
-  updateSyncBadge('synced');
-  document.getElementById('statStorage').textContent = 'OneDrive ✓';
-  document.getElementById('statStorageSub').textContent = msalAccount.username || msalAccount.name;
-  document.getElementById('btnSyncNow').style.display = 'flex';
-  if (document.getElementById('dbView').style.display !== 'none') renderDB();
-  renderUserList();
-  renderCustomerDropdown();
-  renderCustomersView();
+  if (backendMode) { await loadStateFromBackend(); renderDB(); renderUserList(); renderCustomerDropdown(); renderCustomersView(); showNotif('Synced.'); return; }
+  const ok = await cloudSync();
+  if (ok) { if (document.getElementById('dbView').style.display !== 'none') renderDB(); renderUserList(); renderCustomerDropdown(); renderCustomersView(); showNotif('Synced from cloud ✓'); }
+  else showNotif('Sync failed — check internet.', 'error');
 }
 
-async function syncUsersToOneDrive() {
-  if (backendMode) return;
-  if (!msalAccount) {
-    try { await initMsal(); } catch(e) {}
-  }
-  if (!msalAccount) return;
-  const data = await odReadData() || { quotations: dbLoad(), users: [], customers: [], projects: projectsLoad() };
-  data.users = await secureUsers(getUsers());
-  data.customers = customersLoad();
-  data.projects = projectsLoad();
-  await odWriteData(data);
-}
+async function syncUsersToOneDrive() { if (!backendMode) await cloudPush(); }
 
 // ═══════════════════════════════════════════
 // DB
@@ -1927,21 +1969,9 @@ async function dbUpsert(record) {
   const idx = recs.findIndex(r => r.id === record.id);
   if (idx >= 0) recs[idx] = record; else recs.unshift(record);
   dbSave(recs);
-  if (backendMode) {
-    await syncStateToBackend();
-    return;
-  }
-  if (msalAccount) {
-    updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations:[], users:[], customers:[], projects:[] };
-    data.quotations = recs;
-    data.users = await secureUsers(getUsers());
-    data.customers = customersLoad();
-    data.projects = projectsLoad();
-    const ok = await odWriteData(data);
-    updateSyncBadge(ok ? 'synced' : 'error');
-    if (!ok) showNotif('Saved locally but OneDrive sync failed.', 'error');
-  }
+  if (backendMode) { await syncStateToBackend(); return; }
+  const ok = await cloudPush();
+  if (!ok) showNotif('Saved locally. Cloud sync failed — check internet.', 'error');
 }
 
 // ═══════════════════════════════════════════
@@ -2314,17 +2344,7 @@ async function projectUpsert(project) {
     await syncStateToBackend();
     return;
   }
-  if (msalAccount) {
-    updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: customersLoad(), projects: [] };
-    data.quotations = dbLoad();
-    data.users = await secureUsers(getUsers());
-    data.customers = customersLoad();
-    data.projects = projects;
-    const ok = await odWriteData(data);
-    updateSyncBadge(ok ? 'synced' : 'error');
-    if (!ok) showNotif('Project saved locally but OneDrive sync failed.', 'error');
-  }
+  await cloudPush();
 }
 
 async function saveProject() {
@@ -2356,16 +2376,8 @@ async function deleteProject(id) {
   projectsSave(projects);
   if (backendMode) {
     await syncStateToBackend();
-  } else if (msalAccount) {
-    updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: customersLoad(), projects: [] };
-    data.quotations = dbLoad();
-    data.users = await secureUsers(getUsers());
-    data.customers = customersLoad();
-    data.projects = projects;
-    await odWriteData(data);
-    updateSyncBadge('synced');
   }
+  await cloudPush();
   showNotif('Project deleted.', 'info');
 }
 
@@ -2459,19 +2471,6 @@ function generateQuotationNumber(dateLike = new Date(), excludeId = null) {
   const nextSerial = Math.max(parsedMax, fyRecords.length) + 1;
   return 'Q' + getFinancialYearPrefix(dateLike) + String(nextSerial).padStart(3, '0');
 }
-function normalizeEditableQuoteFields(record = {}) {
-  const normalized = { ...(record || {}) };
-  normalized.tcPayment = (typeof normalized.tcPayment === 'string' && normalized.tcPayment.trim())
-    ? normalized.tcPayment
-    : DEFAULT_PAYMENT;
-  normalized.tcDelivery = (typeof normalized.tcDelivery === 'string' && normalized.tcDelivery.trim())
-    ? normalized.tcDelivery
-    : DEFAULT_DELIVERY;
-  normalized.moldSpares = (typeof normalized.moldSpares === 'string' && normalized.moldSpares.trim())
-    ? normalized.moldSpares
-    : DEFAULT_SPARES;
-  return normalized;
-}
 function setAutoQuotationNumber(dateLike = new Date()) {
   const quoteNoEl = document.getElementById('quoteNo');
   if (!quoteNoEl) return;
@@ -2503,8 +2502,8 @@ function clearForm() {
   if(quoteNoEl) quoteNoEl.dataset.autoGenerated='true';
   renderCustomerDropdown('');
   document.getElementById('gstRate').value='18';
-  document.getElementById('tcPayment').value=DEFAULT_PAYMENT;
-  document.getElementById('tcDelivery').value=DEFAULT_DELIVERY;
+  document.getElementById('tcPayment').value='50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory.';
+  document.getElementById('tcDelivery').value='35\u201340 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval.';
   recalcTotals();
 }
 
@@ -2587,16 +2586,15 @@ function gatherData(){
 }
 
 function loadData(d){
-  const quote = normalizeEditableQuoteFields(d);
   clearForm();
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  set('quoteNo',quote.quoteNo);set('quoteDate',quote.quoteDate);set('custCompany',quote.custCompany);
-  set('custName',quote.custName);set('custPhone',quote.custPhone);set('custAddress',quote.custAddress);
-  set('custGST',quote.custGST);set('custEmail',quote.custEmail);set('selectedCustomerId', quote.customerId || '');renderCustomerDropdown(quote.customerId || '');set('gstRate',quote.gstRate||'18');
-  set('tcPayment',quote.tcPayment);set('tcDelivery',quote.tcDelivery);const msEl=document.getElementById('moldSpares');if(msEl) msEl.value=quote.moldSpares;
+  set('quoteNo',d.quoteNo);set('quoteDate',d.quoteDate);set('custCompany',d.custCompany);
+  set('custName',d.custName);set('custPhone',d.custPhone);set('custAddress',d.custAddress);
+  set('custGST',d.custGST);set('custEmail',d.custEmail);set('selectedCustomerId', d.customerId || '');renderCustomerDropdown(d.customerId || '');set('gstRate',d.gstRate||'18');
+  set('tcPayment',d.tcPayment);set('tcDelivery',d.tcDelivery);const msEl=document.getElementById('moldSpares');if(msEl) msEl.value=d.moldSpares||DEFAULT_SPARES;
   const quoteNoEl=document.getElementById('quoteNo');
   if(quoteNoEl) quoteNoEl.dataset.autoGenerated='false';
-  (quote.rows||[]).forEach(r=>addProductRow(r.desc,r.cavity,r.rate));
+  (d.rows||[]).forEach(r=>addProductRow(r.desc,r.cavity,r.rate));
   recalcTotals();
 }
 
@@ -2611,7 +2609,7 @@ async function saveQuotation(){
   if(!editingId)editingId=d.id; else d.id=editingId;
   await dbUpsert(d);
   document.getElementById('formTitle').textContent='Editing: '+d.quoteNo;
-  showNotif('Saved: '+d.quoteNo+' → '+(msalAccount?'OneDrive + Local':'Local'));
+  showNotif('Saved: '+d.quoteNo+' → '+(cloudConnected?'Cloud + Local':'Local only'));
 }
 
 // ═══════════════════════════════════════════
@@ -2655,7 +2653,8 @@ function editQ(id){
 function previewFromDB(id, mode='quotation'){
   const r=dbFind(id);if(!r)return;
   // Each record carries its own spares — never touch the form textarea
-  const previewRecord = normalizeEditableQuoteFields(r);
+  const previewRecord = Object.assign({}, r);
+  previewRecord.moldSpares = r.moldSpares || DEFAULT_SPARES;
   openPreview(mode, previewRecord);
 }
 function fmtDateShort(s){
@@ -2721,10 +2720,12 @@ function openPreview(mode='quotation', record=null){
   currentPrintMode=mode==='proforma'?'proforma':'quotation';
   if (record) {
     // Saved record: use a clean copy, never touch or read the form textarea
-    currentPrintRecord = normalizeEditableQuoteFields(record);
+    currentPrintRecord = Object.assign({}, record);
+    currentPrintRecord.moldSpares = record.moldSpares || DEFAULT_SPARES;
   } else {
     // Current form: read live textarea value
-    currentPrintRecord = normalizeEditableQuoteFields(gatherData());
+    currentPrintRecord = gatherData();
+    if (!currentPrintRecord.moldSpares) currentPrintRecord.moldSpares = DEFAULT_SPARES;
   }
   const cfg=getPrintModeConfig(currentPrintMode);
   const titleEl=document.getElementById('printModalTitle');
@@ -2749,7 +2750,6 @@ function doPrint(){
   pc.innerHTML='';
 }
 function renderPrintDoc(d, mode='quotation'){
-  d = normalizeEditableQuoteFields(d);
   const cfg=getPrintModeConfig(mode);
   let sub=0;(d.rows||[]).forEach(r=>{sub+=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);});
   const gstRate=parseFloat(d.gstRate)||0;const gst=sub*gstRate/100;const grand=sub+gst;
@@ -2851,8 +2851,8 @@ function renderPrintDoc(d, mode='quotation'){
       <div class="pd-sec-title"><strong>Terms &amp; Conditions</strong></div>
       <div class="pd-box pd-box-flow"><ul class="pd-list pd-tlist">
         <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is ${gstRate}%.</li>
-        <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||DEFAULT_DELIVERY)}</li>
-        <li><strong>Payment Terms:</strong> ${esc(d.tcPayment||DEFAULT_PAYMENT)}</li>
+        <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||'')}</li>
+        <li><strong>Payment Terms:</strong> ${esc(d.tcPayment||'')}</li>
         <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
         <li><strong>Delivery &amp; Transportation:</strong> The customer shall take delivery of the goods Ex-Works from the company facility. All expenses and risk of loss or damage during transportation shall be borne by the customer.</li>
         <li><strong>Mould Trial &amp; Training:</strong> Each mould is subjected to in-house mould trial. Your engineer may witness the trial at our factory, and training during the trial is free of cost. Travel, local transport and hotel stay are to be borne by you.</li>
@@ -2870,7 +2870,7 @@ function renderPrintDoc(d, mode='quotation'){
         <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
         <li><strong>Mold Components as Spares Along with Mold</strong>
           <div class="pd-subpoints">
-            ${(d.moldSpares || DEFAULT_SPARES).split('\n').filter(l=>l.trim()).map(l=>`<div class="pd-subpoint">${esc(l.trim())}</div>`).join('')}
+            ${(d.moldSpares || 'Thermocouple - 2 Nos\nCore, Cavity and Neck - 1 Set\nTip Insulator - 2 Nos\nNozzle Heaters - 2 Nos\nFasteners - Sufficient\nEjector Rods - 1 Set\nTeflon Tape - 2 Nos\nLatch Plate - 1 Set\nHeaters - 2 Nos\nBaffle O-Ring - 1 Set\nHot Runner Standard Seal - 2 Nos\nToolbox (Bolts, Keys, etc.) - 1 No').split('\n').filter(l=>l.trim()).map(l=>`<div class="pd-subpoint">${esc(l.trim())}</div>`).join('')}
           </div>
         </li>
       </ul></div>
@@ -2911,15 +2911,18 @@ async function retryODConnect() {
   const bar = document.getElementById('reconnectBar');
   if (bar) bar.querySelector('button').textContent = 'Connecting...';
   updateSyncBadge('syncing');
-  try {
-    await initMsal();
-    if (msalAccount) { hideReconnectBar(); checkODSetup(); showNotif('OneDrive connected!', 'success'); return; }
-    await msalSignIn();
-    return;
-  } catch(e) {}
-  if (bar) bar.querySelector('button').textContent = '↻ Reconnect OneDrive';
-  updateSyncBadge('error');
-  showNotif('OneDrive session expired. Please sign in to Microsoft again.', 'error');
+  (async () => {
+    const ok = await cloudSync();
+    if (ok) {
+      if (bar) bar.remove();
+      renderDB(); renderUserList();
+      showNotif('Cloud connected!', 'success');
+    } else {
+      if (bar) bar.querySelector('button').textContent = '↻ Retry';
+      updateSyncBadge('error');
+      showNotif('Still cannot reach cloud. Check internet.', 'error');
+    }
+  })();
 }
 
 function canAccessProjects(){ return false; }
@@ -2955,42 +2958,19 @@ function showNotif(msg,type='success'){
 async function startup() {
   if (window.__hexamechStartupDone) return;
   window.__hexamechStartupDone = true;
-  try {
-    // Seed embedded credentials if present
-    if (EMBEDDED_CLIENT_ID && EMBEDDED_REFRESH_TOKEN) {
-      localStorage.setItem('hx_od_clientid', EMBEDDED_CLIENT_ID);
-      var existing = loadTokens();
-      if (!existing || !existing.refresh_token) {
-        saveTokens({ refresh_token: EMBEDDED_REFRESH_TOKEN, expires_in: 0, savedAt: 0 });
-      }
-    }
-    ensureEmbeddedOneDriveAccount();
-  } catch(e) { console.warn('credential seed error:', e); }
-
-  // Show login screen immediately
+  // Show login immediately — no OAuth, no seeding needed
   var ls = document.getElementById('loadingScreen');
   var li = document.getElementById('loginScreen');
   if (ls) ls.style.display = 'none';
   if (li) li.style.display = 'flex';
-  const hasEmbeddedConnection = !!(EMBEDDED_CLIENT_ID && EMBEDDED_REFRESH_TOKEN);
-  const loginSub = document.getElementById('loginSub');
-  const loginDivider = document.getElementById('loginDivider');
+
+  // Hide Microsoft sign-in button — not needed anymore
   const msSignInBtn = document.getElementById('msSignInBtn');
+  const loginDivider = document.getElementById('loginDivider');
   const loginCloudStatus = document.getElementById('loginCloudStatus');
-  if (loginSub) {
-    loginSub.textContent = hasEmbeddedConnection
-      ? 'Sign in with your quotation username and password.'
-      : 'Sign in to access the Quotation System';
-  }
-  if (loginDivider) loginDivider.style.display = hasEmbeddedConnection ? 'none' : 'flex';
-  if (msSignInBtn) msSignInBtn.style.display = hasEmbeddedConnection ? 'none' : 'flex';
-  if (loginCloudStatus) loginCloudStatus.style.display = hasEmbeddedConnection ? 'block' : 'none';
-  const redirectHint = document.getElementById('redirectUriHint');
-  if (redirectHint) {
-    redirectHint.textContent = isSupportedRedirectUri()
-      ? getAppRedirectUri()
-      : 'Open this app from a hosted http/https web link. Local file paths cannot be used as the Microsoft redirect URL.';
-  }
+  if (msSignInBtn) msSignInBtn.style.display = 'none';
+  if (loginDivider) loginDivider.style.display = 'none';
+  if (loginCloudStatus) loginCloudStatus.style.display = 'none';
 
   wireCustomerFieldListeners();
   const quoteNoEl = document.getElementById('quoteNo');
@@ -3009,23 +2989,7 @@ async function startup() {
     });
   }
 
-  await detectBackendMode();
-  if (backendMode) {
-    try {
-      const restored = await restoreBackendSession();
-      if (restored) {
-        launchApp();
-        return;
-      }
-    } catch(e) {
-      apiAuthToken = '';
-      localStorage.removeItem('hx_api_token');
-    }
-    hideOneDriveUiForBackend();
-    return;
-  }
-
-  ensureUsersLoadedFromOneDrive();
+  // No backend, no OAuth — just show login. Cloud syncs after sign-in.
 }
 
 // Run immediately and also on DOMContentLoaded as fallback
