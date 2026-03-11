@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex,nofollow">
 <title>Hexamech — Quotation System</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -46,7 +45,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .btn-ms:hover{background:#f0f4ff;}
 .ms-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:18px;height:18px;}
 .ms-grid span{border-radius:1px;}
-.login-cloud-status{display:none;margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(39,174,96,.14);border:1px solid rgba(39,174,96,.35);color:#b9f3c9;font-size:13px;line-height:1.45;}
 .login-error{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#ff8070;border-radius:8px;padding:9px 13px;font-size:13px;margin-top:10px;display:none;}
 
 /* APP */
@@ -105,18 +103,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .fg2 label,.field-group label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
 .fg2 input,.fg2 select,.field-group input,.field-group textarea{background:var(--light);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Barlow',sans-serif;color:var(--text);outline:none;transition:border .18s;resize:vertical;}
 .fg2 input:focus,.fg2 select:focus,.field-group input:focus,.field-group textarea:focus{border-color:var(--accent);background:#fff;}
-.customer-db-bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-bottom:16px;}
-.customer-db-bar .btn-main{height:42px;white-space:nowrap;}
-.customer-search-shell{position:relative;}
-.customer-search-results{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 18px 40px rgba(13,27,42,.16);z-index:30;max-height:260px;overflow:auto;}
-.customer-search-results.open{display:block;}
-.customer-search-option{width:100%;background:#fff;border:none;border-bottom:1px solid #eef2f7;padding:10px 12px;text-align:left;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .15s;}
-.customer-search-option:last-child{border-bottom:none;}
-.customer-search-option:hover,.customer-search-option.active{background:#f5f8ff;}
-.customer-search-option strong{display:block;font-size:14px;color:var(--navy);}
-.customer-search-option span{display:block;font-size:12px;color:var(--muted);margin-top:2px;}
-.customer-search-empty{padding:11px 12px;font-size:13px;color:var(--muted);}
-.customer-db-hint{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px;}
 .cust-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 .cust-grid .span2{grid-column:span 2;}
 .qno-input{font-family:'DM Mono',monospace !important;font-weight:600 !important;color:var(--navy) !important;background:#fff !important;border:1.5px solid var(--accent) !important;}
@@ -128,10 +114,10 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .product-table thead th{padding:10px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.9);text-align:left;white-space:nowrap;}
 .product-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
 .product-table tbody tr:hover{background:#f9fafc;}
-.product-table tbody td{padding:8px 12px;vertical-align:top;}
+.product-table tbody td{padding:8px 12px;vertical-align:middle;}
 .td-sr{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);width:36px;text-align:center !important;}
-.td-desc textarea{width:100%;min-width:220px;min-height:44px;resize:vertical;background:var(--light);border:1.5px solid var(--border);border-radius:7px;padding:8px 10px;font-size:14px;line-height:1.35;font-family:'Barlow',sans-serif;outline:none;transition:border .18s;white-space:pre-wrap;overflow:hidden;}
-.td-desc textarea:focus{border-color:var(--accent);background:#fff;}
+.td-desc input{width:100%;min-width:220px;background:var(--light);border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;font-family:'Barlow',sans-serif;outline:none;transition:border .18s;}
+.td-desc input:focus{border-color:var(--accent);background:#fff;}
 .td-num input{width:105px;background:var(--light);border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;font-family:'DM Mono',monospace;text-align:right;outline:none;transition:border .18s;}
 .td-num input:focus{border-color:var(--accent);background:#fff;}
 .td-total{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--steel);white-space:nowrap;text-align:right;min-width:110px;}
@@ -163,17 +149,12 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .terms-editable-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .terms-editable-input{background:rgba(232,160,32,.08);border:1.5px solid var(--accent);border-radius:6px;padding:3px 9px;font-size:14px;font-family:'Barlow',sans-serif;color:var(--navy);outline:none;font-weight:500;min-width:220px;}
 .terms-editable-badge{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--accent);background:rgba(232,160,32,.12);padding:2px 6px;border-radius:4px;white-space:nowrap;}
-.spec-subpoints{margin-top:7px;display:grid;gap:4px;}
-.spec-subpoint{padding-left:14px;position:relative;color:var(--text);}
-.spec-subpoint::before{content:'•';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;}
-.spec-note{margin-top:8px;font-size:12px;color:var(--muted);font-style:italic;}
 .bank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .bank-item .bk{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;}
 .bank-item .bv{font-size:14px;font-family:'DM Mono',monospace;color:var(--text);font-weight:500;margin-top:2px;}
 
 /* DB VIEW */
 #dbView{display:none;}
-#projectsView{display:none;}
 .db-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
 .db-header h2{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--navy);}
 .db-search-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
@@ -197,34 +178,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .db-table tbody td.acts{white-space:nowrap;text-align:right;}
 .db-table tbody td.acts>*{margin-left:5px;}
 .db-empty{text-align:center;padding:56px 20px;color:var(--muted);}
-
-/* CUSTOMER VIEW */
-#customersView{display:none;}
-.customer-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:20px;}
-.customer-table-wrap{background:#fff;border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;}
-.customer-table{width:100%;border-collapse:collapse;font-size:14px;}
-.customer-table thead tr{background:var(--navy);}
-.customer-table thead th{padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.85);text-align:left;white-space:nowrap;}
-.customer-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
-.customer-table tbody tr:hover{background:#f5f8ff;}
-.customer-table tbody tr:last-child{border-bottom:none;}
-.customer-table tbody td{padding:10px 14px;color:var(--text);vertical-align:top;}
-.customer-table tbody td.cmono{font-family:'DM Mono',monospace;font-size:13px;}
-.customer-table tbody td.cacts{white-space:nowrap;text-align:right;}
-.customer-table tbody td.cacts>*{margin-left:5px;}
-.customer-empty{text-align:center;padding:56px 20px;color:var(--muted);}
-.customer-mini{font-size:12px;color:var(--muted);margin-top:3px;}
-.project-form-wrap{display:none;margin-bottom:20px;}
-.project-form-wrap.open{display:block;}
-.project-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.project-grid .span2{grid-column:1 / -1;}
-.project-helper{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px;}
-.project-status-chip{display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
-.project-status-chip.active{background:#e8f5e9;color:#1b5e20;}
-.project-status-chip.completed{background:#e3f2fd;color:#0d47a1;}
-.project-empty{text-align:center;padding:32px 20px;color:var(--muted);}
-.checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);}
-.checkbox-row input{width:16px;height:16px;accent-color:var(--accent);}
 
 /* SETTINGS VIEW */
 #settingsView{display:none;}
@@ -252,17 +205,13 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 /* MODALS */
 .modal-backdrop{display:none;position:fixed;inset:0;z-index:9998;background:rgba(13,27,42,.75);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:20px;}
 .modal-backdrop.open{display:flex;}
-.modal-card{background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.3);width:100%;overflow:hidden;}
+.modal-card{background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.3);width:100%;}
 .modal-header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0;}
 .modal-header h3{font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:17px;font-weight:700;}
 .modal-close{background:rgba(255,255,255,.12);border:none;color:#fff;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
 .modal-close:hover{background:rgba(255,255,255,.22);}
 .modal-body{padding:24px;}
 .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
-#customerModal .modal-card{max-width:760px;}
-#customerModal .cust-grid{grid-template-columns:1fr 1fr;gap:16px;}
-#customerModal .cust-grid .span2{grid-column:1 / -1;}
-
 
 /* PRINT MODAL */
 #printModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(13,27,42,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
@@ -272,15 +221,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pm-topbar h4{font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:15px;font-weight:700;}
 
 /* PRINT DOC */
-#printDoc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
-.pd-corner-logo{position:absolute;top:12px;right:6px;display:block;}
-.pd-corner-logo img{height:46px;width:auto;display:block;object-fit:contain;}
-.pd-second-page .pd-sec-title{margin-top:10px;padding:6px 11px;font-size:12px;}
-.pd-second-page .pd-box{padding:9px;margin-bottom:10px;}
-.pd-second-page .pd-list li{font-size:11px;line-height:1.42;padding:3px 0 3px 17px;}
-.pd-second-page .pd-list li::before{top:4px;width:12px;height:12px;font-size:8px;}
-.pd-second-page .pd-subpoints{margin-top:4px;gap:2px;}
-.pd-second-page .pd-subpoint{font-size:11px;line-height:1.35;}
+#printDoc{padding:36px;font-family:'Barlow',sans-serif;}
 .pd-title-bar{text-align:center;margin-bottom:18px;}
 .pd-title-bar span{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;letter-spacing:.18em;color:var(--navy);border-bottom:3px solid var(--accent);padding-bottom:5px;}
 .pd-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--navy);}
@@ -288,26 +229,22 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pd-company-info strong{color:var(--navy);font-size:13px;}
 .pd-meta-strip{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
 .pd-meta-box{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-.pd-mbox-hdr{background:#fff;color:var(--navy);padding:8px 13px;font-size:12px;font-family:Arial,'Barlow',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.09em;border-bottom:1px solid var(--border);}
+.pd-mbox-hdr{background:var(--navy);color:rgba(255,255,255,.85);padding:7px 13px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
 .pd-mbox-body{padding:12px;}
-.pd-mrow{display:flex;gap:8px;margin-bottom:4px;font-size:13px;align-items:flex-start;}
+.pd-mrow{display:flex;gap:8px;margin-bottom:4px;font-size:13px;}
 .pd-mrow:last-child{margin-bottom:0;}
-.pd-mrow .pml{font-weight:700;color:var(--navy);min-width:140px;flex:0 0 140px;}
-.pd-mrow .pmv{color:#445066;font-weight:500;flex:1;min-width:0;}
-.pd-sec-title{font-family:Arial,'Barlow',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--navy);background:#fff;padding:8px 13px;border:1px solid var(--border);border-bottom:none;border-left:4px solid var(--accent);border-radius:8px 8px 0 0;margin-top:16px;}
-.pd-product-shell{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;min-height:500px;display:flex;flex-direction:column;overflow:hidden;background:#fff;}
-.pd-table-wrap{flex:1;}
+.pd-mrow .pml{font-weight:600;color:var(--text);min-width:76px;}
+.pd-mrow .pmv{color:var(--muted);}
+.pd-sec-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fff;background:var(--navy);padding:8px 13px;border-radius:8px 8px 0 0;margin-top:16px;}
 .pd-table{width:100%;border-collapse:collapse;font-size:13px;}
-.pd-table thead tr{background:transparent;}
-.pd-table thead th{padding:9px 11px;color:var(--navy);font-size:11px;font-family:Arial,'Barlow',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.07em;text-align:left;border-top:none;border-bottom:2px solid var(--navy);background:#f7f9fb;}
+.pd-table thead tr{background:var(--steel);}
+.pd-table thead th{padding:9px 11px;color:rgba(255,255,255,.9);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-align:left;}
 .pd-table thead th:last-child{text-align:right;}
-.pd-table tbody td{padding:8px 11px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
-.pd-table tbody td.pd-desc-cell{white-space:pre-line;line-height:1.42;}
-.pd-second-page{page-break-before:always;break-before:page;}
+.pd-table tbody td{padding:8px 11px;border-bottom:1px solid var(--border);color:var(--text);}
 .pd-table tbody td:last-child{text-align:right;font-family:'DM Mono',monospace;}
 .pd-table tbody td.pdsr{font-family:'DM Mono',monospace;color:var(--muted);text-align:center;}
-.pd-totals-wrap{display:flex;justify-content:flex-end;margin-top:auto;padding-top:12px;}
-.pd-totals{min-width:250px;border:1px solid var(--border);border-right:none;border-bottom:none;border-radius:10px 0 0 0;overflow:hidden;background:#fff;}
+.pd-totals-wrap{display:flex;justify-content:flex-end;}
+.pd-totals{min-width:250px;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;}
 .pd-tot-row{display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid var(--border);font-size:13px;}
 .pd-tot-row:last-child{border-bottom:none;}
 .pd-tot-row .ptl{color:var(--muted);}
@@ -316,17 +253,11 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pd-tot-row.pdgrand .ptl{color:rgba(255,255,255,.75);font-weight:600;}
 .pd-tot-row.pdgrand .ptv{color:var(--accent);font-weight:700;font-size:15px;}
 .pd-box{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:12px;margin-bottom:14px;}
-.pd-box-flow{page-break-inside:auto;break-inside:auto;}
-.pd-box-flow .pd-list{display:block;}
-.pd-box-flow .pd-list li{break-inside:avoid;page-break-inside:avoid;}
 .pd-list{list-style:none;counter-reset:pl;}
 .pd-list li{counter-increment:pl;font-size:12px;line-height:1.6;color:var(--text);padding:4px 0 4px 19px;position:relative;border-bottom:1px solid #f0f2f5;}
 .pd-list li:last-child{border-bottom:none;}
 .pd-list li::before{content:counter(pl);position:absolute;left:0;top:6px;width:14px;height:14px;background:var(--steel);color:#fff;border-radius:50%;font-size:9px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;font-weight:700;}
 .pd-tlist li::before{background:var(--accent);color:var(--navy);}
-.pd-subpoints{margin-top:6px;display:grid;gap:3px;}
-.pd-subpoint{padding-left:12px;position:relative;}
-.pd-subpoint::before{content:'•';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;}
 .pd-bank-wrap{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:12px;display:flex;flex-wrap:wrap;gap:15px;font-size:12px;}
 .pd-bi .pbk{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;}
 .pd-bi .pbv{font-family:'DM Mono',monospace;color:var(--text);font-weight:500;margin-top:2px;}
@@ -364,7 +295,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 
 @media(max-width:700px){
   .cust-grid{grid-template-columns:1fr;}.cust-grid .span2{grid-column:span 1;}
-  .meta-row,.settings-grid,.project-grid{grid-template-columns:1fr;}.bank-grid{grid-template-columns:1fr 1fr;}
+  .meta-row,.settings-grid{grid-template-columns:1fr;}.bank-grid{grid-template-columns:1fr 1fr;}
   .app-main{padding:14px 12px 46px;}.topbar{padding:0 12px;}
   .db-stats{grid-template-columns:1fr;}.login-card{width:100%;padding:28px 20px;}
 }
@@ -372,18 +303,14 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   @page{margin:14mm 16mm;size:A4 portrait;}
   body>*{display:none !important;}
   body.printing>#printContainer{display:block !important;}
-  #printContainer{display:none;position:static;width:100%;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
-  #printContainer .pd-sec-title{page-break-after:auto;break-after:auto;}
+  #printContainer{display:none;position:static;width:100%;font-family:'Barlow',sans-serif;}
+  #printContainer .pd-sec-title{page-break-after:avoid;break-after:avoid;}
   #printContainer .pd-box,#printContainer .pd-bank-wrap{page-break-inside:avoid;break-inside:avoid;}
-  #printContainer .pd-box-flow{page-break-inside:auto;break-inside:auto;}
-  #printContainer .pd-box-flow .pd-list{display:block;}
-  #printContainer .pd-box-flow .pd-list li{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-footer{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-product-block{page-break-inside:auto;break-inside:auto;}
   #printContainer .pd-totals-wrap{page-break-inside:avoid;break-inside:avoid;page-break-before:avoid;break-before:avoid;}
   #printContainer .pd-table thead{display:table-header-group;}
   #printContainer .pd-table tr{page-break-inside:avoid;break-inside:avoid;}
-  #printContainer .pd-second-page{page-break-before:always;break-before:page;}
 }
 </style>
 </head>
@@ -405,19 +332,18 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       <div class="login-logo-wrap"><img id="logoLogin" alt="Hexamech" style="height:32px;display:block;"></div>
     </div>
     <div class="login-heading">Welcome back</div>
-    <div class="login-sub" id="loginSub">Sign in to access the Quotation System</div>
+    <div class="login-sub">Sign in to access the Quotation System</div>
     <div class="fg"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="username"></div>
     <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password"></div>
     <button class="btn-login" onclick="doLogin()">Sign In →</button>
-    <div class="login-divider" id="loginDivider">or sync with OneDrive</div>
-    <button class="btn-ms" id="msSignInBtn" onclick="msalSignIn()">
+    <div class="login-divider">or sync with OneDrive</div>
+    <button class="btn-ms" onclick="msalSignIn()">
       <div class="ms-grid">
         <span style="background:#f25022;"></span><span style="background:#7fba00;"></span>
         <span style="background:#00a4ef;"></span><span style="background:#ffb900;"></span>
       </div>
       Sign in with Microsoft (OneDrive)
     </button>
-    <div class="login-cloud-status" id="loginCloudStatus">Company cloud is connected. Sign in with your quotation username and password.</div>
     <div class="login-error" id="loginError">Invalid username or password.</div>
   </div>
 </div>
@@ -432,13 +358,12 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       <span style="color:rgba(255,255,255,.35);font-size:12px;font-weight:400;">— Quotations</span>
     </div>
     <div class="topbar-nav">
+      <button class="tnb active" id="navNew" onclick="showView('new')">＋ New</button>
       <button class="tnb" id="navDB" onclick="showView('db')">📋 All Quotations</button>
-      <button class="tnb" id="navCustomers" onclick="showView('customers')">👥 Customer List</button>
-      <button class="tnb" id="navProjects" onclick="showView('projects')" style="display:none;">🗂 Project Management</button>
       <button class="tnb" id="navSettings" onclick="showView('settings')">⚙️ Settings</button>
     </div>
     <div class="topbar-actions">
-      <div id="syncBadge" class="sync-badge local" title="OneDrive sync status" style="cursor:default;">
+      <div id="syncBadge" class="sync-badge local" onclick="openSetupModal()" title="OneDrive status">
         <span id="syncIcon">💾</span><span id="syncText">Local only</span>
       </div>
       <div class="topbar-user">Hi, <strong id="loggedUser"></strong></div>
@@ -447,23 +372,43 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   </div>
 
   <!-- NEW QUOTATION VIEW -->
-  <div id="newView" style="display:none;">
+  <div id="newView">
     <div class="app-main">
+      <div class="od-banner" id="odBanner" style="display:none;">
+        <div class="od-banner-left">
+          <div class="od-banner-icon">☁️</div>
+          <div class="od-banner-text">
+            <h4>Save to OneDrive — Your data, your cloud</h4>
+            <p>Connect Microsoft OneDrive to auto-sync all quotations. One-time 5-minute setup.</p>
+          </div>
+        </div>
+        <button class="btn-od-connect" onclick="openSetupModal()">Connect OneDrive →</button>
+      </div>
+      <div class="action-bar">
+        <h2 id="formTitle">New Quotation</h2>
+        <div class="action-bar-right">
+          <button class="btn-main btn-navy" onclick="openPreview()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Preview & Print
+          </button>
+          <button class="btn-main btn-gold" onclick="saveQuotation()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Quotation
+          </button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><div class="s-num">1</div><h3>Quotation Details</h3></div>
+        <div class="section-body">
+          <div class="meta-row">
+            <div class="fg2"><label>Quotation Number <span style="color:var(--accent);font-size:10px;">(Editable)</span></label><input type="text" id="quoteNo" class="qno-input" placeholder="e.g. Q25010IMHR"></div>
+            <div class="fg2"><label>Quotation Date</label><input type="date" id="quoteDate"></div>
+          </div>
+        </div>
+      </div>
       <div class="section-card">
         <div class="section-header"><div class="s-num">2</div><h3>Customer Details</h3></div>
         <div class="section-body">
-          <input type="hidden" id="selectedCustomerId">
-          <div class="customer-db-bar">
-            <div class="field-group">
-              <label>Saved Customer</label>
-              <div class="customer-search-shell">
-                <input type="text" id="savedCustomerSearch" placeholder="Type customer or company name to search" autocomplete="off" oninput="onSavedCustomerInput(this.value)" onfocus="openCustomerSuggestions()" onblur="closeCustomerSuggestionsSoon()" onkeydown="handleSavedCustomerKeydown(event)">
-                <div id="savedCustomerSuggestions" class="customer-search-results"></div>
-              </div>
-              <div class="customer-db-hint">Type company or contact name to search and select a saved customer, or keep manual entry for a new customer.</div>
-            </div>
-            <button class="btn-main btn-green" type="button" onclick="openCustomerModal('new')">＋ Add Customer</button>
-          </div>
           <div class="cust-grid">
             <div class="field-group"><label>M/S (Company)</label><input type="text" id="custCompany" placeholder="e.g. Sardar Beverages"></div>
             <div class="field-group"><label>Contact Person</label><input type="text" id="custName" placeholder="e.g. Mr. Parth"></div>
@@ -501,26 +446,14 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
         </div>
       </div>
       <div class="section-card">
-        <div class="section-header"><div class="s-num">4</div><h3>Special Features Inclusive with Mould</h3></div>
+        <div class="section-header"><div class="s-num">4</div><h3>Technical Specifications</h3></div>
         <div class="section-body">
           <ul class="specs-list">
-            <li>We design preform according to clients' specifications.</li>
+            <li>Cavity and Core manufactured from highly conductive, tough and wear resistant material.</li>
             <li>Channels for cooling water are designed to flow turbulently.</li>
-            <li>Assembled stack parts for the hot runner system sourced internationally.</li>
-            <li>The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.</li>
-            <li>We use Unbrako or TVS fasteners.</li>
-            <li>
-              <strong>Mould material specification</strong>
-              <div class="spec-subpoints">
-                <div class="spec-subpoint">Cavity: DIN 1.2316 ESR - Böhler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.</div>
-                <div class="spec-subpoint">Core: DIN 1.2316 ESR - Böhler (German Make), corrosion resistance steel.</div>
-                <div class="spec-subpoint">Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.</div>
-                <div class="spec-subpoint">Hot Runner Plates: 1.2085 corrosion resistance steel.</div>
-                <div class="spec-subpoint">Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.</div>
-                <div class="spec-subpoint">All mould base plates are electroless nickel plated (ENP).</div>
-                <div class="spec-subpoint">Advanced profile heaters are used for smooth mould operation start-up.</div>
-              </div>
-            </li>
+            <li>Recommended to use Unbrako fasteners.</li>
+            <li>We design preform according to clients' specifications.</li>
+            <li>The customer must supply a preform design or sample. If not, we will design the preform, and manufacturing will begin only after the customer approves the design.</li>
           </ul>
         </div>
       </div>
@@ -528,42 +461,20 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
         <div class="section-header"><div class="s-num">5</div><h3>Terms & Conditions</h3></div>
         <div class="section-body">
           <ul class="terms-list">
-            <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is 18%.</li>
-            <li><strong>Delivery Period:</strong> <span class="terms-editable-wrap"><input class="terms-editable-input" id="tcDelivery" value="35–40 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval."><span class="terms-editable-badge">Editable</span></span></li>
-            <li><strong>Payment Terms:</strong> <span class="terms-editable-wrap"><input class="terms-editable-input" id="tcPayment" value="50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory."><span class="terms-editable-badge">Editable</span></span></li>
-            <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
-            <li><strong>Delivery &amp; Transportation:</strong> Goods are supplied Ex-Works from our facility. All transportation expenses and risk of loss or damage are to be borne by the customer.</li>
-            <li><strong>Mould Trial &amp; Training:</strong> In-house mould trial can be witnessed by your engineer. Training during mould trial at our factory is free of cost; travel, local transport and hotel stay are to be borne by you.</li>
-            <li><strong>Mould Commissioning:</strong> Commissioning support up to 2 days per mould is free. After that, ₹5,000 per day (domestic) applies. Travel, local transport and accommodation are to be arranged and borne by the customer.</li>
-            <li><strong>Packaging &amp; Freight Forwarding:</strong> Exclusive.</li>
-            <li><strong>Delayed Payments:</strong> Delay in balance payment beyond 1 week from mould readiness will attract interest @ 1% per week on due payment.</li>
-            <li><strong>Factory Environment:</strong> To achieve best output, productivity and quality, maintain dust-free conditions and 25 °C shop-floor temperature.</li>
-            <li><strong>Rejection of Non-Conforming Goods:</strong> Notify the company within five days after delivery.</li>
-            <li><strong>Warranty:</strong> The mould is under warranty for one year from dispatch against manufacturing defects or faulty workmanship.</li>
-            <li><strong>Warranty Excludes:</strong> Misuse, improper installation, accidental damage, and unauthorised repair or alteration.</li>
-            <li><strong>Order Cancellation:</strong> Order once placed cannot be cancelled without written consent and cancellation charges based on manufacturing progress. Full mould price is recoverable once all mould parts are manufactured.</li>
-            <li><strong>Insurance:</strong> If required, it will be handled by the client.</li>
-            <li><strong>Jurisdiction:</strong> Gujarat courts have jurisdiction only.</li>
-            <li><strong>Copyright:</strong> Customer is liable for design and product copyright.</li>
-            <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
-            <li><strong>Mold Components as Spares:</strong>
-              <div class="spec-subpoints">
-                <div class="spec-subpoint">Thermocouple - 2 Nos</div>
-                <div class="spec-subpoint">Core, Cavity and Neck - 1 Set</div>
-                <div class="spec-subpoint">Tip Insulator - 2 Nos</div>
-                <div class="spec-subpoint">Nozzle Heaters - 2 Nos</div>
-                <div class="spec-subpoint">Fasteners - Sufficient</div>
-                <div class="spec-subpoint">Ejector Rods - 1 Set</div>
-                <div class="spec-subpoint">Teflon Tape - 2 Nos</div>
-                <div class="spec-subpoint">Latch Plate - 1 Set</div>
-                <div class="spec-subpoint">Heaters - 2 Nos</div>
-                <div class="spec-subpoint">Baffle O-Ring - 1 Set</div>
-                <div class="spec-subpoint">Hot Runner Standard Seal - 2 Nos</div>
-                <div class="spec-subpoint">Toolbox (Bolts, Keys, etc.) - 1 No</div>
-              </div>
-            </li>
+            <li><strong>Warranty:</strong> One year from dispatch against manufacturing defects. No penalties or liquidated damages. Defective parts will be replaced or repaired.</li>
+            <li><strong>Warranty Excludes:</strong> Misuse, improper installation, accidental damage, or unauthorised repair.</li>
+            <li><strong>Insurance:</strong> If required, handled by the client.</li>
+            <li><strong>Jurisdiction:</strong> Gujarat courts only.</li>
+            <li><strong>Copyright:</strong> Customer liable for design and product copyright.</li>
+            <li><strong>Validity:</strong> Quotation valid up to 15 days only.</li>
+            <li><strong>Payment:</strong> <span class="terms-editable-wrap"><input class="terms-editable-input" id="tcPayment" value="50% advance, balance against trial prior to dispatch."><span class="terms-editable-badge">Editable</span></span></li>
+            <li><strong>Charges:</strong> Design modification, trial, polishing, rework charges extra and borne by customer.</li>
+            <li><strong>Delivery & Transportation:</strong> Ex-Works. All transport expenses and risks borne by customer.</li>
+            <li><strong>Rejection:</strong> Notify within 5 days of delivery.</li>
+            <li><strong>Packaging & Forwarding:</strong> Exclusive.</li>
+            <li><strong>Delivery Period:</strong> <span class="terms-editable-wrap"><input class="terms-editable-input" id="tcDelivery" value="60–70 working days from date of receipt of confirmed PO and advance payment."><span class="terms-editable-badge">Editable</span></span></li>
+            <li><strong>Tax:</strong> As applicable extra at despatch. At present GST is 18%.</li>
           </ul>
-          <div class="spec-note">Only Delivery Period and Payment Terms are editable.</div>
         </div>
       </div>
       <div class="section-card">
@@ -583,7 +494,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   </div>
 
   <!-- DB VIEW -->
-  <div id="dbView" style="display:none;">
+  <div id="dbView">
     <div class="app-main">
       <div class="db-header">
         <h2>All Quotations</h2>
@@ -593,8 +504,9 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           <button class="btn-main btn-navy" onclick="syncFromOneDrive()" id="btnSyncNow" style="display:none;">↻ Sync</button>
         </div>
       </div>
-      <div class="db-stats" style="grid-template-columns:repeat(2,1fr);">
+      <div class="db-stats">
         <div class="db-stat"><div class="dsl">Total Quotations</div><div class="dsv" id="statTotal">0</div></div>
+        <div class="db-stat"><div class="dsl">Total Value (excl. GST)</div><div class="dsv acc" id="statValue">₹0</div></div>
         <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Local</div><div class="dssub" id="statStorageSub">Connect OneDrive to sync</div></div>
       </div>
       <div class="db-table-wrap">
@@ -611,148 +523,8 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     </div>
   </div>
 
-  <!-- CUSTOMERS VIEW -->
-  <div id="customersView" style="display:none;">
-    <div class="app-main">
-      <div class="db-header">
-        <h2>Customer List</h2>
-        <div class="db-search-row">
-          <input type="text" id="customerSearch" placeholder="Search by company, person, phone, GST, email…" oninput="renderCustomersView()">
-          <button class="btn-main btn-green" onclick="openCustomerModal('new')">＋ Add Customer</button>
-          <button class="btn-main btn-navy" onclick="showView('new');newQuotation()">＋ New Quotation</button>
-        </div>
-      </div>
-      <div class="customer-stats">
-        <div class="db-stat"><div class="dsl">Total Customers</div><div class="dsv" id="customerStatTotal">0</div></div>
-        <div class="db-stat"><div class="dsl">With GST Number</div><div class="dsv" id="customerStatGST">0</div></div>
-        <div class="db-stat"><div class="dsl">With Email</div><div class="dsv" id="customerStatEmail">0</div></div>
-      </div>
-      <div class="customer-table-wrap">
-        <table class="customer-table">
-          <thead><tr>
-            <th>M/S (Company)</th><th>Contact Person</th><th>Contact Details</th><th>Address</th><th style="text-align:right;">Actions</th>
-          </tr></thead>
-          <tbody id="customerTableBody"></tbody>
-        </table>
-        <div id="customerEmpty" class="customer-empty" style="display:none;"><p style="font-size:15px;">👥 No saved customers yet.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PROJECTS VIEW -->
-  <div id="projectsView" style="display:none;">
-    <div class="app-main">
-      <div class="db-header">
-        <h2>Project Management</h2>
-        <div class="db-search-row">
-          <input type="text" id="projectSearch" placeholder="Search by project no, customer, order ref..." oninput="renderProjectsView()">
-          <button class="btn-main btn-green" onclick="openProjectForm()">＋ New Project</button>
-        </div>
-      </div>
-
-      <div class="db-stats">
-        <div class="db-stat"><div class="dsl">Active Projects</div><div class="dsv" id="projectStatActive">0</div></div>
-        <div class="db-stat"><div class="dsl">Completed Projects</div><div class="dsv" id="projectStatCompleted">0</div></div>
-        <div class="db-stat"><div class="dsl">Total BOM Parts</div><div class="dsv" id="projectStatParts">0</div></div>
-      </div>
-
-      <div id="projectFormWrap" class="project-form-wrap">
-        <div class="action-bar">
-          <h2 id="projectFormTitle">New Project</h2>
-          <div class="action-bar-right">
-            <button class="btn-main btn-navy" onclick="closeProjectForm()">✕ Close</button>
-            <button class="btn-main btn-gold" onclick="saveProject()">💾 Save Project</button>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-header"><div class="s-num">1</div><h3>Project & Order Details</h3></div>
-          <div class="section-body">
-            <div class="project-grid">
-              <div class="field-group"><label>Project Number</label><input type="text" id="projectNo" readonly></div>
-              <div class="field-group"><label>Order Date</label><input type="date" id="projectOrderDate"></div>
-              <div class="field-group"><label>Customer Company</label><input type="text" id="projectCustomerCompany" placeholder="e.g. Sumitek Natraj Machinery Pvt Ltd"></div>
-              <div class="field-group"><label>Contact Person</label><input type="text" id="projectCustomerContact" placeholder="e.g. Mr. Mukesh"></div>
-              <div class="field-group"><label>Customer Phone</label><input type="tel" id="projectCustomerPhone" placeholder="e.g. 9876543210"></div>
-              <div class="field-group"><label>Order Reference</label><input type="text" id="projectOrderRef" placeholder="e.g. PO-2026-014"></div>
-              <div class="field-group"><label>Status</label>
-                <select id="projectStatus">
-                  <option value="active">Active</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-              <div class="field-group"><label>Quotation Reference</label><input type="text" id="projectQuoteRef" placeholder="e.g. Q26001"></div>
-              <div class="field-group span2"><label>Order Details</label><textarea id="projectOrderDetails" rows="3" placeholder="Enter order details, mould details, cavity information, special requirements, delivery notes, etc."></textarea></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-header"><div class="s-num">2</div><h3>BOM Creator</h3></div>
-          <div class="section-body">
-            <div class="product-table-wrap">
-              <table class="product-table">
-                <thead><tr>
-                  <th style="text-align:center;">Sr.</th><th>Part Name</th><th>Raw Material</th><th>Finish Size</th><th style="text-align:right;">Qty</th><th style="width:32px;"></th>
-                </tr></thead>
-                <tbody id="projectBomRows"></tbody>
-              </table>
-            </div>
-            <button class="btn-add-row" type="button" onclick="addBomRow()">＋ Add BOM Part</button>
-            <div class="project-helper">Each BOM part will automatically appear in the progress sheet below.</div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-header"><div class="s-num">3</div><h3>Project Progress Sheet</h3></div>
-          <div class="section-body">
-            <div class="product-table-wrap">
-              <table class="product-table">
-                <thead><tr>
-                  <th>Part Name</th><th>Process Stage</th><th>Stage Date</th>
-                </tr></thead>
-                <tbody id="projectProgressRows"></tbody>
-              </table>
-            </div>
-            <div class="project-helper">Update the latest process stage and date for each BOM part. Completed projects will move to the completed list.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-header"><div class="s-num">A</div><h3>Active Projects</h3></div>
-        <div class="section-body">
-          <div class="db-table-wrap">
-            <table class="db-table">
-              <thead><tr>
-                <th>Project No.</th><th>Customer</th><th>Order Ref</th><th>Order Date</th><th style="text-align:center;">BOM Parts</th><th>Status</th><th style="text-align:right;">Actions</th>
-              </tr></thead>
-              <tbody id="activeProjectsBody"></tbody>
-            </table>
-          </div>
-          <div id="activeProjectsEmpty" class="project-empty" style="display:none;">No active projects yet.</div>
-        </div>
-      </div>
-
-      <div class="section-card" style="margin-top:20px;">
-        <div class="section-header"><div class="s-num">C</div><h3>Completed Projects</h3></div>
-        <div class="section-body">
-          <div class="db-table-wrap">
-            <table class="db-table">
-              <thead><tr>
-                <th>Project No.</th><th>Customer</th><th>Order Ref</th><th>Completed On</th><th style="text-align:center;">BOM Parts</th><th>Status</th><th style="text-align:right;">Actions</th>
-              </tr></thead>
-              <tbody id="completedProjectsBody"></tbody>
-            </table>
-          </div>
-          <div id="completedProjectsEmpty" class="project-empty" style="display:none;">No completed projects yet.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- SETTINGS VIEW -->
-  <div id="settingsView" style="display:none;">
+  <div id="settingsView">
     <div class="app-main">
       <div class="action-bar"><h2>Settings</h2></div>
       <div class="settings-grid">
@@ -777,25 +549,15 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           </div>
         </div>
 
-        <div class="settings-card">
-          <div class="settings-card-header"><h3>📱 My Contact Details</h3></div>
-          <div class="settings-card-body">
-            <div class="fg2" style="margin-bottom:12px;"><label>Mobile Number</label><input type="tel" id="myContactPhone" placeholder="e.g. 9876543210"></div>
-            <div class="fg2" style="margin-bottom:16px;"><label>Email ID</label><input type="email" id="myContactEmail" placeholder="e.g. sales@hexamech.com"></div>
-            <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">These details will appear on every quotation and proforma invoice you save.</div>
-            <button class="btn-main btn-green" style="width:100%;justify-content:center;" onclick="saveMyContactDetails()">Save My Contact Details</button>
-          </div>
-        </div>
-
         <!-- OneDrive -->
         <div class="settings-card" style="grid-column:span 2;">
           <div class="settings-card-header"><h3>☁️ OneDrive Connection</h3></div>
           <div class="settings-card-body">
             <div id="odStatusBox"></div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn-main btn-navy" >⚙️ Setup / Change Client ID</button>
+              <button class="btn-main btn-navy" onclick="openSetupModal()">⚙️ Setup / Change Client ID</button>
               <button class="btn-main btn-green" onclick="syncFromOneDrive()" id="btnSyncSettings" style="display:none;">↻ Sync Now</button>
-              <button class="btn-main" id="btnExportApp" onclick="exportConfiguredApp()" style="background:#7b2d8b;color:#fff;display:none;">📦 Export App for Other Users</button>
+              <button class="btn-main" style="background:#7b2d8b;color:#fff;" onclick="exportConfiguredApp()" id="btnExportApp" style="display:none;">📦 Export App for Other Users</button>
               <button class="btn-main btn-red" onclick="disconnectOneDrive()" id="btnDisconnect" style="display:none;">✕ Disconnect OneDrive</button>
             </div>
           </div>
@@ -810,13 +572,62 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 <div id="printModal">
   <div class="print-modal-inner">
     <div class="pm-topbar">
-      <h4 id="printModalTitle">Quotation Preview</h4>
+      <h4>Quotation Preview</h4>
       <div style="display:flex;gap:8px;">
         <button class="btn-sm btn-acc" onclick="doPrint()">🖨 Print / Save PDF</button>
         <button class="btn-sm btn-ol" onclick="closePreview()">✕ Close</button>
       </div>
     </div>
     <div id="printDoc"></div>
+  </div>
+</div>
+
+<!-- ONEDRIVE SETUP MODAL -->
+<div id="setupModal" class="modal-backdrop">
+  <div class="modal-card" style="max-width:620px;">
+    <div class="modal-header" style="background:var(--od);">
+      <h3>☁️ Connect Microsoft OneDrive</h3>
+      <button class="modal-close" onclick="closeSetupModal()">×</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+      <div id="odAlreadyConnected" style="display:none;">
+        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <span style="font-size:22px;">✅</span>
+          <div style="font-size:13px;color:#1b5e20;"><strong id="odConnectedUser" style="display:block;font-size:14px;margin-bottom:2px;"></strong>Quotations auto-sync to OneDrive → <code>HexamechQuotations/data.json</code></div>
+        </div>
+      </div>
+      <div id="odSetupSteps">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">One-time 5-minute Azure setup. Your password is never stored — Microsoft handles login securely.</p>
+        <div class="setup-step">
+          <div class="step-num">1</div>
+          <div class="step-body"><h4>Go to Azure Portal</h4><p>Open <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> → sign in with your Microsoft/OneDrive account.</p></div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">2</div>
+          <div class="step-body"><h4>Register a New App</h4><p>Search <strong>"App registrations"</strong> → <strong>"New registration"</strong> → Name: <code>HexamechQuotations</code> → Supported account types: <strong>"Accounts in any organizational directory and personal Microsoft accounts"</strong> → Click <strong>Register</strong>.</p></div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">3</div>
+          <div class="step-body"><h4>Add Redirect URI</h4><p>In your app → <strong>Authentication</strong> → <strong>Add a platform</strong> → <strong>Single-page application</strong> → Redirect URI:</p>
+          <code style="display:block;padding:8px 12px;margin:8px 0;word-break:break-all;">http://localhost:8080/hexamech-quotation.html</code>
+          <p>Enable <strong>"Access tokens"</strong> and <strong>"ID tokens"</strong> → Click <strong>Configure</strong>.</p></div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">4</div>
+          <div class="step-body"><h4>Add Files.ReadWrite Permission</h4><p><strong>API permissions</strong> → <strong>Add a permission</strong> → <strong>Microsoft Graph</strong> → <strong>Delegated</strong> → expand <strong>Files</strong> → tick <code>Files.ReadWrite</code> → <strong>Add permissions</strong>.</p></div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">5</div>
+          <div class="step-body"><h4>Paste your Client ID below</h4><p>App <strong>Overview</strong> → copy <strong>Application (client) ID</strong></p>
+          <input type="text" class="step-input" id="clientIdInput" placeholder="e.g. 9abd9532-b7c6-41b1-99bc-fb601f40714f"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-main btn-navy" onclick="clearODData()">🗑 Clear & Reset</button>
+      <button class="btn-main btn-navy" onclick="closeSetupModal()">Cancel</button>
+      <button class="btn-main" style="background:var(--od);color:#fff;" onclick="saveClientId()">Connect & Sign In to OneDrive →</button>
+    </div>
   </div>
 </div>
 
@@ -837,38 +648,10 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           <option value="admin">Admin (can manage users)</option>
         </select>
       </div>
-      <label class="checkbox-row" style="margin-top:14px;">
-        <input type="checkbox" id="umProjectAccess">
-        <span>Allow Project Management access</span>
-      </label>
     </div>
     <div class="modal-footer">
       <button class="btn-main btn-navy" onclick="closeUserModal()">Cancel</button>
       <button class="btn-main btn-gold" onclick="saveUser()" id="saveUserBtn">Add User</button>
-    </div>
-  </div>
-</div>
-
-<div id="customerModal" class="modal-backdrop">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h3 id="customerModalTitle">Add Customer</h3>
-      <button class="modal-close" onclick="closeCustomerModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="cmId">
-      <div class="cust-grid">
-        <div class="field-group"><label>M/S (Company)</label><input type="text" id="cmCompany" placeholder="e.g. Sardar Beverages"></div>
-        <div class="field-group"><label>Contact Person</label><input type="text" id="cmName" placeholder="e.g. Mr. Parth"></div>
-        <div class="field-group"><label>Phone</label><input type="tel" id="cmPhone" placeholder="e.g. 9601619668"></div>
-        <div class="field-group span2"><label>Address</label><input type="text" id="cmAddress" placeholder="City / Full address"></div>
-        <div class="field-group"><label>GST Number</label><input type="text" id="cmGST" placeholder="e.g. 24XXXXX..."></div>
-        <div class="field-group span2"><label>Email</label><input type="email" id="cmEmail" placeholder="customer@email.com"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-main btn-navy" onclick="closeCustomerModal()">Cancel</button>
-      <button class="btn-main btn-green" id="saveCustomerBtn" onclick="saveCustomerFromModal()">Save Customer</button>
     </div>
   </div>
 </div>
@@ -888,491 +671,36 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 <div class="notif" id="notif"></div>
 
 <script>
-const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";
-const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";
 // ═══════════════════════════════════════════
 // LOGO
 // ═══════════════════════════════════════════
-const LOGO_SRC = 'data:image/png;base64,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';
-const CORNER_LOGO_SRC = 'data:image/png;base64,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';
+const LOGO_SRC = 'data:image/jpeg;base64,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';
 ['logoLoading','logoLogin','logoTopbar'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.src = LOGO_SRC;
 });
 
 // ═══════════════════════════════════════════
-// USER MANAGEMENT (cached in browser, synced to OneDrive when connected)
+// USER MANAGEMENT (stored in localStorage)
 // ═══════════════════════════════════════════
 const USERS_KEY = 'hx_users';
-const CUSTOMERS_KEY = 'hx_customers';
-const PROJECTS_KEY = 'hx_projects';
-const DEFAULT_USERS = [
-  { username:'admin', displayName:'Admin', passwordHash:'4243810fb1ec73d1da79e60b954d34175cf64e9bdca6612029ef50e1cafe6f19', role:'admin' },
-  { username:'sales', displayName:'Sales', passwordHash:'e47f598eeb1bfb2f6d49719c1cc67f620a60a46e8055187297c2be372efd241b', role:'user' }
-];
-let applyingCustomerSelection = false;
-let customerSuggestionCloseTimer = null;
-let backendMode = false;
-let backendChecked = false;
-let apiAuthToken = localStorage.getItem('hx_api_token') || '';
 
-function getStateSnapshot() {
-  return {
-    users: getUsers(),
-    customers: customersLoad(),
-    quotations: dbLoad(),
-    projects: projectsLoad()
-  };
-}
-
-function applyStateSnapshot(state = {}) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(normalizeUsers(state.users)));
-  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(Array.isArray(state.customers) ? state.customers : []));
-  localStorage.setItem(DB_KEY, JSON.stringify(Array.isArray(state.quotations) ? state.quotations : []));
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(Array.isArray(state.projects) ? state.projects : []));
-}
-
-function shouldImportLocalState(remoteState, localState) {
-  const remoteHasData = (remoteState?.quotations?.length || 0) + (remoteState?.customers?.length || 0) + (remoteState?.projects?.length || 0);
-  const localHasData = (localState?.quotations?.length || 0) + (localState?.customers?.length || 0) + (localState?.projects?.length || 0);
-  return remoteHasData === 0 && localHasData > 0;
-}
-
-async function apiRequest(path, options = {}, includeAuth = true) {
-  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-  if (includeAuth && apiAuthToken) headers.Authorization = 'Bearer ' + apiAuthToken;
-  const response = await fetch(path, { ...options, headers });
-  const text = await response.text();
-  let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch (e) {}
-  if (!response.ok) throw new Error(data.error || ('Request failed: ' + response.status));
-  return data;
-}
-
-function hideOneDriveUiForBackend() {
-  const syncBadge = document.getElementById('syncBadge');
-  const syncIcon = document.getElementById('syncIcon');
-  const syncText = document.getElementById('syncText');
-  const odBanner = document.getElementById('odBanner');
-  const loginDivider = document.getElementById('loginDivider');
-  const msSignInBtn = document.getElementById('msSignInBtn');
-  const loginCloudStatus = document.getElementById('loginCloudStatus');
-  const loginSub = document.getElementById('loginSub');
-  if (syncBadge) syncBadge.style.display = 'none';
-  if (syncIcon) syncIcon.textContent = 'DB';
-  if (syncText) syncText.textContent = 'Server Database';
-  if (odBanner) odBanner.style.display = 'none';
-  if (loginDivider) loginDivider.style.display = 'none';
-  if (msSignInBtn) msSignInBtn.style.display = 'none';
-  if (loginCloudStatus) {
-    loginCloudStatus.style.display = 'block';
-    loginCloudStatus.textContent = 'Server database is connected. Sign in with your quotation username and password.';
-  }
-  if (loginSub) loginSub.textContent = 'Sign in with your quotation username and password.';
-  const odStatusBox = document.getElementById('odStatusBox');
-  if (odStatusBox) {
-    const card = odStatusBox.closest('.settings-card');
-    if (card) card.style.display = 'none';
-  }
-}
-
-async function detectBackendMode() {
-  if (backendChecked) return backendMode;
-  backendChecked = true;
-  try {
-    const data = await apiRequest('/api/health', { method: 'GET', headers: {} }, false);
-    backendMode = data && data.mode === 'backend-server';
-  } catch (e) {
-    backendMode = false;
-  }
-  if (backendMode) hideOneDriveUiForBackend();
-  return backendMode;
-}
-
-async function syncStateToBackend() {
-  if (!backendMode || !apiAuthToken) return false;
-  await apiRequest('/api/state', {
-    method: 'PUT',
-    body: JSON.stringify(getStateSnapshot())
-  });
-  return true;
-}
-
-async function loadStateFromBackend() {
-  if (!backendMode || !apiAuthToken) return false;
-  const data = await apiRequest('/api/state', { method: 'GET' });
-  applyStateSnapshot(data.state || {});
-  return true;
-}
-async function restoreBackendSession() {
-  if (!backendMode || !apiAuthToken) return false;
-  const data = await apiRequest('/api/session', { method: 'GET' });
-  applyStateSnapshot(data.state || {});
-  currentUser = {
-    username: data.user.username,
-    displayName: data.user.displayName,
-    role: data.user.role,
-    canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
-    contactPhone: data.user.contactPhone || '',
-    contactEmail: data.user.contactEmail || ''
-  };
-  return true;
-}
-
-function getDefaultUsers() {
-  return DEFAULT_USERS.map(u => ({ ...u }));
-}
-function normalizeUserRecord(user) {
-  const normalized = { ...(user || {}) };
-  normalized.username = String(normalized.username || '').trim().toLowerCase();
-  normalized.displayName = String(normalized.displayName || normalized.username || 'User').trim();
-  normalized.role = normalized.role === 'admin' ? 'admin' : 'user';
-  normalized.canProjectAccess = normalized.role === 'admin' ? true : !!normalized.canProjectAccess;
-  normalized.contactPhone = String(normalized.contactPhone || normalized.mobile || '').trim();
-  normalized.contactEmail = String(normalized.contactEmail || normalized.email || '').trim().toLowerCase();
-  return normalized;
-}
-function normalizeUsers(users, includeDefaults = true) {
-  const source = Array.isArray(users) && users.length ? users : (includeDefaults ? getDefaultUsers() : []);
-  return source.map(normalizeUserRecord).filter(u => u.username);
-}
 function getUsers() {
-  try { return normalizeUsers(JSON.parse(localStorage.getItem(USERS_KEY))); }
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || getDefaultUsers(); }
   catch(e) { return getDefaultUsers(); }
 }
+function getDefaultUsers() {
+  return [
+    { username:'admin', displayName:'Admin', password:'hexamech@123', role:'admin' },
+    { username:'sales', displayName:'Sales', password:'sales@2025', role:'user' }
+  ];
+}
 function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(normalizeUsers(users)));
-  if (backendMode) { syncStateToBackend(); return; }
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
   syncUsersToOneDrive();
 }
 function findUser(username) {
   return getUsers().find(u => u.username === username);
-}
-function findDefaultUser(username) {
-  const normalized = String(username || '').trim().toLowerCase();
-  return getDefaultUsers().find(u => u.username === normalized) || null;
-}
-function getCurrentUserProfile() {
-  if (!currentUser || !currentUser.username) return null;
-  return findUser(currentUser.username) || findDefaultUser(currentUser.username) || null;
-}
-function renderMyContactDetails() {
-  const profile = getCurrentUserProfile() || currentUser || {};
-  const phoneEl = document.getElementById('myContactPhone');
-  const emailEl = document.getElementById('myContactEmail');
-  if (phoneEl) phoneEl.value = profile.contactPhone || '';
-  if (emailEl) emailEl.value = profile.contactEmail || '';
-}
-function customersLoad() {
-  try { return JSON.parse(localStorage.getItem(CUSTOMERS_KEY)) || []; }
-  catch(e) { return []; }
-}
-function customersSave(customers) {
-  const normalized = Array.isArray(customers) ? customers.filter(Boolean) : [];
-  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(normalized));
-  renderCustomerDropdown();
-  renderCustomersView();
-  if (backendMode) { syncStateToBackend(); return; }
-  syncCustomersToOneDrive();
-}
-async function hashPassword(password) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-async function isPasswordMatch(user, password) {
-  if (!user) return false;
-  if (user.passwordHash) return (await hashPassword(password)) === user.passwordHash;
-  return user.password === password;
-}
-async function secureUsers(users, includeDefaults = true) {
-  const next = [];
-  const source = Array.isArray(users) && users.length ? users : (includeDefaults ? getDefaultUsers() : []);
-  for (const entry of normalizeUsers(source, includeDefaults)) {
-    const user = { ...entry };
-    if (!user.passwordHash && user.password) {
-      user.passwordHash = await hashPassword(user.password);
-      delete user.password;
-    }
-    next.push(user);
-  }
-  return next;
-}
-function customerOptionLabel(c) {
-  const company = (c.company || '').trim();
-  const name = (c.name || '').trim();
-  if (company && name) return company + ' — ' + name;
-  return company || name || 'Untitled customer';
-}
-function getCurrentCustomerFormData() {
-  return {
-    company: document.getElementById('custCompany')?.value.trim() || '',
-    name: document.getElementById('custName')?.value.trim() || '',
-    phone: document.getElementById('custPhone')?.value.trim() || '',
-    address: document.getElementById('custAddress')?.value.trim() || '',
-    gst: document.getElementById('custGST')?.value.trim() || '',
-    email: document.getElementById('custEmail')?.value.trim() || ''
-  };
-}
-function renderCustomerDropdown(selectedId = null) {
-  const input = document.getElementById('savedCustomerSearch');
-  if (!input) return;
-  const customers = customersLoad().slice().sort((a,b) => customerOptionLabel(a).localeCompare(customerOptionLabel(b)));
-  const currentSelected = selectedId !== null ? selectedId : (document.getElementById('selectedCustomerId')?.value || '');
-  const selectedCustomer = customers.find(c => c.id === currentSelected) || null;
-  input.value = selectedCustomer ? customerOptionLabel(selectedCustomer) : '';
-  input.dataset.selectedId = selectedCustomer ? selectedCustomer.id : '';
-  const hidden = document.getElementById('selectedCustomerId');
-  if (hidden) hidden.value = selectedCustomer ? selectedCustomer.id : '';
-  closeCustomerSuggestions();
-}
-function clearCustomerSelection() {
-  const hidden = document.getElementById('selectedCustomerId');
-  const input = document.getElementById('savedCustomerSearch');
-  if (hidden) hidden.value = '';
-  if (input) {
-    input.value = '';
-    input.dataset.selectedId = '';
-  }
-}
-function getCustomerSearchResults(query = '') {
-  const search = String(query || '').trim().toLowerCase();
-  const customers = customersLoad().slice();
-  const scored = customers.map(c => {
-    const company = String(c.company || '').trim();
-    const name = String(c.name || '').trim();
-    const label = customerOptionLabel(c);
-    const companyLower = company.toLowerCase();
-    const nameLower = name.toLowerCase();
-    const labelLower = label.toLowerCase();
-    let score = 0;
-    if (!search) score = 1;
-    else if (companyLower === search || nameLower === search || labelLower === search) score = 120;
-    else if (companyLower.startsWith(search) || nameLower.startsWith(search)) score = 90;
-    else if (labelLower.includes(search)) score = 70;
-    else if (companyLower.includes(search) || nameLower.includes(search)) score = 60;
-    else if (String(c.phone || '').toLowerCase().includes(search) || String(c.email || '').toLowerCase().includes(search)) score = 40;
-    return { customer: c, score, label };
-  }).filter(item => item.score > 0);
-  return scored
-    .sort((a, b) => (b.score - a.score) || a.label.localeCompare(b.label))
-    .slice(0, 8)
-    .map(item => item.customer);
-}
-function closeCustomerSuggestions() {
-  const box = document.getElementById('savedCustomerSuggestions');
-  if (!box) return;
-  box.classList.remove('open');
-  box.innerHTML = '';
-}
-function closeCustomerSuggestionsSoon() {
-  if (customerSuggestionCloseTimer) clearTimeout(customerSuggestionCloseTimer);
-  customerSuggestionCloseTimer = setTimeout(() => closeCustomerSuggestions(), 160);
-}
-function openCustomerSuggestions() {
-  if (customerSuggestionCloseTimer) clearTimeout(customerSuggestionCloseTimer);
-  const input = document.getElementById('savedCustomerSearch');
-  renderCustomerSuggestions(input?.value || '', true);
-}
-function renderCustomerSuggestions(query = '', forceOpen = false) {
-  const box = document.getElementById('savedCustomerSuggestions');
-  const input = document.getElementById('savedCustomerSearch');
-  if (!box || !input) return;
-  const results = getCustomerSearchResults(query);
-  const search = String(query || '').trim();
-  if (!results.length && !search && !forceOpen) {
-    closeCustomerSuggestions();
-    return;
-  }
-  if (!results.length) {
-    box.innerHTML = '<div class="customer-search-empty">No saved customer matches your search.</div>';
-    box.classList.add('open');
-    return;
-  }
-  box.innerHTML = results.map(c => `
-    <button type="button" class="customer-search-option" onmousedown="selectCustomerSuggestion('${esc(c.id || '')}')">
-      <strong>${esc(c.company || c.name || 'Untitled customer')}</strong>
-      <span>${esc((c.name || 'No contact person') + ' | ' + (c.phone || 'No phone'))}</span>
-    </button>
-  `).join('');
-  box.classList.add('open');
-}
-function selectCustomerSuggestion(customerId) {
-  if (customerSuggestionCloseTimer) clearTimeout(customerSuggestionCloseTimer);
-  const customer = customersLoad().find(c => c.id === customerId);
-  if (!customer) return;
-  applyCustomerToForm(customer);
-  closeCustomerSuggestions();
-  showNotif('Customer details filled from saved database.');
-}
-function fillCustomerFormFields(data = {}) {
-  applyingCustomerSelection = true;
-  const map = {
-    custCompany: data.company || '',
-    custName: data.name || '',
-    custPhone: data.phone || '',
-    custAddress: data.address || '',
-    custGST: data.gst || '',
-    custEmail: data.email || ''
-  };
-  Object.entries(map).forEach(([id, value]) => {
-    const el = document.getElementById(id);
-    if (el) el.value = value;
-  });
-  applyingCustomerSelection = false;
-}
-function applyCustomerToForm(customer) {
-  if (!customer) return;
-  fillCustomerFormFields(customer);
-  const hidden = document.getElementById('selectedCustomerId');
-  const input = document.getElementById('savedCustomerSearch');
-  if (hidden) hidden.value = customer.id || '';
-  if (input) {
-    input.value = customerOptionLabel(customer);
-    input.dataset.selectedId = customer.id || '';
-  }
-}
-function findCustomerFromSearch(value) {
-  const search = String(value || '').trim().toLowerCase();
-  if (!search) return null;
-  return customersLoad().find(c => {
-    const label = customerOptionLabel(c).toLowerCase();
-    const company = String(c.company || '').trim().toLowerCase();
-    const name = String(c.name || '').trim().toLowerCase();
-    return label === search || company === search || name === search;
-  }) || null;
-}
-function onSavedCustomerInput(value) {
-  const search = String(value || '').trim();
-  if (!search) {
-    clearCustomerSelection();
-    renderCustomerSuggestions('', false);
-    return;
-  }
-  renderCustomerSuggestions(search, true);
-  const customer = findCustomerFromSearch(value);
-  if (!customer) {
-    const hidden = document.getElementById('selectedCustomerId');
-    const input = document.getElementById('savedCustomerSearch');
-    if (hidden) hidden.value = '';
-    if (input) input.dataset.selectedId = '';
-    return;
-  }
-  applyCustomerToForm(customer);
-  closeCustomerSuggestions();
-}
-function handleSavedCustomerKeydown(event) {
-  if (!event) return;
-  const query = event.target?.value || '';
-  const results = getCustomerSearchResults(query);
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    const customer = findCustomerFromSearch(query) || results[0];
-    if (customer) selectCustomerSuggestion(customer.id);
-  } else if (event.key === 'Escape') {
-    closeCustomerSuggestions();
-  }
-}
-function handleCustomerFieldManualEdit() {
-  if (applyingCustomerSelection) return;
-  clearCustomerSelection();
-}
-function wireCustomerFieldListeners() {
-  ['custCompany','custName','custPhone','custAddress','custGST','custEmail'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el || el.dataset.customerWire === '1') return;
-    el.addEventListener('input', handleCustomerFieldManualEdit);
-    el.dataset.customerWire = '1';
-  });
-}
-function openCustomerModal(mode = 'new', customerId = '') {
-  const selectedId = customerId || document.getElementById('selectedCustomerId')?.value || '';
-  const selectedCustomer = (mode === 'edit' && selectedId) ? customersLoad().find(c => c.id === selectedId) : null;
-  const seed = selectedCustomer || getCurrentCustomerFormData();
-  document.getElementById('customerModalTitle').textContent = selectedCustomer ? 'Edit Saved Customer' : 'Add Customer';
-  document.getElementById('saveCustomerBtn').textContent = selectedCustomer ? 'Save Changes' : 'Save Customer';
-  document.getElementById('cmId').value = selectedCustomer?.id || '';
-  document.getElementById('cmCompany').value = seed.company || '';
-  document.getElementById('cmName').value = seed.name || '';
-  document.getElementById('cmPhone').value = seed.phone || '';
-  document.getElementById('cmAddress').value = seed.address || '';
-  document.getElementById('cmGST').value = seed.gst || '';
-  document.getElementById('cmEmail').value = seed.email || '';
-  document.getElementById('customerModal').classList.add('open');
-}
-function closeCustomerModal() {
-  document.getElementById('customerModal').classList.remove('open');
-}
-function saveCustomerFromModal() {
-  const id = document.getElementById('cmId').value.trim() || ('cust_' + Date.now());
-  const customer = {
-    id,
-    company: document.getElementById('cmCompany').value.trim(),
-    name: document.getElementById('cmName').value.trim(),
-    phone: document.getElementById('cmPhone').value.trim(),
-    address: document.getElementById('cmAddress').value.trim(),
-    gst: document.getElementById('cmGST').value.trim(),
-    email: document.getElementById('cmEmail').value.trim(),
-    savedAt: new Date().toISOString()
-  };
-  if (!customer.company) { showNotif('Customer company / M/S is required.', 'error'); return; }
-  const customers = customersLoad();
-  const idx = customers.findIndex(c => c.id === id);
-  if (idx >= 0) customers[idx] = { ...customers[idx], ...customer };
-  else customers.unshift(customer);
-  customersSave(customers);
-  applyCustomerToForm(customer);
-  closeCustomerModal();
-  showNotif(idx >= 0 ? 'Customer updated.' : 'Customer saved.');
-}
-function renderCustomersView() {
-  const tbody = document.getElementById('customerTableBody');
-  const empty = document.getElementById('customerEmpty');
-  const totalEl = document.getElementById('customerStatTotal');
-  const gstEl = document.getElementById('customerStatGST');
-  const emailEl = document.getElementById('customerStatEmail');
-  if (!tbody || !empty || !totalEl || !gstEl || !emailEl) return;
-
-  const customers = customersLoad().slice().sort((a,b) => customerOptionLabel(a).localeCompare(customerOptionLabel(b)));
-  const q = (document.getElementById('customerSearch')?.value || '').trim().toLowerCase();
-  const filtered = q ? customers.filter(c => [c.company, c.name, c.phone, c.address, c.gst, c.email].some(v => String(v || '').toLowerCase().includes(q))) : customers;
-
-  totalEl.textContent = customers.length;
-  gstEl.textContent = customers.filter(c => (c.gst || '').trim()).length;
-  emailEl.textContent = customers.filter(c => (c.email || '').trim()).length;
-
-  if (!filtered.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  tbody.innerHTML = filtered.map(c => `
-    <tr>
-      <td><strong>${esc(c.company || '—')}</strong><div class="customer-mini">${esc(c.gst || 'No GST saved')}</div></td>
-      <td>${esc(c.name || '—')}</td>
-      <td>
-        <div>${esc(c.phone || '—')}</div>
-        <div class="customer-mini">${esc(c.email || 'No email saved')}</div>
-      </td>
-      <td>${esc(c.address || '—')}</td>
-      <td class="cacts">
-        <button class="btn-edit-s" onclick="openCustomerModal('edit','${esc(c.id)}')">✏ Edit</button>
-      </td>
-    </tr>`).join('');
-}
-
-async function syncCustomersToOneDrive() {
-  if (backendMode) return;
-  if (!msalAccount) {
-    try { await initMsal(); } catch(e) {}
-  }
-  if (!msalAccount) return;
-  const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: [], projects: projectsLoad() };
-  if (!data.quotations) data.quotations = dbLoad();
-  data.users = await secureUsers(getUsers());
-  data.customers = customersLoad();
-  data.projects = projectsLoad();
-  await odWriteData(data);
 }
 
 // ═══════════════════════════════════════════
@@ -1382,168 +710,45 @@ let currentUser = null; // { username, displayName, role }
 let msalInstance = null;
 let msalAccount = null;
 
-let usersHydrationPromise = null;
-
-async function ensureUsersLoadedFromOneDrive(force = false) {
-  if (backendMode) return false;
-  if (usersHydrationPromise && !force) return usersHydrationPromise;
-
-  usersHydrationPromise = (async () => {
-    const clientId = localStorage.getItem('hx_od_clientid');
-    const tokens = loadTokens();
-    if (!clientId || !tokens) return false;
-
-    try {
-      if (!msalAccount) await initMsal();
-      if (!msalAccount) return false;
-
-      const data = await odReadData();
-      if (data && Array.isArray(data.users) && data.users.length > 0) {
-        localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
-      }
-      if (data && Array.isArray(data.customers) && data.customers.length > 0) {
-        localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
-      }
-      if (data && Array.isArray(data.quotations)) {
-        localStorage.setItem(DB_KEY, JSON.stringify(data.quotations));
-      }
-      if (data && Array.isArray(data.projects)) {
-        localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects));
-      }
-      if (data) return true;
-    } catch (e) {
-      console.warn('user preload failed:', e);
-    }
-    return false;
-  })();
-
-  return usersHydrationPromise;
-}
-
-async function doLogin() {
-  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
-
-  await detectBackendMode();
-
-  if (backendMode) {
-    try {
-      const localSnapshot = getStateSnapshot();
-      const data = await apiRequest('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ username: u, password: p })
-      }, false);
-      apiAuthToken = data.token || '';
-      localStorage.setItem('hx_api_token', apiAuthToken);
-      if (shouldImportLocalState(data.state || {}, localSnapshot)) {
-        applyStateSnapshot(localSnapshot);
-        await syncStateToBackend();
-      } else {
-        applyStateSnapshot(data.state || {});
-      }
-      err.style.display = 'none';
-      currentUser = {
-        username: data.user.username,
-        displayName: data.user.displayName,
-        role: data.user.role,
-        canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
-        contactPhone: data.user.contactPhone || '',
-        contactEmail: data.user.contactEmail || ''
-      };
-      launchApp();
-      return;
-    } catch (e) {
-      err.style.display = 'block';
-      return;
-    }
-  }
-
-  try {
-    await Promise.race([ensureUsersLoadedFromOneDrive(), new Promise(r=>setTimeout(r,5000))]);
-  } catch(e) {}
-
-  let user = findUser(u);
-  let matched = user ? await isPasswordMatch(user, p) : false;
-
-  // Keep the original built-in company logins available even if shared data is out of sync.
-  if (!matched) {
-    const fallbackUser = findDefaultUser(u);
-    if (fallbackUser && await isPasswordMatch(fallbackUser, p)) {
-      user = fallbackUser;
-      matched = true;
-    }
-  }
-
-  if (matched && user) {
-    if (!user.passwordHash && user.password) {
-      const users = await secureUsers(getUsers());
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
+  const user = findUser(u);
+  if (user && user.password === p) {
     err.style.display = 'none';
-    currentUser = {
-      username: user.username,
-      displayName: user.displayName,
-      role: user.role,
-      canProjectAccess: user.role === 'admin' ? true : !!user.canProjectAccess,
-      contactPhone: user.contactPhone || '',
-      contactEmail: user.contactEmail || ''
-    };
+    currentUser = { username: user.username, displayName: user.displayName, role: user.role };
     launchApp();
   } else {
     err.style.display = 'block';
   }
 }
 function doLogout() {
-  if (backendMode && apiAuthToken) {
-    apiRequest('/api/logout', { method: 'POST' }).catch(() => {});
-  }
   currentUser = null; msalAccount = null; odToken = null;
-  apiAuthToken = '';
-  localStorage.removeItem('hx_api_token');
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   updateSyncBadge('local');
 }
-function canAccessProjects() {
-  return !!currentUser && (currentUser.role === 'admin' || !!currentUser.canProjectAccess);
-}
 function launchApp() {
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
   document.getElementById('loggedUser').textContent = currentUser.displayName || currentUser.username;
-  wireCustomerFieldListeners();
-  renderCustomerDropdown();
-  renderCustomersView();
   // Show/hide admin features
   document.getElementById('btnAddUser').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
-  const navProjects = document.getElementById('navProjects');
-  if (navProjects) navProjects.style.display = canAccessProjects() ? 'inline-flex' : 'none';
-  showView('db');
+  showView('new');
+  newQuotation();
   renderUserList();
-  renderProjectsView();
-  // Auto-connect OneDrive silently — retry 3 times
-  if (backendMode) return;
-  (async () => {
+  // Reconnect OneDrive silently in background after UI is ready
+  setTimeout(async () => {
     const clientId = localStorage.getItem('hx_od_clientid');
-    if (!clientId) { updateSyncBadge('local'); return; }
-    updateSyncBadge('syncing');
-    for (let i = 1; i <= 3; i++) {
-      await new Promise(r => setTimeout(r, i * 600));
-      if (msalAccount) break;
+    if (clientId && !msalAccount) {
       try { await initMsal(); } catch(e) {}
     }
-    if (msalAccount) {
-      checkODSetup();
-    } else {
-      updateSyncBadge('error');
-      // Show small reconnect bar at bottom
-      if (typeof showReconnectBar === 'function') showReconnectBar();
-    }
-  })();
+    checkODSetup();
+  }, 100);
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
@@ -1560,14 +765,6 @@ function getMsalConfig() {
   const clientId = localStorage.getItem('hx_od_clientid');
   if (!clientId) return null;
   return { clientId }; // simplified - OAuth2 PKCE handles auth directly
-}
-function getAppRedirectUri() {
-  const path = window.location.pathname || '/';
-  const normalizedPath = path.replace(/\/index\.html$/i, '/');
-  return window.location.origin + normalizedPath;
-}
-function isSupportedRedirectUri() {
-  return window.location.protocol === 'http:' || window.location.protocol === 'https:';
 }
 
 // ═══════════════════════════════════════════
@@ -1648,16 +845,10 @@ async function getODToken() {
 async function msalSignIn() {
   const clientId = localStorage.getItem('hx_od_clientid');
   if (!clientId) { openSetupModal(); return; }
-  if (!isSupportedRedirectUri()) {
-    updateSyncBadge('error');
-    showNotif('Microsoft sign-in only works from an http or https app link. Open the hosted web link, not the local HTML file.', 'error');
-    openSetupModal();
-    return;
-  }
   try {
     const { verifier, challenge } = await makePkce();
     localStorage.setItem('hx_od_pkce', verifier);
-    const redirectUri = getAppRedirectUri();
+    const redirectUri = 'http://localhost:8080/hexamech-quotation.html';
     const authUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' +
       new URLSearchParams({
         client_id: clientId,
@@ -1680,7 +871,7 @@ async function msalSignIn() {
       'width='+w+',height='+h+',left='+left+',top='+top);
 
     if (!popup) {
-      showNotif('Popup blocked! Allow popups for this app link in browser settings.', 'error');
+      showNotif('Popup blocked! Allow popups for localhost:8080 in browser settings.', 'error');
       updateSyncBadge('local'); return;
     }
 
@@ -1689,7 +880,7 @@ async function msalSignIn() {
         try {
           if (popup.closed) { clearInterval(timer); reject(new Error('cancelled')); return; }
           const url = popup.location.href;
-          if (url && url.startsWith(redirectUri) && url.includes('code=')) {
+          if (url && url.includes('localhost:8080') && url.includes('code=')) {
             clearInterval(timer); popup.close();
             const params = new URL(url).searchParams;
             if (params.get('error')) reject(new Error(params.get('error_description') || params.get('error')));
@@ -1728,7 +919,7 @@ async function msalSignIn() {
       checkODSetup(); closeSetupModal();
       showNotif('OneDrive connected: ' + msalAccount.name, 'success');
     } else {
-      currentUser = { username: msalAccount.username, displayName: msalAccount.name, role: 'admin', canProjectAccess: true, contactPhone: '', contactEmail: '' };
+      currentUser = { username: msalAccount.username, displayName: msalAccount.name, role: 'admin' };
       launchApp();
     }
   } catch(e) {
@@ -1764,15 +955,30 @@ async function initMsal() {
 // ═══════════════════════════════════════════
 function checkODSetup() {
   const clientId = localStorage.getItem('hx_od_clientid');
-  // Safely update any optional UI elements
-  const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
-  const show = (id,d='flex') => { const el=document.getElementById(id); if(el) el.style.display=d; };
-  hide('odBanner');
+  const banner = document.getElementById('odBanner');
+  const syncBtn = document.getElementById('btnSyncNow');
+  const syncBtnSettings = document.getElementById('btnSyncSettings');
+  const disconnectBtn = document.getElementById('btnDisconnect');
+
   if (clientId && msalAccount) {
+    banner.style.display = 'none';
+    syncBtn.style.display = 'flex';
+    syncBtnSettings.style.display = 'flex';
+    disconnectBtn.style.display = 'flex';
+    const exportBtn = document.getElementById('btnExportApp');
+    if (exportBtn) exportBtn.style.display = 'flex';
     updateSyncBadge('synced');
     updateODStatusBox(true);
     syncFromOneDrive();
+  } else if (clientId && !msalAccount) {
+    banner.style.display = 'none';
+    updateSyncBadge('local');
+    updateODStatusBox(false);
   } else {
+    banner.style.display = 'flex';
+    syncBtn.style.display = 'none';
+    syncBtnSettings.style.display = 'none';
+    disconnectBtn.style.display = 'none';
     updateSyncBadge('local');
     updateODStatusBox(false);
   }
@@ -1782,9 +988,9 @@ function updateODStatusBox(connected) {
   const box = document.getElementById('odStatusBox');
   if (!box) return;
   if (connected && msalAccount) {
-    box.innerHTML = '<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>' + (msalAccount.name || msalAccount.username) + '</strong>Connected — auto-syncing all quotations to OneDrive.</div></div>';
+    box.innerHTML = `<div class="od-connected-box"><span class="ocb-icon">✅</span><div class="ocb-text"><strong>${msalAccount.name || msalAccount.username}</strong>Connected — syncing to OneDrive → <code>HexamechQuotations/data.json</code></div></div>`;
   } else {
-    box.innerHTML = '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:20px;">⚠️</span><div style="font-size:13px;color:#e65100;"><strong style="display:block;">OneDrive not connected.</strong>Quotations are saving locally. Click Sync Now to reconnect.</div></div>';
+    box.innerHTML = `<div class="od-disconnected-box"><div class="ocb-text"><strong>Not connected to OneDrive.</strong>Click "Setup / Change Client ID" to connect.</div></div>`;
   }
 }
 
@@ -1824,66 +1030,6 @@ function disconnectOneDrive() {
   clearODData();
 }
 
-function safeDownloadName(name) {
-  return String(name || 'Hexamech-Quotation')
-    .replace(/[^a-z0-9._-]+/gi, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-function downloadTextFile(content, filename, mimeType='text/plain;charset=utf-8') {
-  const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
-}
-
-function exportConfiguredApp() {
-  const clientId = localStorage.getItem('hx_od_clientid');
-  const tokens = loadTokens();
-  const refreshToken = tokens && tokens.refresh_token;
-
-  if (!clientId) {
-    showNotif('First connect OneDrive and save the Client ID.', 'error');
-    return;
-  }
-  if (!refreshToken) {
-    showNotif('Please sign in to OneDrive again before exporting the app.', 'error');
-    return;
-  }
-
-  const proceed = window.confirm(
-    'This export will embed your OneDrive connection for other users. Anyone with the exported file can access the synced quotation data. Continue?'
-  );
-  if (!proceed) return;
-
-  let html = document.documentElement.outerHTML;
-
-  const clientLine = 'const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";';
-  const refreshLine = 'const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";';
-
-  if (/const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";/.test(html)) {
-    html = html.replace(/const EMBEDDED_CLIENT_ID = "9abd9532-b7c6-41b1-99bc-fb601f40714f";/, clientLine);
-  } else {
-    html = html.replace('<script>', '<script>\n' + clientLine);
-  }
-
-  if (/const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";/.test(html)) {
-    html = html.replace(/const EMBEDDED_REFRESH_TOKEN = "1.AUoApOswTo7kQUe4XYe78lDr_zKVvZrGt7FBmbz7YB9AcU8uAbZKAA.BQABAwEAAAADAOz_BQD0_0V2b1N0c0FydGlmYWN0cwIAAAAAAPwR3XjhNZdgeRVUn07VXS9dIJw9AkQzSVaI2SxnDRaLce9THEMnah71DP0PTrOo8fLWR3UnTjpHKQx8jBVBupac52hPnWe-bbd45EBaQ3BozesVdaAIvGggdB-OBHLVJRG5UWvgRk7UTS8-eolhgqwSPN4JP-J38q6PTURWEcYxOaxkArSqhC0gsrfAfJBCdcGbi4aMUYHhFFEakVf6MCdaVCPQ7PxOdZlcqkZk8mljxDJHdwx1bqbNZfgeV5xCQ344OcHXfz6enUzit78mo3FnKxO6_ssJCH1BspVTqODqi_0QlU9lMCdKgzUmk4WxBaeR0Zg_81fjTjiO5YL92-QIdWIRqr-Jhoq14L4VGf41d7gYHhOrIO71BVu2Jdk7oG7l4wunKaY4HuUdL7S37Vfi_OFUjHek2J2n9wmtKzqrFKC9tufY_Ljb1uLzvLUGPfUUBwlOJ2BqDpvwY8Mpa9pb-fD4C4m_n-qlVzQEWUL4jt9qUprfNqN9kcuYEfZHq8uhqK_y0MgTDfdG9c7H8vyx6rw45CT-C8kAfAZ5Y4z_dn4Hezxy-AzYexHdH82eK34YgFPAHu1hbnw_GdlgtU0cZZB807QXcoEFw4vFdkbMyv8ZY_k2BPg0I-9dcUdoClEez2FiD08R8x4tNFYgi63AA3qV-k8PqR5DAqFJpCpBB2UF9Bz1G7JcjRIgXtbSEoNJqjX9MkoC_Cz-sinOmgs_Bq71fVbLCmA2DZhZxU4z141hi_2tXtdj0qlLG--otOnPp8YeF_w9CFvLX94bOBWe2s2Z2TGnvsyjfIc3S9qg0OQNznKZR0wy50Ixx2yFw0PDQ_MmR33wJVFoWZV5SQ2yT9acGMrOhrgmJanUVOTnHKbsq5hu-ngDueEtlI7yVnDwpj9OxDTNQ-K0wNVV7St7EByK9OVIGzilaY15xSYrTuYYMbqAPtwXD6ALDoZKDGGeDWeHTIPj7aHwxJFbbMrMEID2VMgtKxRY0WK3BQm54kK1rkOeY-m5JdeW8Zzv3v69aSzaNqrc0M5e_AIuiRwovyX-GPTXnthTTWJY2B6pKFWU3m9JI8o5pf3_iEBVPxEY79A5DSaGosAGnzELuFYtmekRnTKEqtlh0dP9Jd7smrc0OFj0ZlLVxG3OF9HcgfiVh-Aty8gDV1-p2zHXMpVuhjKSeHqg9RzkKP2ekMnm6Fy2fgDOFVVZVGWnhfDD3U058BcGSucKODHKDyOjO4nlLcErDjmOBRkN7u0qXTbYj1w5_or82xa9DplROw8DBr3JBUwx-36Kuqti85O2C_8MlBPgYEolhowlv_1WOhhVXWYZSxR8oJTJX57oawo591a1HSVpJSEddHqKNBwCxx4Q79lYa-iDctkp7RvGRSjzfqwrG7NpcyAwjKok5Wc94ZZqoXraenRu";/, refreshLine);
-  } else {
-    html = html.replace('<script>', '<script>\n' + refreshLine);
-  }
-
-  const exportedName = 'hexamech-quotation-export-' + safeDownloadName(msalAccount?.username || currentUser?.username || 'user') + '.html';
-  downloadTextFile('<!DOCTYPE html>\n' + html, exportedName, 'text/html;charset=utf-8');
-  showNotif('Configured app exported successfully.', 'success');
-}
-
 function updateSyncBadge(state) {
   const b = document.getElementById('syncBadge');
   const icon = document.getElementById('syncIcon');
@@ -1904,7 +1050,7 @@ async function odReadData() {
     const res = await fetch(`${OD_GRAPH}/me/drive/root:/${OD_FILE_PATH}:/content`, {
       headers: { Authorization: 'Bearer ' + token }
     });
-    if (res.status === 404) return { quotations:[], users:[], customers:[], projects:[] };
+    if (res.status === 404) return { quotations:[], users:[] };
     if (!res.ok) throw new Error('Read failed: ' + res.status);
     return await res.json();
   } catch(e) { console.error('OD read:', e); return null; }
@@ -1924,16 +1070,6 @@ async function odWriteData(data) {
 }
 
 async function syncFromOneDrive() {
-  if (backendMode) {
-    await loadStateFromBackend();
-    renderDB();
-    renderUserList();
-    renderCustomerDropdown();
-    renderCustomersView();
-    renderProjectsView();
-    showNotif('Server data synced.');
-    return;
-  }
   if (!msalAccount) return;
   updateSyncBadge('syncing');
   const data = await odReadData();
@@ -1945,30 +1081,19 @@ async function syncFromOneDrive() {
   // Sync quotations
   if (data.quotations) localStorage.setItem(DB_KEY, JSON.stringify(data.quotations));
   // Sync users (only if OneDrive has users, else keep local)
-  if (data.users && data.users.length > 0) localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
-  if (data.customers && data.customers.length > 0) localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
-  if (data.projects && data.projects.length >= 0) localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects || []));
+  if (data.users && data.users.length > 0) localStorage.setItem(USERS_KEY, JSON.stringify(data.users));
   updateSyncBadge('synced');
   document.getElementById('statStorage').textContent = 'OneDrive ✓';
   document.getElementById('statStorageSub').textContent = msalAccount.username || msalAccount.name;
   document.getElementById('btnSyncNow').style.display = 'flex';
   if (document.getElementById('dbView').style.display !== 'none') renderDB();
   renderUserList();
-  renderCustomerDropdown();
-  renderCustomersView();
-  renderProjectsView();
 }
 
 async function syncUsersToOneDrive() {
-  if (backendMode) return;
-  if (!msalAccount) {
-    try { await initMsal(); } catch(e) {}
-  }
   if (!msalAccount) return;
-  const data = await odReadData() || { quotations: dbLoad(), users: [], customers: [], projects: projectsLoad() };
-  data.users = await secureUsers(getUsers());
-  data.customers = customersLoad();
-  data.projects = projectsLoad();
+  const data = await odReadData() || { quotations: dbLoad(), users: [] };
+  data.users = getUsers();
   await odWriteData(data);
 }
 
@@ -1980,26 +1105,17 @@ function dbLoad() { try { return JSON.parse(localStorage.getItem(DB_KEY)) || [];
 function dbSave(recs) { localStorage.setItem(DB_KEY, JSON.stringify(recs)); }
 function dbFind(id) { return dbLoad().find(r => r.id === id) || null; }
 function dbDelete(id) { dbSave(dbLoad().filter(r => r.id !== id)); }
-function projectsLoad() { try { return JSON.parse(localStorage.getItem(PROJECTS_KEY)) || []; } catch(e) { return []; } }
-function projectsSave(projects) { localStorage.setItem(PROJECTS_KEY, JSON.stringify(Array.isArray(projects) ? projects : [])); }
-function projectFind(id) { return projectsLoad().find(p => p.id === id) || null; }
 
 async function dbUpsert(record) {
   const recs = dbLoad();
   const idx = recs.findIndex(r => r.id === record.id);
   if (idx >= 0) recs[idx] = record; else recs.unshift(record);
   dbSave(recs);
-  if (backendMode) {
-    await syncStateToBackend();
-    return;
-  }
   if (msalAccount) {
     updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations:[], users:[], customers:[], projects:[] };
+    const data = await odReadData() || { quotations:[], users:[] };
     data.quotations = recs;
-    data.users = await secureUsers(getUsers());
-    data.customers = customersLoad();
-    data.projects = projectsLoad();
+    data.users = getUsers();
     const ok = await odWriteData(data);
     updateSyncBadge(ok ? 'synced' : 'error');
     if (!ok) showNotif('Saved locally but OneDrive sync failed.', 'error');
@@ -2022,7 +1138,7 @@ function renderUserList() {
         <div class="user-avatar ${u.role==='admin'?'admin-av':''}">${(u.displayName||u.username)[0].toUpperCase()}</div>
         <div>
           <div class="user-name">${esc(u.displayName||u.username)}</div>
-          <div class="user-role">${u.username} · ${u.role}${u.canProjectAccess ? ' · project access' : ''}</div>
+          <div class="user-role">${u.username} · ${u.role}</div>
         </div>
       </div>
       <div class="user-actions">
@@ -2039,9 +1155,7 @@ function openAddUserModal() {
   document.getElementById('umUsername').disabled = false;
   document.getElementById('umDisplayName').value = '';
   document.getElementById('umPassword').value = '';
-  document.getElementById('umPassword').placeholder = 'Enter password';
   document.getElementById('umRole').value = 'user';
-  document.getElementById('umProjectAccess').checked = false;
   document.getElementById('saveUserBtn').textContent = 'Add User';
   document.getElementById('userModal').classList.add('open');
 }
@@ -2054,26 +1168,23 @@ function openEditUserModal(username) {
   document.getElementById('umUsername').value = user.username;
   document.getElementById('umUsername').disabled = true;
   document.getElementById('umDisplayName').value = user.displayName || '';
-  document.getElementById('umPassword').value = '';
-  document.getElementById('umPassword').placeholder = 'Leave blank to keep current password';
+  document.getElementById('umPassword').value = user.password;
   document.getElementById('umRole').value = user.role || 'user';
-  document.getElementById('umProjectAccess').checked = user.role === 'admin' ? true : !!user.canProjectAccess;
   document.getElementById('saveUserBtn').textContent = 'Save Changes';
   document.getElementById('userModal').classList.add('open');
 }
 
 function closeUserModal() { document.getElementById('userModal').classList.remove('open'); editingUsername = null; }
 
-async function saveUser() {
+function saveUser() {
   const username = document.getElementById('umUsername').value.trim().toLowerCase();
   const displayName = document.getElementById('umDisplayName').value.trim();
   const password = document.getElementById('umPassword').value;
   const role = document.getElementById('umRole').value;
-  const canProjectAccess = role === 'admin' ? true : document.getElementById('umProjectAccess').checked;
 
   if (!username) { showNotif('Username is required.', 'error'); return; }
-  if (!editingUsername && !password) { showNotif('Password is required.', 'error'); return; }
-  if (password && password.length < 6) { showNotif('Password must be at least 6 characters.', 'error'); return; }
+  if (!password) { showNotif('Password is required.', 'error'); return; }
+  if (password.length < 6) { showNotif('Password must be at least 6 characters.', 'error'); return; }
 
   const users = getUsers();
 
@@ -2081,18 +1192,8 @@ async function saveUser() {
     // Edit existing
     const idx = users.findIndex(u => u.username === editingUsername);
     if (idx >= 0) {
-      const updatedUser = { ...users[idx], displayName: displayName || username, role, canProjectAccess };
-      if (password) {
-        updatedUser.passwordHash = await hashPassword(password);
-        delete updatedUser.password;
-      }
-      users[idx] = updatedUser;
+      users[idx] = { ...users[idx], displayName: displayName || username, password, role };
       saveUsers(users);
-      if (currentUser && currentUser.username === updatedUser.username) {
-        currentUser = { ...currentUser, role: updatedUser.role, canProjectAccess: updatedUser.canProjectAccess };
-        const navProjects = document.getElementById('navProjects');
-        if (navProjects) navProjects.style.display = canAccessProjects() ? 'inline-flex' : 'none';
-      }
       renderUserList();
       closeUserModal();
       showNotif('User updated: ' + (displayName || username));
@@ -2100,7 +1201,7 @@ async function saveUser() {
   } else {
     // Add new
     if (users.find(u => u.username === username)) { showNotif('Username already exists.', 'error'); return; }
-    users.push({ username, displayName: displayName || username, passwordHash: await hashPassword(password), role, canProjectAccess });
+    users.push({ username, displayName: displayName || username, password, role });
     saveUsers(users);
     renderUserList();
     closeUserModal();
@@ -2124,363 +1225,27 @@ function confirmDeleteUser(username) {
   };
 }
 
-async function changeMyPassword() {
+function changeMyPassword() {
   const current = document.getElementById('cpCurrent').value;
   const newPw = document.getElementById('cpNew').value;
   const confirm = document.getElementById('cpConfirm').value;
 
-  const user = findUser(currentUser.username) || findDefaultUser(currentUser.username);
+  const user = findUser(currentUser.username);
   if (!user) { showNotif('User not found.', 'error'); return; }
-  if (!(await isPasswordMatch(user, current))) { showNotif('Current password is incorrect.', 'error'); return; }
+  if (user.password !== current) { showNotif('Current password is incorrect.', 'error'); return; }
   if (newPw.length < 6) { showNotif('New password must be at least 6 characters.', 'error'); return; }
   if (newPw !== confirm) { showNotif('New passwords do not match.', 'error'); return; }
 
   const users = getUsers();
   const idx = users.findIndex(u => u.username === currentUser.username);
   if (idx >= 0) {
-    users[idx].passwordHash = await hashPassword(newPw);
-    delete users[idx].password;
-  } else {
-    users.push({ ...user, passwordHash: await hashPassword(newPw), password: undefined });
+    users[idx].password = newPw;
+    saveUsers(users);
+    document.getElementById('cpCurrent').value = '';
+    document.getElementById('cpNew').value = '';
+    document.getElementById('cpConfirm').value = '';
+    showNotif('Password changed successfully!');
   }
-  saveUsers(users);
-  document.getElementById('cpCurrent').value = '';
-  document.getElementById('cpNew').value = '';
-  document.getElementById('cpConfirm').value = '';
-  showNotif('Password changed successfully!');
-}
-
-function saveMyContactDetails() {
-  if (!currentUser || !currentUser.username) { showNotif('Please sign in again.', 'error'); return; }
-
-  const contactPhone = document.getElementById('myContactPhone').value.trim();
-  const contactEmail = document.getElementById('myContactEmail').value.trim().toLowerCase();
-  if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
-    showNotif('Please enter a valid email ID.', 'error');
-    return;
-  }
-
-  const users = getUsers();
-  const idx = users.findIndex(u => u.username === currentUser.username);
-  if (idx >= 0) {
-    users[idx] = { ...users[idx], contactPhone, contactEmail };
-  } else {
-    const fallbackUser = findDefaultUser(currentUser.username);
-    users.push({
-      ...(fallbackUser || { username: currentUser.username, displayName: currentUser.displayName || currentUser.username, role: currentUser.role || 'user' }),
-      contactPhone,
-      contactEmail
-    });
-  }
-
-  saveUsers(users);
-  currentUser = { ...currentUser, contactPhone, contactEmail };
-  showNotif('Your contact details have been updated.');
-}
-
-// ═══════════════════════════════════════════
-// PROJECT MANAGEMENT
-// ═══════════════════════════════════════════
-let editingProjectId = null;
-let projectBomSeq = 0;
-
-function generateProjectNumber(excludeId = null) {
-  const max = projectsLoad().reduce((highest, project) => {
-    if (!project || project.id === excludeId) return highest;
-    const match = String(project.projectNo || '').match(/(\d+)/);
-    return Math.max(highest, match ? (parseInt(match[1], 10) || 0) : 0);
-  }, 0);
-  return 'PRJ' + String(max + 1).padStart(4, '0');
-}
-
-function createBomRowId() {
-  projectBomSeq += 1;
-  return 'bom_' + Date.now() + '_' + projectBomSeq;
-}
-
-function getCurrentProjectProgressMap() {
-  const map = {};
-  document.querySelectorAll('#projectProgressRows tr[data-part-id]').forEach(tr => {
-    const partId = tr.dataset.partId;
-    map[partId] = {
-      stage: tr.querySelector('[data-field="stage"]')?.value.trim() || '',
-      stageDate: tr.querySelector('[data-field="stageDate"]')?.value || ''
-    };
-  });
-  return map;
-}
-
-function updateProjectBomSrNos() {
-  document.querySelectorAll('#projectBomRows tr').forEach((tr, index) => {
-    const sr = tr.querySelector('.project-bom-sr');
-    if (sr) sr.textContent = index + 1;
-  });
-}
-
-function syncProjectProgressRows(seedProgress = null) {
-  const tbody = document.getElementById('projectProgressRows');
-  if (!tbody) return;
-  const progressMap = seedProgress || getCurrentProjectProgressMap();
-  const bomRows = Array.from(document.querySelectorAll('#projectBomRows tr[data-part-id]'));
-  if (!bomRows.length) {
-    tbody.innerHTML = '<tr><td colspan="3" style="padding:12px;color:var(--muted);">Add BOM parts to start tracking project progress.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = bomRows.map(tr => {
-    const partId = tr.dataset.partId;
-    const partName = tr.querySelector('.project-part-name')?.value.trim() || 'Untitled part';
-    const progress = progressMap[partId] || {};
-    return `
-      <tr data-part-id="${esc(partId)}">
-        <td>${esc(partName)}</td>
-        <td><input type="text" data-field="stage" value="${esc(progress.stage || '')}" placeholder="e.g. Design, Roughing, Heat Treatment, Final Machining"></td>
-        <td><input type="date" data-field="stageDate" value="${esc(progress.stageDate || '')}"></td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function handleBomRowChange() {
-  updateProjectBomSrNos();
-  syncProjectProgressRows();
-}
-
-function addBomRow(item = {}) {
-  const tbody = document.getElementById('projectBomRows');
-  if (!tbody) return;
-  const partId = item.id || createBomRowId();
-  const tr = document.createElement('tr');
-  tr.dataset.partId = partId;
-  tr.innerHTML = `
-    <td class="td-sr project-bom-sr"></td>
-    <td class="td-desc"><input type="text" class="project-part-name" value="${esc(item.partName || '')}" placeholder="Part name" oninput="handleBomRowChange()"></td>
-    <td><input type="text" value="${esc(item.rawMaterial || '')}" placeholder="Raw material" oninput="handleBomRowChange()"></td>
-    <td><input type="text" value="${esc(item.finishSize || '')}" placeholder="Finish size" oninput="handleBomRowChange()"></td>
-    <td class="td-num" style="text-align:right;"><input type="number" value="${esc(item.quantity || '')}" min="0" placeholder="0" oninput="handleBomRowChange()"></td>
-    <td><button class="btn-remove-row" type="button" onclick="removeBomRow('${esc(partId)}')">×</button></td>
-  `;
-  tbody.appendChild(tr);
-  updateProjectBomSrNos();
-  syncProjectProgressRows(item.progress ? { [partId]: item.progress } : null);
-}
-
-function removeBomRow(partId) {
-  const row = document.querySelector(`#projectBomRows tr[data-part-id="${partId}"]`);
-  if (row) row.remove();
-  updateProjectBomSrNos();
-  syncProjectProgressRows();
-}
-
-function clearProjectForm() {
-  editingProjectId = null;
-  projectBomSeq = 0;
-  document.getElementById('projectFormTitle').textContent = 'New Project';
-  document.getElementById('projectNo').value = generateProjectNumber();
-  document.getElementById('projectOrderDate').valueAsDate = new Date();
-  ['projectCustomerCompany','projectCustomerContact','projectCustomerPhone','projectOrderRef','projectQuoteRef'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('projectOrderDetails').value = '';
-  document.getElementById('projectStatus').value = 'active';
-  document.getElementById('projectBomRows').innerHTML = '';
-  document.getElementById('projectProgressRows').innerHTML = '';
-  addBomRow();
-}
-
-function closeProjectForm() {
-  document.getElementById('projectFormWrap').classList.remove('open');
-  editingProjectId = null;
-}
-
-function openProjectForm(id = null) {
-  if (!canAccessProjects()) { showNotif('You do not have access to Project Management.', 'error'); return; }
-  const wrap = document.getElementById('projectFormWrap');
-  wrap.classList.add('open');
-  if (!id) {
-    clearProjectForm();
-    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return;
-  }
-  const project = projectFind(id);
-  if (!project) return;
-  editingProjectId = id;
-  projectBomSeq = 0;
-  document.getElementById('projectFormTitle').textContent = 'Editing: ' + (project.projectNo || id);
-  document.getElementById('projectNo').value = project.projectNo || '';
-  document.getElementById('projectOrderDate').value = project.orderDate || '';
-  document.getElementById('projectCustomerCompany').value = project.customerCompany || '';
-  document.getElementById('projectCustomerContact').value = project.customerContact || '';
-  document.getElementById('projectCustomerPhone').value = project.customerPhone || '';
-  document.getElementById('projectOrderRef').value = project.orderRef || '';
-  document.getElementById('projectQuoteRef').value = project.quoteRef || '';
-  document.getElementById('projectOrderDetails').value = project.orderDetails || '';
-  document.getElementById('projectStatus').value = project.status || 'active';
-  document.getElementById('projectBomRows').innerHTML = '';
-  document.getElementById('projectProgressRows').innerHTML = '';
-  const progressMap = {};
-  (project.progress || []).forEach(entry => { progressMap[entry.partId] = entry; });
-  (project.bom || []).forEach(item => addBomRow({ ...item, progress: progressMap[item.id] || null }));
-  if (!(project.bom || []).length) addBomRow();
-  syncProjectProgressRows(progressMap);
-  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function gatherProjectData() {
-  const bom = Array.from(document.querySelectorAll('#projectBomRows tr[data-part-id]')).map(tr => {
-    const inputs = tr.querySelectorAll('input');
-    return {
-      id: tr.dataset.partId,
-      partName: inputs[0]?.value.trim() || '',
-      rawMaterial: inputs[1]?.value.trim() || '',
-      finishSize: inputs[2]?.value.trim() || '',
-      quantity: inputs[3]?.value.trim() || ''
-    };
-  }).filter(item => item.partName || item.rawMaterial || item.finishSize || item.quantity);
-
-  const progress = bom.map(item => {
-    const row = document.querySelector(`#projectProgressRows tr[data-part-id="${item.id}"]`);
-    return {
-      partId: item.id,
-      partName: item.partName,
-      stage: row?.querySelector('[data-field="stage"]')?.value.trim() || '',
-      stageDate: row?.querySelector('[data-field="stageDate"]')?.value || ''
-    };
-  });
-
-  const existing = editingProjectId ? projectFind(editingProjectId) : null;
-  const status = document.getElementById('projectStatus').value;
-  return {
-    id: editingProjectId || ('proj_' + Date.now()),
-    projectNo: document.getElementById('projectNo').value.trim() || generateProjectNumber(editingProjectId),
-    customerCompany: document.getElementById('projectCustomerCompany').value.trim(),
-    customerContact: document.getElementById('projectCustomerContact').value.trim(),
-    customerPhone: document.getElementById('projectCustomerPhone').value.trim(),
-    orderRef: document.getElementById('projectOrderRef').value.trim(),
-    orderDate: document.getElementById('projectOrderDate').value,
-    quoteRef: document.getElementById('projectQuoteRef').value.trim(),
-    orderDetails: document.getElementById('projectOrderDetails').value.trim(),
-    status,
-    bom,
-    progress,
-    createdAt: existing?.createdAt || new Date().toISOString(),
-    completedAt: status === 'completed' ? (existing?.completedAt || new Date().toISOString()) : '',
-    updatedAt: new Date().toISOString(),
-    updatedBy: currentUser?.displayName || currentUser?.username || 'Unknown'
-  };
-}
-
-async function projectUpsert(project) {
-  const projects = projectsLoad();
-  const idx = projects.findIndex(p => p.id === project.id);
-  if (idx >= 0) projects[idx] = project; else projects.unshift(project);
-  projectsSave(projects);
-  if (backendMode) {
-    await syncStateToBackend();
-    return;
-  }
-  if (msalAccount) {
-    updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: customersLoad(), projects: [] };
-    data.quotations = dbLoad();
-    data.users = await secureUsers(getUsers());
-    data.customers = customersLoad();
-    data.projects = projects;
-    const ok = await odWriteData(data);
-    updateSyncBadge(ok ? 'synced' : 'error');
-    if (!ok) showNotif('Project saved locally but OneDrive sync failed.', 'error');
-  }
-}
-
-async function saveProject() {
-  const project = gatherProjectData();
-  if (!project.customerCompany) { showNotif('Customer company is required.', 'error'); return; }
-  if (!project.orderRef) { showNotif('Order reference is required.', 'error'); return; }
-  if (!project.bom.length) { showNotif('Add at least one BOM part.', 'error'); return; }
-  await projectUpsert(project);
-  editingProjectId = project.id;
-  document.getElementById('projectFormTitle').textContent = 'Editing: ' + project.projectNo;
-  showNotif('Project saved: ' + project.projectNo);
-  renderProjectsView();
-}
-
-async function updateProjectStatus(id, status) {
-  const project = projectFind(id);
-  if (!project) return;
-  project.status = status;
-  project.completedAt = status === 'completed' ? (project.completedAt || new Date().toISOString()) : '';
-  project.updatedAt = new Date().toISOString();
-  project.updatedBy = currentUser?.displayName || currentUser?.username || 'Unknown';
-  await projectUpsert(project);
-  renderProjectsView();
-}
-
-async function deleteProject(id) {
-  const project = projectFind(id);
-  if (!project) return;
-  if (!window.confirm(`Delete project "${project.projectNo}"?`)) return;
-  const projects = projectsLoad().filter(item => item.id !== id);
-  projectsSave(projects);
-  if (backendMode) {
-    await syncStateToBackend();
-  } else if (msalAccount) {
-    updateSyncBadge('syncing');
-    const data = await odReadData() || { quotations: dbLoad(), users: getUsers(), customers: customersLoad(), projects: [] };
-    data.quotations = dbLoad();
-    data.users = await secureUsers(getUsers());
-    data.customers = customersLoad();
-    data.projects = projects;
-    await odWriteData(data);
-    updateSyncBadge('synced');
-  }
-  renderProjectsView();
-  showNotif('Project deleted.', 'info');
-}
-
-function renderProjectRows(targetId, projects, emptyId, completed = false) {
-  const tbody = document.getElementById(targetId);
-  const empty = document.getElementById(emptyId);
-  if (!tbody || !empty) return;
-  if (!projects.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  tbody.innerHTML = projects.map(project => `
-    <tr>
-      <td class="mono" style="font-weight:700;color:var(--navy);">${esc(project.projectNo || '—')}</td>
-      <td><strong>${esc(project.customerCompany || '—')}</strong><div class="customer-mini">${esc(project.customerContact || '')}</div></td>
-      <td>${esc(project.orderRef || '—')}</td>
-      <td class="mono">${completed ? fmtDateShort(project.completedAt || project.updatedAt) : fmtDateShort(project.orderDate)}</td>
-      <td style="text-align:center;">${(project.bom || []).length}</td>
-      <td><span class="project-status-chip ${project.status === 'completed' ? 'completed' : 'active'}">${esc(project.status || 'active')}</span></td>
-      <td class="acts">
-        <button class="btn-edit-s" onclick="openProjectForm('${project.id}')">✏ Edit</button>
-        ${completed ? `<button class="btn-sm btn-ol" onclick="updateProjectStatus('${project.id}','active')">Reopen</button>` : `<button class="btn-sm btn-acc" onclick="updateProjectStatus('${project.id}','completed')">Complete</button>`}
-        <button class="btn-del" onclick="deleteProject('${project.id}')">🗑</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function renderProjectsView() {
-  const records = projectsLoad();
-  const q = String(document.getElementById('projectSearch')?.value || '').trim().toLowerCase();
-  const filtered = q ? records.filter(project => (
-    String(project.projectNo || '').toLowerCase().includes(q) ||
-    String(project.customerCompany || '').toLowerCase().includes(q) ||
-    String(project.customerContact || '').toLowerCase().includes(q) ||
-    String(project.orderRef || '').toLowerCase().includes(q) ||
-    String(project.quoteRef || '').toLowerCase().includes(q)
-  )) : records;
-  const active = filtered.filter(project => project.status !== 'completed');
-  const completed = filtered.filter(project => project.status === 'completed');
-  document.getElementById('projectStatActive').textContent = records.filter(project => project.status !== 'completed').length;
-  document.getElementById('projectStatCompleted').textContent = records.filter(project => project.status === 'completed').length;
-  document.getElementById('projectStatParts').textContent = records.reduce((sum, project) => sum + ((project.bom || []).length), 0);
-  renderProjectRows('activeProjectsBody', active, 'activeProjectsEmpty', false);
-  renderProjectRows('completedProjectsBody', completed, 'completedProjectsEmpty', true);
 }
 
 // ═══════════════════════════════════════════
@@ -2488,64 +1253,24 @@ function renderProjectsView() {
 // ═══════════════════════════════════════════
 let editingId = null;
 function showView(v) {
-  ['newView','dbView','customersView','projectsView','settingsView'].forEach(id => document.getElementById(id).style.display = 'none');
-  ['navDB','navCustomers','navProjects','navSettings'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-  });
-  if (v === 'new') { document.getElementById('newView').style.display = 'block'; }
+  ['newView','dbView','settingsView'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['navNew','navDB','navSettings'].forEach(id => document.getElementById(id).classList.remove('active'));
+  if (v === 'new') { document.getElementById('newView').style.display = 'block'; document.getElementById('navNew').classList.add('active'); }
   if (v === 'db')  { document.getElementById('dbView').style.display = 'block';  document.getElementById('navDB').classList.add('active'); renderDB(); }
-  if (v === 'customers') { document.getElementById('customersView').style.display = 'block'; document.getElementById('navCustomers').classList.add('active'); renderCustomersView(); }
-  if (v === 'projects') {
-    if (!canAccessProjects()) { showNotif('You do not have access to Project Management.', 'error'); showView('db'); return; }
-    document.getElementById('projectsView').style.display = 'block';
-    document.getElementById('navProjects').classList.add('active');
-    renderProjectsView();
-  }
-  if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); renderMyContactDetails(); updateODStatusBox(!!msalAccount); }
+  if (v === 'settings') { document.getElementById('settingsView').style.display = 'block'; document.getElementById('navSettings').classList.add('active'); renderUserList(); updateODStatusBox(!!msalAccount); }
 }
 
 // ═══════════════════════════════════════════
 // FORM
 // ═══════════════════════════════════════════
-function getFinancialYearStart(dateLike) {
-  const d = dateLike ? new Date(dateLike) : new Date();
-  if (Number.isNaN(d.getTime())) return new Date().getFullYear();
-  return d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
-}
-function getFinancialYearPrefix(dateLike) {
-  return String(getFinancialYearStart(dateLike)).slice(2);
-}
-function getQuotationSerialForRecord(record, fyStartYear) {
-  if (!record) return 0;
-  const recordFyStart = getFinancialYearStart(record.quoteDate || record.savedAt);
-  if (recordFyStart !== fyStartYear) return 0;
-  const prefix = String(fyStartYear).slice(2);
-  const quoteNo = String(record.quoteNo || '').trim().toUpperCase();
-  const match = quoteNo.match(new RegExp('^Q' + prefix + '(\\d+)'));
-  if (match) return parseInt(match[1], 10) || 0;
-  return 0;
-}
-function generateQuotationNumber(dateLike = new Date(), excludeId = null) {
-  const fyStartYear = getFinancialYearStart(dateLike);
-  const fyRecords = dbLoad().filter(r => r && r.id !== excludeId && getFinancialYearStart(r.quoteDate || r.savedAt) === fyStartYear);
-  const parsedMax = fyRecords.reduce((max, r) => Math.max(max, getQuotationSerialForRecord(r, fyStartYear)), 0);
-  const nextSerial = Math.max(parsedMax, fyRecords.length) + 1;
-  return 'Q' + getFinancialYearPrefix(dateLike) + String(nextSerial).padStart(3, '0');
-}
-function setAutoQuotationNumber(dateLike = new Date()) {
-  const quoteNoEl = document.getElementById('quoteNo');
-  if (!quoteNoEl) return;
-  quoteNoEl.value = generateQuotationNumber(dateLike, editingId);
-  quoteNoEl.dataset.autoGenerated = 'true';
-}
 function newQuotation() {
   editingId = null;
   document.getElementById('formTitle').textContent = 'New Quotation';
   clearForm();
   const now = new Date();
+  const qn = 'Q' + String(now.getFullYear()).slice(2) + String(now.getMonth()+1).padStart(2,'0') + String(dbLoad().length+1).padStart(3,'0') + 'IMHR';
+  document.getElementById('quoteNo').value = qn;
   document.getElementById('quoteDate').valueAsDate = now;
-  setAutoQuotationNumber(now);
   addProductRow('Full mould 500 ml - Hot runner 64 cavity',64,115000);
   addProductRow('Cold Half - 200 ml',64,80500);
   addProductRow('Full mould 1 Lit. - Hot runner 64 cavity',64,115000);
@@ -2554,15 +1279,12 @@ function newQuotation() {
 }
 function clearForm() {
   rowId=0; document.getElementById('productRows').innerHTML='';
-  ['quoteNo','quoteDate','custCompany','custName','custPhone','custAddress','custGST','custEmail','selectedCustomerId'].forEach(id=>{
+  ['quoteNo','quoteDate','custCompany','custName','custPhone','custAddress','custGST','custEmail'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
-  const quoteNoEl=document.getElementById('quoteNo');
-  if(quoteNoEl) quoteNoEl.dataset.autoGenerated='true';
-  renderCustomerDropdown('');
   document.getElementById('gstRate').value='18';
-  document.getElementById('tcPayment').value='50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory.';
-  document.getElementById('tcDelivery').value='35\u201340 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval.';
+  document.getElementById('tcPayment').value='50% advance, balance against trial prior to dispatch.';
+  document.getElementById('tcDelivery').value='60\u201370 working days from date of receipt of confirmed PO and advance payment.';
   recalcTotals();
 }
 
@@ -2574,20 +1296,12 @@ function addProductRow(desc='',cavity='',rate='') {
   const total=(parseFloat(cavity)||0)*(parseFloat(rate)||0);
   tr.innerHTML=`
     <td class="td-sr">${tbody.children.length+1}</td>
-    <td class="td-desc"><textarea class="desc-input" placeholder="Product description…" oninput="autoGrow(this)">${esc(desc||'')}</textarea></td>
+    <td class="td-desc"><input type="text" value="${desc}" placeholder="Product description…" oninput="updateSrNos()"></td>
     <td class="td-num" style="text-align:right;"><input type="number" value="${cavity}" min="0" placeholder="0" oninput="recalcRow(${rowId})"></td>
     <td class="td-num" style="text-align:right;"><input type="number" value="${rate}" min="0" placeholder="0" oninput="recalcRow(${rowId})"></td>
     <td class="td-total" id="rowTotal_${rowId}">₹${fmtNum(total)}</td>
     <td><button class="btn-remove-row" onclick="removeRow(${rowId})">×</button></td>`;
-  tbody.appendChild(tr);
-  const ta=tr.querySelector('.desc-input');
-  if(ta) autoGrow(ta);
-  recalcTotals();
-}
-function autoGrow(el){
-  if(!el)return;
-  el.style.height='auto';
-  el.style.height=Math.max(44,el.scrollHeight)+'px';
+  tbody.appendChild(tr); recalcTotals();
 }
 function removeRow(rid){const r=document.getElementById('row_'+rid);if(r)r.remove();updateSrNos();recalcTotals();}
 function updateSrNos(){document.querySelectorAll('#productRows tr').forEach((tr,i)=>tr.querySelector('.td-sr').textContent=i+1);}
@@ -2615,7 +1329,7 @@ function fmtNum(n){return(n||0).toLocaleString('en-IN',{maximumFractionDigits:0}
 function gatherData(){
   const rows=[];
   document.querySelectorAll('#productRows tr').forEach(tr=>{
-    const desc=tr.querySelector('.desc-input')?.value||'';
+    const desc=tr.querySelector('input[type=text]')?.value||'';
     const ins=tr.querySelectorAll('input[type=number]');
     rows.push({desc,cavity:ins[0]?.value||'',rate:ins[1]?.value||''});
   });
@@ -2631,15 +1345,12 @@ function gatherData(){
     custAddress:document.getElementById('custAddress').value,
     custGST:document.getElementById('custGST').value,
     custEmail:document.getElementById('custEmail').value,
-    customerId:document.getElementById('selectedCustomerId')?.value || '',
     gstRate:String(gstRate),
     tcPayment:document.getElementById('tcPayment').value,
     tcDelivery:document.getElementById('tcDelivery').value,
     rows, subTotal:sub, grandTotal:sub+(sub*gstRate/100),
     savedAt:new Date().toISOString(),
-    savedBy: currentUser?.displayName || currentUser?.username || 'Unknown',
-    userPhone: currentUser?.contactPhone || '',
-    userEmail: currentUser?.contactEmail || ''
+    savedBy: currentUser?.displayName || currentUser?.username || 'Unknown'
   };
 }
 
@@ -2648,20 +1359,15 @@ function loadData(d){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   set('quoteNo',d.quoteNo);set('quoteDate',d.quoteDate);set('custCompany',d.custCompany);
   set('custName',d.custName);set('custPhone',d.custPhone);set('custAddress',d.custAddress);
-  set('custGST',d.custGST);set('custEmail',d.custEmail);set('selectedCustomerId', d.customerId || '');renderCustomerDropdown(d.customerId || '');set('gstRate',d.gstRate||'18');
+  set('custGST',d.custGST);set('custEmail',d.custEmail);set('gstRate',d.gstRate||'18');
   set('tcPayment',d.tcPayment);set('tcDelivery',d.tcDelivery);
-  const quoteNoEl=document.getElementById('quoteNo');
-  if(quoteNoEl) quoteNoEl.dataset.autoGenerated='false';
   (d.rows||[]).forEach(r=>addProductRow(r.desc,r.cavity,r.rate));
   recalcTotals();
 }
 
 async function saveQuotation(){
   const d=gatherData();
-  if(!d.quoteNo){
-    d.quoteNo=generateQuotationNumber(d.quoteDate||new Date(), d.id);
-    document.getElementById('quoteNo').value=d.quoteNo;
-  }
+  if(!d.quoteNo){showNotif('Please enter a Quotation Number.','error');return;}
   const dup=dbLoad().find(r=>r.quoteNo===d.quoteNo&&r.id!==d.id);
   if(dup){showNotif('Quotation number already exists!','error');return;}
   if(!editingId)editingId=d.id; else d.id=editingId;
@@ -2677,12 +1383,9 @@ function renderDB(){
   const records=dbLoad();
   const q=(document.getElementById('dbSearch')?.value||'').toLowerCase();
   const filtered=q?records.filter(r=>(r.quoteNo||'').toLowerCase().includes(q)||(r.custCompany||'').toLowerCase().includes(q)||(r.custName||'').toLowerCase().includes(q)):records;
+  const totalVal=records.reduce((a,r)=>a+(r.subTotal||0),0);
   document.getElementById('statTotal').textContent=records.length;
-  const statValueEl=document.getElementById('statValue');
-  if(statValueEl){
-    const totalVal=records.reduce((a,r)=>a+(r.subTotal||0),0);
-    statValueEl.textContent='₹'+fmtNum(totalVal);
-  }
+  document.getElementById('statValue').textContent='₹'+fmtNum(totalVal);
   const tbody=document.getElementById('dbTableBody');
   const empty=document.getElementById('dbEmpty');
   if(filtered.length===0){tbody.innerHTML='';empty.style.display='block';return;}
@@ -2697,7 +1400,6 @@ function renderDB(){
     <td class="acts">
       <button class="btn-edit-s" onclick="editQ('${r.id}')">✏ Edit</button>
       <button class="btn-sm btn-acc" onclick="previewFromDB('${r.id}')">👁 Preview</button>
-      <button class="btn-sm btn-ol" onclick="previewFromDB('${r.id}','proforma')">PI PDF</button>
       <button class="btn-del" onclick="confirmDeleteQ('${r.id}','${esc(r.quoteNo||'')}')">🗑</button>
     </td>
   </tr>`).join('');
@@ -2708,9 +1410,9 @@ function editQ(id){
   document.getElementById('formTitle').textContent='Editing: '+(r.quoteNo||id);
   showView('new');
 }
-function previewFromDB(id, mode='quotation'){
+function previewFromDB(id){
   const r=dbFind(id);if(!r)return;
-  openPreview(mode, r);
+  renderPrintDoc(r);document.getElementById('printModal').classList.add('open');
 }
 function fmtDateShort(s){
   if(!s)return'—';
@@ -2730,14 +1432,10 @@ function confirmDeleteQ(id,qno){
   document.getElementById('confirmModal').classList.add('open');
   document.getElementById('confirmOkBtn').onclick=async function(){
     dbDelete(pendingDelId);
-    if(backendMode){
-      await syncStateToBackend();
-    } else if(msalAccount){
+    if(msalAccount){
       updateSyncBadge('syncing');
-      const data=await odReadData()||{quotations:[],users:getUsers(),customers:customersLoad(),projects:projectsLoad()};
+      const data=await odReadData()||{quotations:[],users:getUsers()};
       data.quotations=dbLoad();
-      data.customers=customersLoad();
-      data.projects=projectsLoad();
       const ok=await odWriteData(data);
       updateSyncBadge(ok?'synced':'error');
     }
@@ -2749,79 +1447,34 @@ function closeConfirm(){pendingDelId=null;document.getElementById('confirmModal'
 // ═══════════════════════════════════════════
 // PREVIEW & PRINT
 // ═══════════════════════════════════════════
-let currentPrintMode='quotation';
-let currentPrintRecord=null;
-function getPrintModeConfig(mode='quotation'){
-  if(mode==='proforma'){
-    return {
-      mode:'proforma',
-      previewTitle:'Proforma Invoice Preview',
-      documentTitle:'PROFORMA INVOICE',
-      infoTitle:'Proforma Invoice Info',
-      fileLabel:'Proforma-Invoice',
-      numberLabel:'Proforma Invoice No.'
-    };
-  }
-  return {
-    mode:'quotation',
-    previewTitle:'Quotation Preview',
-    documentTitle:'QUOTATION',
-    infoTitle:'Quotation Info',
-    fileLabel:'Quotation',
-    numberLabel:'Quote No'
-  };
-}
-function openPreview(mode='quotation', record=null){
-  currentPrintMode=mode==='proforma'?'proforma':'quotation';
-  currentPrintRecord=record || gatherData();
-  const cfg=getPrintModeConfig(currentPrintMode);
-  const titleEl=document.getElementById('printModalTitle');
-  if(titleEl) titleEl.textContent=cfg.previewTitle;
-  renderPrintDoc(currentPrintRecord, currentPrintMode);
-  document.getElementById('printModal').classList.add('open');
-}
+function openPreview(){renderPrintDoc(gatherData());document.getElementById('printModal').classList.add('open');}
 function closePreview(){document.getElementById('printModal').classList.remove('open');}
 function doPrint(){
   const src=document.getElementById('printDoc');
   let pc=document.getElementById('printContainer');
   if(!pc){pc=document.createElement('div');pc.id='printContainer';document.body.appendChild(pc);}
   pc.innerHTML=src.innerHTML;
-  const cfg=getPrintModeConfig(currentPrintMode);
-  const originalTitle=document.title;
-  const quoteNo=(currentPrintRecord?.quoteNo||'').trim();
-  document.title=quoteNo?`${quoteNo} - ${cfg.fileLabel}`:`Hexamech - ${cfg.fileLabel}`;
   document.body.classList.add('printing');
   window.print();
   document.body.classList.remove('printing');
-  document.title=originalTitle;
   pc.innerHTML='';
 }
-function renderPrintDoc(d, mode='quotation'){
-  const cfg=getPrintModeConfig(mode);
+function renderPrintDoc(d){
   let sub=0;(d.rows||[]).forEach(r=>{sub+=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);});
   const gstRate=parseFloat(d.gstRate)||0;const gst=sub*gstRate/100;const grand=sub+gst;
-  const userPhone=String(d.userPhone || currentUser?.contactPhone || '').trim();
-  const userEmail=String(d.userEmail || currentUser?.contactEmail || '').trim();
-  const companyPhone=userPhone || '+91 8866693972';
-  const companyEmail=userEmail || 'office@hexamech.com';
-  const documentNumber = cfg.mode === 'proforma'
-    ? String(d.quoteNo || '—').replace(/^Q/i, 'PI')
-    : String(d.quoteNo || '—');
   const rowsHtml=(d.rows||[]).map((r,i)=>{
     const t=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);
-    const descHtml=esc(r.desc||'—').replace(/\n/g,'<br>');
-    return`<tr><td class="pdsr">${i+1}</td><td class="pd-desc-cell">${descHtml}</td>
+    return`<tr><td class="pdsr">${i+1}</td><td>${esc(r.desc||'—')}</td>
     <td style="text-align:right;font-family:'DM Mono',monospace;">${r.cavity||0}</td>
     <td style="text-align:right;font-family:'DM Mono',monospace;">₹${fmtNum(parseFloat(r.rate)||0)}</td>
     <td>₹${fmtNum(t)}</td></tr>`;
   }).join('');
   document.getElementById('printDoc').innerHTML=`
-    <div class="pd-corner-logo"><img src="${CORNER_LOGO_SRC}" alt="Hexamech mark"></div>
-    <div class="pd-title-bar"><span>${cfg.documentTitle}</span></div>
+    <div class="pd-title-bar"><span>QUOTATION</span></div>
     <div class="pd-header">
       <div>
         <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 13px;display:inline-flex;align-items:center;margin-bottom:5px;">
-          <img src="${LOGO_SRC}" alt="Hexamech" style="height:44px;display:block;object-fit:contain;">
+          <img src="${LOGO_SRC}" alt="Hexamech" style="height:34px;display:block;">
         </div>
         <div style="font-size:11px;color:var(--steel);font-weight:600;letter-spacing:.04em;">Technology Pvt Ltd</div>
       </div>
@@ -2829,13 +1482,13 @@ function renderPrintDoc(d, mode='quotation'){
         <strong>Hexamech Technology Pvt Ltd</strong><br>
         01, Mahavir Industrial Park-2, Kathwada Singarva Road,<br>
         Ahmedabad-382430. Gujarat INDIA.<br>
-        Phone: ${esc(companyPhone)} &nbsp;|&nbsp; Email: ${esc(companyEmail)}<br>
+        Phone: +91 8866693972 &nbsp;|&nbsp; Email: office@hexamech.com<br>
         Website: www.hexamech.com
       </div>
     </div>
     <div class="pd-meta-strip">
       <div class="pd-meta-box">
-        <div class="pd-mbox-hdr"><strong>Customer Details</strong></div>
+        <div class="pd-mbox-hdr">Customer Details</div>
         <div class="pd-mbox-body">
           <div class="pd-mrow"><span class="pml">M/S</span><span class="pmv">${esc(d.custCompany||'—')}</span></div>
           <div class="pd-mrow"><span class="pml">Name</span><span class="pmv">${esc(d.custName||'—')}</span></div>
@@ -2846,27 +1499,25 @@ function renderPrintDoc(d, mode='quotation'){
         </div>
       </div>
       <div class="pd-meta-box">
-        <div class="pd-mbox-hdr"><strong>${cfg.infoTitle}</strong></div>
+        <div class="pd-mbox-hdr">Quotation Info</div>
         <div class="pd-mbox-body">
-          <div class="pd-mrow"><span class="pml">${cfg.numberLabel}</span><span class="pmv" style="font-family:'DM Mono',monospace;font-weight:700;color:var(--navy);">${esc(documentNumber)}</span></div>
+          <div class="pd-mrow"><span class="pml">Quote No</span><span class="pmv" style="font-family:'DM Mono',monospace;font-weight:700;color:var(--navy);">${esc(d.quoteNo||'—')}</span></div>
           <div class="pd-mrow"><span class="pml">Date</span><span class="pmv">${fmtDateShort(d.quoteDate)}</span></div>
           <div class="pd-mrow"><span class="pml">GST No</span><span class="pmv">24AAECH5305E1Z3</span></div>
           <div class="pd-mrow"><span class="pml">Validity</span><span class="pmv">15 days from date</span></div>
         </div>
       </div>
     </div>
-    <div class="pd-sec-title"><strong>Product Specification</strong></div>
-    <div class="pd-product-block pd-product-shell">
-      <div class="pd-table-wrap">
-        <table class="pd-table">
-          <thead><tr>
-            <th style="width:34px;text-align:center;"><strong>Sr.</strong></th><th><strong>Product Specification</strong></th>
-            <th style="text-align:right;"><strong>No. of Cavity</strong></th><th style="text-align:right;"><strong>Rate Per Cavity (₹)</strong></th>
-            <th style="text-align:right;"><strong>Total (₹)</strong></th>
-          </tr></thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-      </div>
+    <div class="pd-sec-title">Product Specification</div>
+    <div class="pd-product-block">
+      <table class="pd-table">
+        <thead><tr>
+          <th style="width:34px;text-align:center;">Sr.</th><th>Product Specification</th>
+          <th style="text-align:right;">No. of Cavity</th><th style="text-align:right;">Rate Per Cavity (₹)</th>
+          <th style="text-align:right;">Total (₹)</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
       <div class="pd-totals-wrap">
         <div class="pd-totals">
           <div class="pd-tot-row"><span class="ptl">Sub-Total</span><span class="ptv">₹${fmtNum(sub)}</span></div>
@@ -2875,109 +1526,47 @@ function renderPrintDoc(d, mode='quotation'){
         </div>
       </div>
     </div>
-    <div class="pd-second-page">
-      <div class="pd-sec-title" style="margin-top:0;"><strong>Special Features Inclusive with Mould</strong></div>
-      <div class="pd-box pd-box-flow"><ul class="pd-list">
-        <li>We design preform according to clients' specifications.</li>
-        <li>Channels for cooling water are designed to flow turbulently.</li>
-        <li>Assembled stack parts for the hot runner system sourced internationally.</li>
-        <li>The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.</li>
-        <li>We use Unbrako or TVS fasteners.</li>
-        <li><strong>Mould material specification</strong>
-          <div class="pd-subpoints">
-            <div class="pd-subpoint">Cavity: DIN 1.2316 ESR - Böhler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.</div>
-            <div class="pd-subpoint">Core: DIN 1.2316 ESR - Böhler (German Make), corrosion resistance steel.</div>
-            <div class="pd-subpoint">Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.</div>
-            <div class="pd-subpoint">Hot Runner Plates: 1.2085 corrosion resistance steel.</div>
-            <div class="pd-subpoint">Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.</div>
-            <div class="pd-subpoint">All mould base plates are electroless nickel plated (ENP).</div>
-            <div class="pd-subpoint">Advanced profile heaters are used for smooth mould operation start-up.</div>
-          </div>
-        </li>
-      </ul></div>
-      <div class="pd-sec-title"><strong>Terms &amp; Conditions</strong></div>
-      <div class="pd-box pd-box-flow"><ul class="pd-list pd-tlist">
-        <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is ${gstRate}%.</li>
-        <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||'')}</li>
-        <li><strong>Payment Terms:</strong> ${esc(d.tcPayment||'')}</li>
-        <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
-        <li><strong>Delivery &amp; Transportation:</strong> The customer shall take delivery of the goods Ex-Works from the company facility. All expenses and risk of loss or damage during transportation shall be borne by the customer.</li>
-        <li><strong>Mould Trial &amp; Training:</strong> Each mould is subjected to in-house mould trial. Your engineer may witness the trial at our factory, and training during the trial is free of cost. Travel, local transport and hotel stay are to be borne by you.</li>
-        <li><strong>Mould Commissioning:</strong> Our engineer will commission the mould at your factory for no charge up to 2 days per mould. After that, installation charges of ₹5,000 per day (domestic) apply. Travel, local transport and accommodation are to be arranged and borne by you.</li>
-        <li><strong>Packaging &amp; Freight Forwarding:</strong> Exclusive.</li>
-        <li><strong>Delayed Payments:</strong> Delay in balance payment beyond 1 week from the date of mould readiness will attract interest @ 1% per week on the due payment.</li>
-        <li><strong>Factory Environment at Customer Place:</strong> To achieve best output, productivity and quality, maintain dust-free conditions and shop-floor temperature of 25 °C.</li>
-        <li><strong>Rejection of Non-Conforming Goods:</strong> The customer must notify the company of any rejection of goods as non-conforming within five days after delivery.</li>
-        <li><strong>Warranty:</strong> The mould would be under warranty for one year from the date of dispatch against all manufacturing defects or faulty workmanship.</li>
-        <li><strong>Warranty Excludes:</strong> Any part misused, improperly installed or accidentally damaged, or any unauthorised repair or alteration affecting working or performance.</li>
-        <li><strong>Order Cancellation:</strong> The order once placed cannot be cancelled without our written consent and payment of cancellation charges depending on the manufacturing progress. Full mould price shall be recovered once all mould parts are manufactured.</li>
-        <li><strong>Insurance:</strong> If insurance is required, it will be handled by the client.</li>
-        <li><strong>Jurisdiction:</strong> The Gujarat courts have jurisdiction only with respect to correspondence orders against this offer.</li>
-        <li><strong>Copyright:</strong> Customer will be liable for design and product copyright.</li>
-        <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
-        <li><strong>Mold Components as Spares Along with Mold</strong>
-          <div class="pd-subpoints">
-            <div class="pd-subpoint">Thermocouple - 2 Nos</div>
-            <div class="pd-subpoint">Core, Cavity and Neck - 1 Set</div>
-            <div class="pd-subpoint">Tip Insulator - 2 Nos</div>
-            <div class="pd-subpoint">Nozzle Heaters - 2 Nos</div>
-            <div class="pd-subpoint">Fasteners - Sufficient</div>
-            <div class="pd-subpoint">Ejector Rods - 1 Set</div>
-            <div class="pd-subpoint">Teflon Tape - 2 Nos</div>
-            <div class="pd-subpoint">Latch Plate - 1 Set</div>
-            <div class="pd-subpoint">Heaters - 2 Nos</div>
-            <div class="pd-subpoint">Baffle O-Ring - 1 Set</div>
-            <div class="pd-subpoint">Hot Runner Standard Seal - 2 Nos</div>
-            <div class="pd-subpoint">Toolbox (Bolts, Keys, etc.) - 1 No</div>
-          </div>
-        </li>
-      </ul></div>
-      <div class="pd-sec-title"><strong>Company &amp; Bank Details</strong></div>
-      <div class="pd-bank-wrap">
-        <div class="pd-bi"><div class="pbk">Account Name</div><div class="pbv">Hexamech Technology Pvt. Ltd.</div></div>
-        <div class="pd-bi"><div class="pbk">Bank Name</div><div class="pbv">ICICI Bank Ltd</div></div>
-        <div class="pd-bi"><div class="pbk">Branch</div><div class="pbv">Hebatpur</div></div>
-        <div class="pd-bi"><div class="pbk">Account No</div><div class="pbv">439705000097</div></div>
-        <div class="pd-bi"><div class="pbk">IFSC</div><div class="pbv">ICIC0004397</div></div>
-        <div class="pd-bi"><div class="pbk">GST No</div><div class="pbv">24AAECH5305E1Z3</div></div>
-      </div>
-      <div class="pd-footer">
-        <div>
-          <div class="pfv">${esc(documentNumber === '—' ? '' : documentNumber)} · ${fmtDateShort(d.quoteDate)}</div>
-          <div style="margin-top:3px;font-size:10px;">www.hexamech.com | office@hexamech.com</div>
-          <div style="margin-top:3px;font-size:10px;color:var(--muted);">Created by: ${esc(d.savedBy || currentUser?.displayName || currentUser?.username || 'Unknown')}</div>
-        </div>
-        <div><div class="pd-sig-line">Authorised Signatory — Hexamech Technology Pvt Ltd</div></div>
-      </div>
+    <div class="pd-sec-title" style="margin-top:16px;">Technical Specifications</div>
+    <div class="pd-box"><ul class="pd-list">
+      <li>Cavity and Core manufactured from highly conductive, tough and wear resistant material.</li>
+      <li>Channels for cooling water are designed to flow turbulently.</li>
+      <li>Recommended to use Unbrako fasteners.</li>
+      <li>We design preform according to clients' specifications.</li>
+      <li>The customer must supply a preform design or sample. If not, we will design the preform, and manufacturing will begin only after the customer approves the design.</li>
+    </ul></div>
+    <div class="pd-sec-title">Terms &amp; Conditions</div>
+    <div class="pd-box"><ul class="pd-list pd-tlist">
+      <li><strong>Warranty:</strong> One year from dispatch against manufacturing defects. No penalties or liquidated damages.</li>
+      <li><strong>Warranty Excludes:</strong> Misuse, improper installation, accidental damage, or unauthorised repair.</li>
+      <li><strong>Insurance:</strong> If required, handled by the client.</li>
+      <li><strong>Jurisdiction:</strong> Gujarat courts only.</li>
+      <li><strong>Copyright:</strong> Customer liable for design and product copyright.</li>
+      <li><strong>Validity:</strong> 15 days from quotation date.</li>
+      <li><strong>Payment:</strong> ${esc(d.tcPayment||'')}</li>
+      <li><strong>Charges:</strong> Design modification, trial, polishing, rework charges extra and borne by customer.</li>
+      <li><strong>Delivery &amp; Transportation:</strong> Ex-Works. All transport expenses and risks borne by customer.</li>
+      <li><strong>Rejection:</strong> Notify within 5 days of delivery.</li>
+      <li><strong>Packaging &amp; Forwarding:</strong> Exclusive.</li>
+      <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||'')}</li>
+      <li><strong>Tax:</strong> GST @ ${gstRate}% extra at time of despatch.</li>
+    </ul></div>
+    <div class="pd-sec-title">Company &amp; Bank Details</div>
+    <div class="pd-bank-wrap">
+      <div class="pd-bi"><div class="pbk">Account Name</div><div class="pbv">Hexamech Technology Pvt. Ltd.</div></div>
+      <div class="pd-bi"><div class="pbk">Bank Name</div><div class="pbv">ICICI Bank Ltd</div></div>
+      <div class="pd-bi"><div class="pbk">Branch</div><div class="pbv">Hebatpur</div></div>
+      <div class="pd-bi"><div class="pbk">Account No</div><div class="pbv">439705000097</div></div>
+      <div class="pd-bi"><div class="pbk">IFSC</div><div class="pbv">ICIC0004397</div></div>
+      <div class="pd-bi"><div class="pbk">GST No</div><div class="pbv">24AAECH5305E1Z3</div></div>
+    </div>
+    <div class="pd-footer">
+      <div><div class="pfv">${esc(d.quoteNo||'')} · ${fmtDateShort(d.quoteDate)}</div>
+      <div style="margin-top:3px;font-size:10px;">www.hexamech.com | office@hexamech.com</div></div>
+      <div><div class="pd-sig-line">Authorised Signatory — Hexamech Technology Pvt Ltd</div></div>
     </div>`;
 }
 
 // ═══════════════════════════════════════════
-
-function showReconnectBar() {
-  if (document.getElementById('reconnectBar')) return;
-  const bar = document.createElement('div');
-  bar.id = 'reconnectBar';
-  bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1b3a5c;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9997;font-size:13px;font-family:Barlow,sans-serif;gap:12px;';
-  bar.innerHTML = '<span>⚠️ OneDrive not connected — saving locally only.</span><button onclick="retryODConnect()" style="background:#e8a020;color:#0d1b2a;border:none;padding:7px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-family:Barlow,sans-serif;">↻ Reconnect OneDrive</button>';
-  document.body.appendChild(bar);
-}
-function hideReconnectBar() {
-  const b = document.getElementById('reconnectBar'); if(b) b.remove();
-}
-async function retryODConnect() {
-  const bar = document.getElementById('reconnectBar');
-  if (bar) bar.querySelector('button').textContent = 'Connecting...';
-  updateSyncBadge('syncing');
-  try {
-    await initMsal();
-    if (msalAccount) { hideReconnectBar(); checkODSetup(); showNotif('OneDrive connected!', 'success'); return; }
-  } catch(e) {}
-  if (bar) bar.querySelector('button').textContent = '↻ Reconnect OneDrive';
-  updateSyncBadge('error');
-  showNotif('Could not connect. Check internet and try again.', 'error');
-}
-
 // NOTIFICATION
 // ═══════════════════════════════════════════
 let notifTimer;
@@ -2988,13 +1577,12 @@ function showNotif(msg,type='success'){
 }
 
 // Close on backdrop
-['printModal','setupModal','userModal','customerModal','confirmModal'].forEach(id=>{
+['printModal','setupModal','userModal','confirmModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){
     if(e.target===this){
       if(id==='printModal')closePreview();
       else if(id==='setupModal')closeSetupModal();
       else if(id==='userModal')closeUserModal();
-      else if(id==='customerModal')closeCustomerModal();
       else closeConfirm();
     }
   });
@@ -3003,10 +1591,8 @@ function showNotif(msg,type='success'){
 // ═══════════════════════════════════════════
 // STARTUP — handle MSAL redirect first
 // ═══════════════════════════════════════════
-// Startup — fast local boot with optional backend session restore
-async function startup() {
-  if (window.__hexamechStartupDone) return;
-  window.__hexamechStartupDone = true;
+// Startup — purely synchronous, no network, instant
+function startup() {
   try {
     // Seed embedded credentials if present
     if (EMBEDDED_CLIENT_ID && EMBEDDED_REFRESH_TOKEN) {
@@ -3023,60 +1609,6 @@ async function startup() {
   var li = document.getElementById('loginScreen');
   if (ls) ls.style.display = 'none';
   if (li) li.style.display = 'flex';
-  const hasEmbeddedConnection = !!(EMBEDDED_CLIENT_ID && EMBEDDED_REFRESH_TOKEN);
-  const loginSub = document.getElementById('loginSub');
-  const loginDivider = document.getElementById('loginDivider');
-  const msSignInBtn = document.getElementById('msSignInBtn');
-  const loginCloudStatus = document.getElementById('loginCloudStatus');
-  if (loginSub) {
-    loginSub.textContent = hasEmbeddedConnection
-      ? 'Sign in with your quotation username and password.'
-      : 'Sign in to access the Quotation System';
-  }
-  if (loginDivider) loginDivider.style.display = hasEmbeddedConnection ? 'none' : 'flex';
-  if (msSignInBtn) msSignInBtn.style.display = hasEmbeddedConnection ? 'none' : 'flex';
-  if (loginCloudStatus) loginCloudStatus.style.display = hasEmbeddedConnection ? 'block' : 'none';
-  const redirectHint = document.getElementById('redirectUriHint');
-  if (redirectHint) {
-    redirectHint.textContent = isSupportedRedirectUri()
-      ? getAppRedirectUri()
-      : 'Open this app from a hosted http/https web link. Local file paths cannot be used as the Microsoft redirect URL.';
-  }
-
-  wireCustomerFieldListeners();
-  const quoteNoEl = document.getElementById('quoteNo');
-  const quoteDateEl = document.getElementById('quoteDate');
-  if (quoteNoEl && !quoteNoEl.dataset.quoteNoWired) {
-    quoteNoEl.dataset.quoteNoWired = 'true';
-    quoteNoEl.addEventListener('input', function(){
-      this.dataset.autoGenerated = 'false';
-    });
-  }
-  if (quoteDateEl && !quoteDateEl.dataset.quoteDateWired) {
-    quoteDateEl.dataset.quoteDateWired = 'true';
-    quoteDateEl.addEventListener('change', function(){
-      if (editingId) return;
-      setAutoQuotationNumber(this.value || new Date());
-    });
-  }
-
-  await detectBackendMode();
-  if (backendMode) {
-    try {
-      const restored = await restoreBackendSession();
-      if (restored) {
-        launchApp();
-        return;
-      }
-    } catch(e) {
-      apiAuthToken = '';
-      localStorage.removeItem('hx_api_token');
-    }
-    hideOneDriveUiForBackend();
-    return;
-  }
-
-  ensureUsersLoadedFromOneDrive();
 }
 
 // Run immediately and also on DOMContentLoaded as fallback
