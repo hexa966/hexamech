@@ -2845,19 +2845,39 @@ async function downloadPdfForRecord(record, mode='quotation'){
   const cfg = getPrintModeConfig(mode);
   const cleanRecord = Object.assign({}, record || {});
   cleanRecord.moldSpares = cleanRecord.moldSpares || DEFAULT_SPARES;
-  const host = document.createElement('div');
-  host.className = 'pdf-render-host';
-  const source = document.createElement('div');
-  source.className = 'pdf-render-doc';
-  source.innerHTML = renderPrintDoc(cleanRecord, mode);
-  host.appendChild(source);
-  document.body.appendChild(host);
+  const html = renderPrintDoc(cleanRecord, mode);
+  const frame = document.createElement('iframe');
+  frame.className = 'pdf-render-host';
+  frame.setAttribute('title', 'PDF Render Frame');
+  document.body.appendChild(frame);
+
+  const frameDoc = frame.contentDocument || frame.contentWindow?.document;
+  if (!frameDoc) {
+    frame.remove();
+    showNotif('Could not prepare PDF document.', 'error');
+    return;
+  }
+
+  const styles = Array.from(document.querySelectorAll('style')).map(tag => tag.textContent || '').join('\n');
+  const stylesheetLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(link => link.outerHTML).join('\n');
+  frameDoc.open();
+  frameDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8">' + stylesheetLinks + '<style>body{margin:0;background:#fff;}' + styles + '</style></head><body><div id="pdfRoot" class="pdf-render-doc"></div></body></html>');
+  frameDoc.close();
+
+  const source = frameDoc.getElementById('pdfRoot');
+  if (!source) {
+    frame.remove();
+    showNotif('Could not render PDF content.', 'error');
+    return;
+  }
+  source.innerHTML = html;
   const documentNumber = cfg.mode === 'proforma'
     ? String(cleanRecord.quoteNo || 'Document').replace(/^Q/i, 'PI')
     : String(cleanRecord.quoteNo || 'Document');
   const filename = safeDownloadName(documentNumber + '-' + cfg.fileLabel) + '.pdf';
+
   try {
-    await waitForPdfRender(source);
+    await waitForPdfRender(frame, source);
     await html2pdf().set({
       margin: [8, 8, 8, 8],
       filename: filename,
@@ -2871,23 +2891,25 @@ async function downloadPdfForRecord(record, mode='quotation'){
     console.error('PDF download failed:', e);
     showNotif('Could not download PDF.', 'error');
   } finally {
-    host.remove();
+    frame.remove();
   }
 }
 
-async function waitForPdfRender(root){
-  if (document.fonts?.ready) {
-    try { await document.fonts.ready; } catch (_) {}
+async function waitForPdfRender(frame, root){
+  const frameWindow = frame.contentWindow;
+  const frameDoc = frame.contentDocument || frameWindow?.document;
+  if (frameDoc?.fonts?.ready) {
+    try { await frameDoc.fonts.ready; } catch (_) {}
   }
   const images = Array.from(root.querySelectorAll('img'));
   await Promise.all(images.map(img => {
-    if (img.complete) return Promise.resolve();
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
     return new Promise(resolve => {
       img.addEventListener('load', resolve, { once: true });
       img.addEventListener('error', resolve, { once: true });
     });
   }));
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  await new Promise(resolve => (frameWindow || window).requestAnimationFrame(() => (frameWindow || window).requestAnimationFrame(resolve)));
 }
 
 async function downloadPdfFromDB(id, mode='quotation'){
@@ -3154,4 +3176,6 @@ document.addEventListener('DOMContentLoaded', startup);
 </script>
 </body>
 </html>
+
+
 
