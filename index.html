@@ -839,16 +839,19 @@ async function cloudRead() {
       }
     });
     if (res.status === 404) {
-      // File doesn't exist yet — that's fine, start fresh
-      cloudConnected = true;
-      ghFileSha = null;
+      cloudConnected = true; ghFileSha = null;
       return { quotations: [], users: [], customers: [] };
     }
-    if (!res.ok) { const body = await res.text(); throw new Error('GitHub read ' + res.status + ': ' + body.slice(0,200)); }
-    const j = await res.json();
+    const body = await res.text();
+    if (!res.ok) {
+      // Show exact GitHub error in UI so we can diagnose
+      const msg = 'GitHub ' + res.status + ': ' + body.slice(0, 300);
+      showNotif('Sync error — ' + msg, 'error');
+      throw new Error(msg);
+    }
+    const j = JSON.parse(body);
     ghFileSha = j.sha;
     cloudConnected = true;
-    // GitHub returns content as base64
     return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, '')))));
   } catch(e) {
     console.error('cloudRead error:', e);
