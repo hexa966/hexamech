@@ -2613,6 +2613,9 @@ function editQ(id){
 }
 function previewFromDB(id, mode='quotation'){
   const r=dbFind(id);if(!r)return;
+  // Populate moldSpares textarea so user edits are reflected
+  const sparesEl = document.getElementById('moldSpares');
+  if (sparesEl) sparesEl.value = r.moldSpares || sparesEl.value;
   openPreview(mode, r);
 }
 function fmtDateShort(s){
@@ -2677,6 +2680,11 @@ function getPrintModeConfig(mode='quotation'){
 function openPreview(mode='quotation', record=null){
   currentPrintMode=mode==='proforma'?'proforma':'quotation';
   currentPrintRecord=record || gatherData();
+  // Always pick up moldSpares from textarea if user has edited it
+  const sparesEl = document.getElementById('moldSpares');
+  if (sparesEl && sparesEl.value && sparesEl.value.trim()) {
+    currentPrintRecord.moldSpares = sparesEl.value;
+  }
   const cfg=getPrintModeConfig(currentPrintMode);
   const titleEl=document.getElementById('printModalTitle');
   if(titleEl) titleEl.textContent=cfg.previewTitle;
