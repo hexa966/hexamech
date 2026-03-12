@@ -919,6 +919,21 @@ async function cloudPush() {
   return ok;
 }
 
+// Silent background poll — no badge flashing, no notifications
+async function silentSync() {
+  try {
+    const res = await fetch(FB_URL + '/data.json?t=' + Date.now());
+    if (!res.ok) return false;
+    const raw = await res.json();
+    if (!raw) return false;
+    if (raw.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(raw.quotations));
+    if (raw.users && raw.users.length > 0)
+      localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(raw.users)));
+    if (raw.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(raw.customers));
+    return true;
+  } catch(e) { return false; }
+}
+
 // ═══════════════════════════════════════════
 
 async function ghRead() { return await cloudRead(); }
@@ -1525,22 +1540,22 @@ function launchApp() {
   })();
   // Auto-refresh every 60s — all users see each other's edits/deletes in near real-time
   setInterval(async () => {
-    const synced = await cloudSync();
-    if (synced) {
+    const ok = await silentSync();
+    if (ok) {
       if (document.getElementById('dbView').style.display !== 'none') renderDB();
       renderCustomerDropdown(); renderCustomersView();
     }
-  }, 60000);
+  }, 5000);
 
-  // Auto-refresh every 60s — all users see each other's edits/deletes in near real-time
+  // Auto-refresh every 5s — all users see each other's changes near-instantly
   if (!backendMode) {
     setInterval(async () => {
-      const synced = await cloudSync();
-      if (synced) {
+      const ok = await silentSync();
+      if (ok) {
         if (document.getElementById('dbView').style.display !== 'none') renderDB();
         renderCustomerDropdown(); renderCustomersView();
       }
-    }, 60000);
+    }, 5000);
   }
 }
 document.addEventListener('keydown', e => {
