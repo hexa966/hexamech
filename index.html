@@ -1523,6 +1523,25 @@ function launchApp() {
       showNotif('Cloud sync failed. Check internet or Firebase rules, then try again.', 'error');
     }
   })();
+  // Auto-refresh every 60s — all users see each other's edits/deletes in near real-time
+  setInterval(async () => {
+    const synced = await cloudSync();
+    if (synced) {
+      if (document.getElementById('dbView').style.display !== 'none') renderDB();
+      renderCustomerDropdown(); renderCustomersView();
+    }
+  }, 60000);
+
+  // Auto-refresh every 60s — all users see each other's edits/deletes in near real-time
+  if (!backendMode) {
+    setInterval(async () => {
+      const synced = await cloudSync();
+      if (synced) {
+        if (document.getElementById('dbView').style.display !== 'none') renderDB();
+        renderCustomerDropdown(); renderCustomersView();
+      }
+    }, 60000);
+  }
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
@@ -2793,14 +2812,9 @@ function confirmDeleteQ(id,qno){
     dbDelete(pendingDelId);
     if(backendMode){
       await syncStateToBackend();
-    } else if(msalAccount){
-      updateSyncBadge('syncing');
-      const data=await odReadData()||{quotations:[],users:getUsers(),customers:customersLoad(),projects:projectsLoad()};
-      data.quotations=dbLoad();
-      data.customers=customersLoad();
-      data.projects=projectsLoad();
-      const ok=await odWriteData(data);
-      updateSyncBadge(ok?'synced':'error');
+    } else {
+      const ok = await cloudPush();
+      if(!ok) showNotif('Deleted locally. Cloud sync failed — check internet.','error');
     }
     closeConfirm();renderDB();showNotif('Quotation deleted.','info');
   };
