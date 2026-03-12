@@ -748,11 +748,20 @@ Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
       <div class="fg2" style="margin-bottom:12px;"><label>Username</label><input type="text" id="umUsername" placeholder="e.g. sales2"></div>
       <div class="fg2" style="margin-bottom:12px;"><label>Display Name</label><input type="text" id="umDisplayName" placeholder="e.g. Raj Patel"></div>
       <div class="fg2" style="margin-bottom:12px;"><label>Password</label><input type="password" id="umPassword" placeholder="Enter password"></div>
-      <div class="fg2" style="margin-bottom:4px;"><label>Role</label>
+      <div class="fg2" style="margin-bottom:12px;"><label>Role</label>
         <select id="umRole" onchange="handleUserRoleChange()">
           <option value="user">User (can create quotations)</option>
           <option value="admin">Admin (can manage users)</option>
         </select>
+      </div>
+      <div class="fg2" style="margin-bottom:4px;" id="umGroupRow">
+        <label>Group</label>
+        <select id="umGroup">
+          <option value="">— No Group (Admin only) —</option>
+          <option value="A">Group A</option>
+          <option value="B">Group B</option>
+        </select>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Group A users only see Group A data. Group B users only see Group B data.</div>
       </div>
       <div class="fg2" style="margin-top:12px;">
         <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:.02em;">
@@ -1159,7 +1168,10 @@ function getCurrentCustomerFormData() {
 function renderCustomerDropdown(selectedId = null) {
   const input = document.getElementById('savedCustomerSearch');
   if (!input) return;
-  const customers = customersLoad().slice().sort((a,b) => customerOptionLabel(a).localeCompare(customerOptionLabel(b)));
+  const _allC2 = customersLoad().slice();
+  const _cGrp2 = currentUser?.group || '';
+  const _cAdm2 = currentUser?.role === 'admin';
+  const customers = (_cAdm2 || !_cGrp2 ? _allC2 : _allC2.filter(c => (c.savedByGroup||'') === _cGrp2)).sort((a,b) => customerOptionLabel(a).localeCompare(customerOptionLabel(b)));
   const currentSelected = selectedId !== null ? selectedId : (document.getElementById('selectedCustomerId')?.value || '');
   const selectedCustomer = customers.find(c => c.id === currentSelected) || null;
   input.value = selectedCustomer ? customerOptionLabel(selectedCustomer) : '';
@@ -1355,7 +1367,8 @@ function saveCustomerFromModal() {
     address: document.getElementById('cmAddress').value.trim(),
     gst: document.getElementById('cmGST').value.trim(),
     email: document.getElementById('cmEmail').value.trim(),
-    savedAt: new Date().toISOString()
+    savedAt: new Date().toISOString(),
+    savedByGroup: currentUser?.group || ''
   };
   if (!customer.company) { showNotif('Customer company / M/S is required.', 'error'); return; }
   const customers = customersLoad();
@@ -1375,7 +1388,8 @@ function renderCustomersView() {
   const emailEl = document.getElementById('customerStatEmail');
   if (!tbody || !empty || !totalEl || !gstEl || !emailEl) return;
 
-  const customers = customersLoad().slice().sort((a,b) => customerOptionLabel(a).localeCompare(customerOptionLabel(b)));
+  const _acv=customersLoad().slice(); const _gcv=currentUser?.group||''; const _icv=currentUser?.role==='admin';
+  const customers=(_icv||!_gcv?_acv:_acv.filter(c=>(c.savedByGroup||'')===_gcv)).sort((a,b)=>customerOptionLabel(a).localeCompare(customerOptionLabel(b)));
   const q = (document.getElementById('customerSearch')?.value || '').trim().toLowerCase();
   const filtered = q ? customers.filter(c => [c.company, c.name, c.phone, c.address, c.gst, c.email].some(v => String(v || '').toLowerCase().includes(q))) : customers;
 
@@ -1456,6 +1470,7 @@ async function doLogin() {
       username: user.username,
       displayName: user.displayName,
       role: user.role,
+      group: user.group || '',
       canProjectAccess: user.role === 'admin' ? true : !!user.canProjectAccess,
       contactPhone: user.contactPhone || '',
       contactEmail: user.contactEmail || ''
@@ -2053,7 +2068,7 @@ function renderUserList() {
         <div class="user-avatar ${u.role==='admin'?'admin-av':''}">${(u.displayName||u.username)[0].toUpperCase()}</div>
         <div>
           <div class="user-name">${esc(u.displayName||u.username)}</div>
-          <div class="user-role">${u.username} · ${u.role}${u.canProjectAccess ? ' · project access' : ''}</div>
+          <div class="user-role">${u.username} · ${u.role}${u.group?' · Group '+u.group:''}${u.canProjectAccess ? ' · project access' : ''}</div>
         </div>
       </div>
       <div class="user-actions">
@@ -2100,6 +2115,8 @@ function openEditUserModal(username) {
     document.getElementById('umPassword').placeholder = 'Leave blank to keep current password';
     document.getElementById('umRole').value = user.role || 'user';
     document.getElementById('umProjectAccess').checked = user.role === 'admin' ? true : !!user.canProjectAccess;
+    const grpEl = document.getElementById('umGroup');
+    if (grpEl) grpEl.value = user.group || '';
     handleUserRoleChange();
     document.getElementById('saveUserBtn').textContent = 'Save Changes';
     document.getElementById('userModal').classList.add('open');
@@ -2114,10 +2131,15 @@ function closeUserModal() { document.getElementById('userModal').classList.remov
 function handleUserRoleChange() {
   const roleEl = document.getElementById('umRole');
   const projectAccessEl = document.getElementById('umProjectAccess');
+  const groupRow = document.getElementById('umGroupRow');
+  const groupEl = document.getElementById('umGroup');
   if (!roleEl || !projectAccessEl) return;
   const isAdmin = roleEl.value === 'admin';
   projectAccessEl.disabled = isAdmin;
   if (isAdmin) projectAccessEl.checked = true;
+  // Admins have no group — hide the field
+  if (groupRow) groupRow.style.display = isAdmin ? 'none' : 'block';
+  if (isAdmin && groupEl) groupEl.value = '';
 }
 
 async function saveUser() {
@@ -2126,6 +2148,7 @@ async function saveUser() {
   const password = document.getElementById('umPassword').value;
   const role = document.getElementById('umRole').value;
   const canProjectAccess = role === 'admin' ? true : document.getElementById('umProjectAccess').checked;
+  const group = role === 'admin' ? '' : (document.getElementById('umGroup')?.value || '');
 
   if (!username) { showNotif('Username is required.', 'error'); return; }
   if (!editingUsername && !password) { showNotif('Password is required.', 'error'); return; }
@@ -2137,7 +2160,7 @@ async function saveUser() {
     // Edit existing
     const idx = users.findIndex(u => u.username === editingUsername);
     if (idx >= 0) {
-      const updatedUser = { ...users[idx], displayName: displayName || username, role, canProjectAccess };
+      const updatedUser = { ...users[idx], displayName: displayName || username, role, canProjectAccess, group };
       if (password) {
         updatedUser.passwordHash = await hashPassword(password);
         delete updatedUser.password;
@@ -2155,7 +2178,7 @@ async function saveUser() {
   } else {
     // Add new
     if (users.find(u => u.username === username)) { showNotif('Username already exists.', 'error'); return; }
-    users.push({ username, displayName: displayName || username, passwordHash: await hashPassword(password), role, canProjectAccess });
+    users.push({ username, displayName: displayName || username, passwordHash: await hashPassword(password), role, canProjectAccess, group });
     saveUsers(users);
     renderUserList();
     closeUserModal();
@@ -2668,6 +2691,7 @@ function gatherData(){
     rows, subTotal:sub, grandTotal:sub+(sub*gstRate/100),
     savedAt:new Date().toISOString(),
     savedBy: currentUser?.displayName || currentUser?.username || 'Unknown',
+    savedByGroup: currentUser?.group || '',
     userPhone: currentUser?.contactPhone || '',
     userEmail: currentUser?.contactEmail || '',
     moldSpares: document.getElementById('moldSpares')?.value || ''
@@ -2705,7 +2729,9 @@ async function saveQuotation(){
 // DB VIEW
 // ═══════════════════════════════════════════
 function renderDB(){
-  const records=dbLoad();
+  const _ar=dbLoad();
+  const _ug=currentUser?.group||''; const _ia=currentUser?.role==='admin';
+  const records=(_ia||!_ug)?_ar:_ar.filter(r=>(r.savedByGroup||'')===_ug);
   const q=(document.getElementById('dbSearch')?.value||'').toLowerCase();
   const filtered=q?records.filter(r=>(r.quoteNo||'').toLowerCase().includes(q)||(r.custCompany||'').toLowerCase().includes(q)||(r.custName||'').toLowerCase().includes(q)):records;
   document.getElementById('statTotal').textContent=records.length;
