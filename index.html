@@ -3066,8 +3066,16 @@ function renderPrintDoc(d, mode='quotation'){
         <div><div class="pd-sig-line">Authorised Signatory — Hexamech Technology Pvt Ltd</div></div>
       </div>
     </div>`;
-  document.getElementById('printDoc').innerHTML=html;
-  return html;
+  const pdfBrandHtml = `<div class="pd-brand" aria-label="Hexamech logo" style="background:none;border:none;padding:0;">
+          <img src="${LOGO_SRC}" alt="Hexamech" style="width:180px;height:54px;display:block;object-fit:contain;">
+        </div>
+        <div style="font-size:11px;color:#555;font-weight:600;letter-spacing:.04em;">Technology Pvt Ltd</div>`;
+  const normalizedHtml = html.replace(
+    /<div class="pd-brand" aria-label="Hexamech logo"[\s\S]*?<div style="font-size:11px;color:#555;font-weight:600;letter-spacing:\.04em;">Technology Pvt Ltd<\/div>/,
+    pdfBrandHtml
+  );
+  document.getElementById('printDoc').innerHTML=normalizedHtml;
+  return normalizedHtml;
 }
 
 // ═══════════════════════════════════════════
@@ -3176,6 +3184,7 @@ document.addEventListener('DOMContentLoaded', startup);
 </script>
 </body>
 </html>
+
 
 
 
