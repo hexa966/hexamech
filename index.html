@@ -435,7 +435,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     </div>
     <div class="topbar-actions">
 <div id="syncBadge" class="sync-badge local" title="Cloud sync status" style="cursor:default;">
-        <span id="syncIcon">💾</span><span id="syncText">Local only</span>
+        <span id="syncIcon">☁️</span><span id="syncText">Cloud only</span>
       </div>
       <div class="topbar-user">Hi, <strong id="loggedUser"></strong></div>
       <button class="btn-sm btn-ol" onclick="doLogout()">Sign Out</button>
@@ -879,28 +879,31 @@ async function cloudSync() {
   updateSyncBadge('syncing');
   const ss  = document.getElementById('statStorage');
   const sss = document.getElementById('statStorageSub');
-  let data = await cloudRead();
+  const data = await cloudRead();
   if (!data) {
     updateSyncBadge('error');
     if (ss)  ss.textContent  = 'Error';
     if (sss) sss.textContent = 'Cannot reach Firebase';
     return false;
   }
-  const localState = getStateSnapshot();
-  if (shouldImportLocalState(data, localState)) {
-    data = {
-      quotations: Array.isArray(localState.quotations) ? localState.quotations : [],
-      users: await secureUsers(localState.users),
-      customers: Array.isArray(localState.customers) ? localState.customers : [],
-      projects: Array.isArray(localState.projects) ? localState.projects : []
-    };
-    await cloudWrite(data);
+  const remoteState = {
+    quotations: Array.isArray(data.quotations) ? data.quotations : [],
+    users: normalizeUsers(data.users, false),
+    customers: Array.isArray(data.customers) ? data.customers : [],
+    projects: Array.isArray(data.projects) ? data.projects : []
+  };
+  if (shouldSeedCloudUsers(remoteState)) {
+    remoteState.users = await secureUsers(getDefaultUsers(), false);
+    const seeded = await cloudWrite(remoteState);
+    if (!seeded) {
+      updateSyncBadge('error');
+      if (ss)  ss.textContent  = 'Error';
+      if (sss) sss.textContent = 'Cannot seed Firebase users';
+      return false;
+    }
   }
-  if (data.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(data.quotations));
-  if (data.users && data.users.length > 0)
-    localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(data.users)));
-  if (data.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data.customers));
-  if (data.projects)   localStorage.setItem(PROJECTS_KEY, JSON.stringify(data.projects));
+  applyStateSnapshot(remoteState);
+  clearStoredAppData();
   updateSyncBadge('synced');
   if (ss)  ss.textContent  = 'Cloud ✓';
   if (sss) sss.textContent = 'Firebase synced';
@@ -908,13 +911,15 @@ async function cloudSync() {
 }
 
 async function cloudPush() {
+  const snapshot = getStateSnapshot();
   const data = {
-    quotations: dbLoad(),
-    users:      await secureUsers(getUsers()),
-    customers:  customersLoad(),
-    projects:   projectsLoad()
+    quotations: snapshot.quotations,
+    users:      await secureUsers(snapshot.users, false),
+    customers:  snapshot.customers,
+    projects:   snapshot.projects
   };
   const ok = await cloudWrite(data);
+  if (ok) clearStoredAppData();
   updateSyncBadge(ok ? 'synced' : 'error');
   return ok;
 }
@@ -926,10 +931,13 @@ async function silentSync() {
     if (!res.ok) return false;
     const raw = await res.json();
     if (!raw) return false;
-    if (raw.quotations) localStorage.setItem(DB_KEY,        JSON.stringify(raw.quotations));
-    if (raw.users && raw.users.length > 0)
-      localStorage.setItem(USERS_KEY, JSON.stringify(await secureUsers(raw.users)));
-    if (raw.customers)  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(raw.customers));
+    applyStateSnapshot({
+      quotations: Array.isArray(raw.quotations) ? raw.quotations : [],
+      users: normalizeUsers(raw.users, false),
+      customers: Array.isArray(raw.customers) ? raw.customers : [],
+      projects: Array.isArray(raw.projects) ? raw.projects : []
+    });
+    clearStoredAppData();
     return true;
   } catch(e) { return false; }
 }
@@ -975,16 +983,15 @@ function getStateSnapshot() {
 }
 
 function applyStateSnapshot(state = {}) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(normalizeUsers(state.users)));
-  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(Array.isArray(state.customers) ? state.customers : []));
-  localStorage.setItem(DB_KEY, JSON.stringify(Array.isArray(state.quotations) ? state.quotations : []));
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(Array.isArray(state.projects) ? state.projects : []));
+  appState.users = normalizeUsers(state.users, false);
+  appState.customers = cloneList(state.customers);
+  appState.quotations = cloneList(state.quotations);
+  appState.projects = cloneList(state.projects);
+  clearStoredAppData();
 }
 
-function shouldImportLocalState(remoteState, localState) {
-  const remoteHasData = (remoteState?.quotations?.length || 0) + (remoteState?.customers?.length || 0) + (remoteState?.projects?.length || 0);
-  const localHasData = (localState?.quotations?.length || 0) + (localState?.customers?.length || 0) + (localState?.projects?.length || 0);
-  return remoteHasData === 0 && localHasData > 0;
+function shouldSeedCloudUsers(remoteState) {
+  return !Array.isArray(remoteState?.users) || remoteState.users.length === 0;
 }
 
 async function apiRequest(path, options = {}, includeAuth = true) {
@@ -1095,11 +1102,12 @@ function normalizeUsers(users, includeDefaults = true) {
   return source.map(normalizeUserRecord).filter(u => u.username);
 }
 function getUsers() {
-  try { return normalizeUsers(JSON.parse(localStorage.getItem(USERS_KEY))); }
-  catch(e) { return getDefaultUsers(); }
+  const users = normalizeUsers(appState.users, false);
+  return users.length ? users : getDefaultUsers();
 }
 function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(normalizeUsers(users)));
+  appState.users = normalizeUsers(users, false);
+  clearStoredAppData();
   if (backendMode) { syncStateToBackend(); return; }
   syncUsersToOneDrive();
 }
@@ -1131,12 +1139,12 @@ function renderMyContactDetails() {
   if (emailEl) emailEl.value = profile.contactEmail || '';
 }
 function customersLoad() {
-  try { return JSON.parse(localStorage.getItem(CUSTOMERS_KEY)) || []; }
-  catch(e) { return []; }
+  return cloneList(appState.customers);
 }
 function customersSave(customers) {
   const normalized = Array.isArray(customers) ? customers.filter(Boolean) : [];
-  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(normalized));
+  appState.customers = cloneList(normalized);
+  clearStoredAppData();
   renderCustomerDropdown();
   renderCustomersView();
   if (backendMode) { syncStateToBackend(); return; }
@@ -1478,7 +1486,7 @@ async function doLogin() {
   if (matched && user) {
     if (!user.passwordHash && user.password) {
       const users = await secureUsers(getUsers());
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      saveUsers(users);
     }
     err.style.display = 'none';
     currentUser = {
@@ -2043,7 +2051,7 @@ function updateSyncBadge(state) {
   const icon = document.getElementById('syncIcon');
   const text = document.getElementById('syncText');
   b.className = 'sync-badge ' + state;
-  const map = { local:{i:'💾',t:'Local only'}, syncing:{i:'↻',t:'Syncing…'}, synced:{i:'☁️',t:'Cloud ✓'}, error:{i:'⚠️',t:'Sync error'} };
+  const map = { local:{i:'☁️',t:'Cloud required'}, syncing:{i:'↻',t:'Syncing…'}, synced:{i:'☁️',t:'Cloud ✓'}, error:{i:'⚠️',t:'Sync error'} };
   icon.textContent = map[state].i;
   text.textContent = map[state].t;
 }
@@ -2068,12 +2076,28 @@ async function syncUsersToOneDrive() { if (!backendMode) await cloudPush(); }
 // DB
 // ═══════════════════════════════════════════
 const DB_KEY = 'hexamech_quotations';
-function dbLoad() { try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; } catch(e) { return []; } }
-function dbSave(recs) { localStorage.setItem(DB_KEY, JSON.stringify(recs)); }
+const APP_DATA_KEYS = [DB_KEY, USERS_KEY, CUSTOMERS_KEY, PROJECTS_KEY];
+const appState = {
+  quotations: [],
+  users: [],
+  customers: [],
+  projects: []
+};
+function deepClone(value) { return JSON.parse(JSON.stringify(value ?? null)); }
+function cloneList(items) { return Array.isArray(items) ? deepClone(items) : []; }
+function clearStoredAppData() { APP_DATA_KEYS.forEach(key => localStorage.removeItem(key)); }
+function dbLoad() { return cloneList(appState.quotations); }
+function dbSave(recs) {
+  appState.quotations = cloneList(Array.isArray(recs) ? recs : []);
+  clearStoredAppData();
+}
 function dbFind(id) { return dbLoad().find(r => r.id === id) || null; }
 function dbDelete(id) { dbSave(dbLoad().filter(r => r.id !== id)); }
-function projectsLoad() { try { return JSON.parse(localStorage.getItem(PROJECTS_KEY)) || []; } catch(e) { return []; } }
-function projectsSave(projects) { localStorage.setItem(PROJECTS_KEY, JSON.stringify(Array.isArray(projects) ? projects : [])); }
+function projectsLoad() { return cloneList(appState.projects); }
+function projectsSave(projects) {
+  appState.projects = cloneList(Array.isArray(projects) ? projects : []);
+  clearStoredAppData();
+}
 function projectFind(id) { return projectsLoad().find(p => p.id === id) || null; }
 
 async function dbUpsert(record) {
@@ -2081,9 +2105,10 @@ async function dbUpsert(record) {
   const idx = recs.findIndex(r => r.id === record.id);
   if (idx >= 0) recs[idx] = record; else recs.unshift(record);
   dbSave(recs);
-  if (backendMode) { await syncStateToBackend(); return; }
+  if (backendMode) { await syncStateToBackend(); return true; }
   const ok = await cloudPush();
-  if (!ok) showNotif('Saved locally. Cloud sync failed — check internet.', 'error');
+  if (!ok) showNotif('Cloud save failed. Nothing was stored locally.', 'error');
+  return ok;
 }
 
 // ═══════════════════════════════════════════
@@ -2754,9 +2779,10 @@ async function saveQuotation(){
   const dup=dbLoad().find(r=>r.quoteNo===d.quoteNo&&r.id!==d.id);
   if(dup){showNotif('Quotation number already exists!','error');return;}
   if(!editingId)editingId=d.id; else d.id=editingId;
-  await dbUpsert(d);
+  const ok = await dbUpsert(d);
   document.getElementById('formTitle').textContent='Editing: '+d.quoteNo;
-  showNotif('Saved: '+d.quoteNo+' → '+(cloudConnected?'Cloud + Local':'Local only'));
+  if (ok === false) showNotif('Cloud save failed. Nothing was stored locally.', 'error');
+  else showNotif('Saved: '+d.quoteNo+' → Cloud only');
 }
 
 // ═══════════════════════════════════════════
@@ -3252,6 +3278,7 @@ async function startup() {
   if (msSignInBtn) msSignInBtn.style.display = 'none';
   if (loginDivider) loginDivider.style.display = 'none';
   if (loginCloudStatus) loginCloudStatus.style.display = 'none';
+  clearStoredAppData();
 
   wireCustomerFieldListeners();
   const quoteNoEl = document.getElementById('quoteNo');
@@ -3279,6 +3306,12 @@ document.addEventListener('DOMContentLoaded', startup);
 </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
