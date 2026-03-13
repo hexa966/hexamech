@@ -295,10 +295,10 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pd-meta-box{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .pd-mbox-hdr{background:#fff;color:var(--navy);padding:8px 13px;font-size:12px;font-family:Arial,'Barlow',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.09em;border-bottom:1px solid var(--border);}
 .pd-mbox-body{padding:12px;}
-.pd-mrow{display:flex;gap:8px;margin-bottom:4px;font-size:13px;align-items:flex-start;}
+.pd-mrow{display:flex;gap:6px;margin-bottom:4px;font-size:13px;align-items:flex-start;}
 .pd-mrow:last-child{margin-bottom:0;}
-.pd-mrow .pml{font-weight:700;color:var(--navy);min-width:140px;flex:0 0 140px;}
-.pd-mrow .pmv{color:#445066;font-weight:500;flex:1;min-width:0;}
+.pd-mrow .pml{font-weight:700;color:var(--navy);min-width:84px;flex:0 0 84px;}
+.pd-mrow .pmv{color:#445066;font-weight:500;flex:1;min-width:0;overflow-wrap:anywhere;word-break:break-word;}
 .pd-sec-title{font-family:Arial,'Barlow',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--navy);background:#fff;padding:8px 13px;border:1px solid var(--border);border-bottom:none;border-left:4px solid var(--accent);border-radius:8px 8px 0 0;margin-top:16px;}
 .pd-product-shell{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;min-height:500px;display:flex;flex-direction:column;overflow:hidden;background:#fff;}
 .pd-table-wrap{flex:1;}
@@ -1321,22 +1321,25 @@ function findCustomerFromSearch(value) {
 }
 function onSavedCustomerInput(value) {
   const search = String(value || '').trim();
+  const hidden = document.getElementById('selectedCustomerId');
+  const input = document.getElementById('savedCustomerSearch');
+  const selectedId = hidden?.value || input?.dataset.selectedId || '';
+
   if (!search) {
     clearCustomerSelection();
     renderCustomerSuggestions('', false);
     return;
   }
-  renderCustomerSuggestions(search, true);
-  const customer = findCustomerFromSearch(value);
-  if (!customer) {
-    const hidden = document.getElementById('selectedCustomerId');
-    const input = document.getElementById('savedCustomerSearch');
-    if (hidden) hidden.value = '';
-    if (input) input.dataset.selectedId = '';
-    return;
+
+  if (selectedId) {
+    const selectedCustomer = customersLoad().find(c => c.id === selectedId);
+    if (!selectedCustomer || customerOptionLabel(selectedCustomer) !== value) {
+      if (hidden) hidden.value = '';
+      if (input) input.dataset.selectedId = '';
+    }
   }
-  applyCustomerToForm(customer);
-  closeCustomerSuggestions();
+
+  renderCustomerSuggestions(search, true);
 }
 function handleSavedCustomerKeydown(event) {
   if (!event) return;
@@ -3306,6 +3309,7 @@ document.addEventListener('DOMContentLoaded', startup);
 </script>
 </body>
 </html>
+
 
 
 
