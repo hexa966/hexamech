@@ -3098,6 +3098,16 @@ async function drawPdfLogoCanvases(root) {
       const x = (canvas.width - drawWidth) / 2;
       const y = (canvas.height - drawHeight) / 2;
       ctx.drawImage(img, x, y, drawWidth, drawHeight);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (pixels[i] >= 240 && pixels[i + 1] >= 240 && pixels[i + 2] >= 240) {
+          pixels[i] = 255;
+          pixels[i + 1] = 255;
+          pixels[i + 2] = 255;
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
       resolve();
     };
     img.onerror = resolve;
