@@ -340,6 +340,76 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pd-footer .pfv{font-family:'DM Mono',monospace;}
 .pd-sig-line{border-top:1px solid var(--navy);margin-top:26px;padding-top:5px;font-size:11px;color:var(--muted);text-align:right;}
 
+/* GOLD PDF LAYOUT */
+.qh-doc{font-family:'Segoe UI',Arial,sans-serif;color:#2e2e2e;}
+.qh-page{background:#fff;border:1px solid #e0d8cf;border-radius:4px;overflow:hidden;}
+.qh-page + .qh-page{margin-top:16px;page-break-before:always;break-before:page;}
+.qh-header{background:#c09b72;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.qh-brand-block{display:flex;align-items:center;gap:13px;min-width:0;}
+.qh-logo-box{width:46px;height:46px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 46px;overflow:hidden;}
+.qh-logo-box img{width:28px;height:38px;object-fit:contain;display:block;}
+.qh-brand-name{color:#fff;font-size:21px;font-weight:800;letter-spacing:.03em;line-height:1;}
+.qh-header-right{text-align:right;color:rgba(255,255,255,.86);font-size:9.6px;line-height:1.8;}
+.qh-header-right strong{display:block;color:#fff;font-size:12px;font-weight:700;margin-bottom:4px;}
+.qh-title-bar{background:#f4f4f4;border-bottom:2px solid #c09b72;padding:11px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;}
+.qh-title-bar h2{font-size:18px;font-weight:800;letter-spacing:.26em;color:#c09b72;}
+.qh-title-meta{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end;}
+.qh-meta-item{text-align:right;}
+.qh-meta-item span{display:block;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.1em;}
+.qh-meta-item strong{font-size:11px;color:#2e2e2e;}
+.qh-meta-item strong.hl{color:#a07d55;}
+.qh-body{padding:22px 28px;}
+.qh-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.qh-info-card{border:1px solid #e0d8cf;border-radius:6px;padding:14px 16px;}
+.qh-info-card h4{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#c09b72;margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid #f0e6d8;}
+.qh-info-row{display:flex;gap:8px;margin-bottom:4px;align-items:flex-start;}
+.qh-info-row:last-child{margin-bottom:0;}
+.qh-info-label{color:#888;font-size:9.6px;min-width:74px;flex:0 0 74px;}
+.qh-info-value{color:#2e2e2e;font-size:9.8px;font-weight:500;flex:1;min-width:0;overflow-wrap:anywhere;word-break:break-word;}
+.qh-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+.qh-table thead tr{background:#c09b72;}
+.qh-table thead th{color:#fff;padding:9px 12px;font-size:9px;font-weight:700;letter-spacing:.05em;text-align:left;}
+.qh-table thead th:nth-child(1),.qh-table tbody td:nth-child(1){width:34px;text-align:center;}
+.qh-table thead th:nth-child(3),.qh-table thead th:nth-child(4),.qh-table tbody td:nth-child(3),.qh-table tbody td:nth-child(4){text-align:center;}
+.qh-table thead th:last-child,.qh-table tbody td:last-child{text-align:right;}
+.qh-table tbody tr:nth-child(even){background:#faf6f1;}
+.qh-table tbody td{padding:11px 12px;font-size:10px;border-bottom:1px solid #e0d8cf;vertical-align:top;}
+.qh-table tbody td:last-child{font-weight:700;color:#a07d55;}
+.qh-table-note{display:block;font-size:9px;color:#888;margin-top:4px;white-space:pre-line;}
+.qh-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:18px;}
+.qh-total-box{width:230px;}
+.qh-total-row{display:flex;justify-content:space-between;padding:6px 0;font-size:10px;border-bottom:1px solid #e0d8cf;color:#6b6b6b;}
+.qh-total-row.grand{border:none;border-top:2px solid #c09b72;padding-top:10px;font-weight:800;font-size:13px;color:#2e2e2e;}
+.qh-total-row.grand span:last-child{color:#c09b72;}
+.qh-bottom-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:22px;}
+.qh-bank-box{background:#f4f4f4;border-radius:6px;padding:12px 14px;border:1px solid #e0d8cf;min-width:280px;max-width:360px;}
+.qh-bank-box h5{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#a07d55;margin-bottom:8px;}
+.qh-bank-row{font-size:9.5px;color:#6b6b6b;display:flex;gap:8px;margin-bottom:3px;}
+.qh-bank-row:last-child{margin-bottom:0;}
+.qh-bank-row span:first-child{min-width:70px;color:#888;}
+.qh-sign{margin-left:auto;min-width:170px;text-align:center;}
+.qh-sign-gap{height:26px;}
+.qh-sign-line{border-top:1.5px solid #c09b72;padding-top:8px;}
+.qh-sign-line p{font-size:9.5px;color:#6b6b6b;}
+.qh-sign-line p.name{font-weight:700;color:#2e2e2e;font-size:10px;}
+.qh-footer{background:#c09b72;padding:11px 28px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;}
+.qh-footer p{color:rgba(255,255,255,.88);font-size:9px;}
+.qh-footer strong{color:#fff;}
+.qh-second-body{padding:22px 28px 24px;}
+.qh-section-card{border:1px solid #e0d8cf;border-radius:6px;margin-bottom:16px;overflow:hidden;background:#fff;}
+.qh-section-head{background:#f4f4f4;border-bottom:1px solid #e0d8cf;padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#a07d55;}
+.qh-section-body{padding:14px 16px;}
+.qh-list{list-style:none;counter-reset:qhitem;}
+.qh-list li{counter-increment:qhitem;position:relative;padding:0 0 8px 22px;margin-bottom:8px;border-bottom:1px solid #eee3d7;font-size:10px;line-height:1.65;color:#2e2e2e;}
+.qh-list li:last-child{margin-bottom:0;border-bottom:none;padding-bottom:0;}
+.qh-list li::before{content:counter(qhitem);position:absolute;left:0;top:2px;width:14px;height:14px;border-radius:50%;background:#c09b72;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.qh-subpoints{display:grid;gap:3px;margin-top:6px;}
+.qh-subpoint{position:relative;padding-left:10px;font-size:9.6px;color:#6b6b6b;}
+.qh-subpoint::before{content:'\2022';position:absolute;left:0;top:0;color:#c09b72;font-weight:700;}
+.qh-second-footer{background:#f4f4f4;border-top:1px solid #e0d8cf;padding:11px 28px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;}
+.qh-second-footer p{font-size:9px;color:#6b6b6b;}
+.qh-second-footer strong{color:#a07d55;}
+
 /* ONEDRIVE SETUP MODAL */
 .setup-step{display:flex;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
 .setup-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
@@ -3083,140 +3153,190 @@ function renderPrintDoc(d, mode='quotation'){
   const userEmail=String(d.userEmail || currentUser?.contactEmail || '').trim();
   const companyPhone=userPhone || '+91 8866693972';
   const companyEmail=userEmail || 'office@hexamech.com';
+  const companyGst='24AAECH5305E1Z3';
+  const validityText='15 days from date';
   const documentNumber = cfg.mode === 'proforma'
     ? String(d.quoteNo || '-').replace(/^Q/i, 'PI')
     : String(d.quoteNo || '-');
+  const quoteDateValue = d.quoteDate ? new Date(String(d.quoteDate) + 'T00:00:00') : null;
+  const metaDate = quoteDateValue && !Number.isNaN(quoteDateValue.getTime())
+    ? quoteDateValue.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+    : '-';
+  const infoDate = quoteDateValue && !Number.isNaN(quoteDateValue.getTime())
+    ? quoteDateValue.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})
+    : '-';
   const rowsHtml=(d.rows||[]).map((r,i)=>{
     const t=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);
-    const descHtml=esc(r.desc||'-').replace(/\n/g,'<br>');
-    return`<tr><td class="pdsr">${i+1}</td><td class="pd-desc-cell">${descHtml}</td>
-    <td style="text-align:right;font-family:'DM Mono',monospace;">${r.cavity||0}</td>
-    <td style="text-align:right;font-family:'DM Mono',monospace;">&#8377;${fmtNum(parseFloat(r.rate)||0)}</td>
-    <td>&#8377;${fmtNum(t)}</td></tr>`;
+    const descLines=String(r.desc||'-').split('\n').filter(Boolean);
+    const mainDesc=esc(descLines.shift() || '-');
+    const noteHtml=descLines.length?`<span class="qh-table-note">${esc(descLines.join('\n'))}</span>`:'';
+    return`<tr>
+      <td>${i+1}</td>
+      <td><strong>${mainDesc}</strong>${noteHtml}</td>
+      <td>${r.cavity||0}</td>
+      <td>&#8377;${fmtNum(parseFloat(r.rate)||0)}</td>
+      <td>&#8377;${fmtNum(t)}</td>
+    </tr>`;
   }).join('');
   const moldSparesItems = String(d.moldSpares ?? '').split('\n').filter(l=>l.trim());
   const html=`
-    <div class="pd-corner-logo"><img src="${CORNER_LOGO_SRC}" alt="Hexamech mark"></div>
-    <div class="pd-title-bar"><span>${cfg.documentTitle}</span></div>
-    <div class="pd-header">
-      <div>
-        <div class="pd-brand" aria-label="Hexamech logo" style="background:none;border:none;padding:0;">
-          <img id="hexamechLogoImg" src="${LOGO_SRC}" alt="Hexamech" style="display:block;width:190px;height:57px;object-fit:contain;object-position:left center;">
-        </div>
-      </div>
-      <div class="pd-company-info">
-        <strong>Hexamech Technology Pvt Ltd</strong><br>
-        01, Mahavir Industrial Park-2, Kathwada Singarva Road,<br>
-        Ahmedabad-382430. Gujarat INDIA.<br>
-        Phone: ${esc(companyPhone)} &nbsp;|&nbsp; Email: ${esc(companyEmail)}<br>
-        Website: www.hexamech.com
-      </div>
-    </div>
-    <div class="pd-meta-strip">
-      <div class="pd-meta-box">
-        <div class="pd-mbox-hdr"><strong>Customer Details</strong></div>
-        <div class="pd-mbox-body">
-          <div class="pd-mrow"><span class="pml">M/S</span><span class="pmv">${esc(d.custCompany||'-')}</span></div>
-          <div class="pd-mrow"><span class="pml">Name</span><span class="pmv">${esc(d.custName||'-')}</span></div>
-          <div class="pd-mrow"><span class="pml">Address</span><span class="pmv">${esc(d.custAddress||'-')}</span></div>
-          <div class="pd-mrow"><span class="pml">GST No</span><span class="pmv">${esc(d.custGST||'-')}</span></div>
-          <div class="pd-mrow"><span class="pml">Phone</span><span class="pmv">${esc(d.custPhone||'-')}</span></div>
-          <div class="pd-mrow"><span class="pml">Email</span><span class="pmv">${esc(d.custEmail||'-')}</span></div>
-        </div>
-      </div>
-      <div class="pd-meta-box">
-        <div class="pd-mbox-hdr"><strong>${cfg.infoTitle}</strong></div>
-        <div class="pd-mbox-body">
-          <div class="pd-mrow"><span class="pml">${cfg.numberLabel}</span><span class="pmv" style="font-family:'DM Mono',monospace;font-weight:700;color:var(--navy);">${esc(documentNumber)}</span></div>
-          <div class="pd-mrow"><span class="pml">Date</span><span class="pmv">${fmtDateShort(d.quoteDate)}</span></div>
-          <div class="pd-mrow"><span class="pml">GST No</span><span class="pmv">24AAECH5305E1Z3</span></div>
-          <div class="pd-mrow"><span class="pml">Validity</span><span class="pmv">15 days from date</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="pd-sec-title"><strong>Product Specification</strong></div>
-    <div class="pd-product-block pd-product-shell">
-      <div class="pd-table-wrap">
-        <table class="pd-table">
-          <thead><tr>
-            <th style="width:34px;text-align:center;"><strong>Sr.</strong></th><th><strong>Product Specification</strong></th>
-            <th style="text-align:right;"><strong>No. of Cavity</strong></th><th style="text-align:right;"><strong>Rate Per Cavity (&#8377;)</strong></th>
-            <th style="text-align:right;"><strong>Total (&#8377;)</strong></th>
-          </tr></thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-      </div>
-      <div class="pd-totals-wrap">
-        <div class="pd-totals">
-          <div class="pd-tot-row"><span class="ptl">Sub-Total</span><span class="ptv">&#8377;${fmtNum(sub)}</span></div>
-          <div class="pd-tot-row"><span class="ptl">GST @ ${gstRate}%</span><span class="ptv">&#8377;${fmtNum(gst)}</span></div>
-          <div class="pd-tot-row pdgrand"><span class="ptl">Grand Total</span><span class="ptv">&#8377;${fmtNum(grand)}</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="pd-second-page">
-      <div class="pd-sec-title" style="margin-top:0;"><strong>Special Features Inclusive with Mould</strong></div>
-      <div class="pd-box pd-box-flow"><ul class="pd-list">
-        <li>We design preform according to clients' specifications.</li>
-        <li>Channels for cooling water are designed to flow turbulently.</li>
-        <li>Assembled stack parts for the hot runner system sourced internationally.</li>
-        <li>The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.</li>
-        <li>We use Unbrako or TVS fasteners.</li>
-        <li><strong>Mould material specification</strong>
-          <div class="pd-subpoints">
-            <div class="pd-subpoint">Cavity: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.</div>
-            <div class="pd-subpoint">Core: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel.</div>
-            <div class="pd-subpoint">Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.</div>
-            <div class="pd-subpoint">Hot Runner Plates: 1.2085 corrosion resistance steel.</div>
-            <div class="pd-subpoint">Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.</div>
-            <div class="pd-subpoint">All mould base plates are electroless nickel plated (ENP).</div>
-            <div class="pd-subpoint">Advanced profile heaters are used for smooth mould operation start-up.</div>
+    <div class="qh-doc">
+      <div class="qh-page">
+        <div class="qh-header">
+          <div class="qh-brand-block">
+            <div class="qh-logo-box">
+              <img id="hexamechLogoImg" src="${CORNER_LOGO_SRC}" alt="Hexamech mark">
+            </div>
+            <div class="qh-brand-name">HEXAMECH</div>
           </div>
-        </li>
-      </ul></div>
-      <div class="pd-sec-title"><strong>Terms &amp; Conditions</strong></div>
-      <div class="pd-box pd-box-flow"><ul class="pd-list pd-tlist">
-        <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is ${gstRate}%.</li>
-        <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||'')}</li>
-        <li><strong>Payment Terms:</strong> ${esc(d.tcPayment||'')}</li>
-        <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
-        <li><strong>Delivery &amp; Transportation:</strong> The customer shall take delivery of the goods Ex-Works from the company facility. All expenses and risk of loss or damage during transportation shall be borne by the customer.</li>
-        <li><strong>Mould Trial &amp; Training:</strong> Each mould is subjected to in-house mould trial. Your engineer may witness the trial at our factory, and training during the trial is free of cost. Travel, local transport and hotel stay are to be borne by you.</li>
-        <li><strong>Mould Commissioning:</strong> Our engineer will commission the mould at your factory for no charge up to 2 days per mould. After that, installation charges of &#8377;5,000 per day (domestic) apply. Travel, local transport and accommodation are to be arranged and borne by you.</li>
-        <li><strong>Packaging &amp; Freight Forwarding:</strong> Exclusive.</li>
-        <li><strong>Delayed Payments:</strong> Delay in balance payment beyond 1 week from the date of mould readiness will attract interest @ 1% per week on the due payment.</li>
-        <li><strong>Factory Environment at Customer Place:</strong> To achieve best output, productivity and quality, maintain dust-free conditions and shop-floor temperature of 25 C.</li>
-        <li><strong>Rejection of Non-Conforming Goods:</strong> The customer must notify the company of any rejection of goods as non-conforming within five days after delivery.</li>
-        <li><strong>Warranty:</strong> The mould would be under warranty for one year from the date of dispatch against all manufacturing defects or faulty workmanship.</li>
-        <li><strong>Warranty Excludes:</strong> Any part misused, improperly installed or accidentally damaged, or any unauthorised repair or alteration affecting working or performance.</li>
-        <li><strong>Order Cancellation:</strong> The order once placed cannot be cancelled without our written consent and payment of cancellation charges depending on the manufacturing progress. Full mould price shall be recovered once all mould parts are manufactured.</li>
-        <li><strong>Insurance:</strong> If insurance is required, it will be handled by the client.</li>
-        <li><strong>Jurisdiction:</strong> The Gujarat courts have jurisdiction only with respect to correspondence orders against this offer.</li>
-        <li><strong>Copyright:</strong> Customer will be liable for design and product copyright.</li>
-        <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
-        ${moldSparesItems.length ? `<li><strong>Mold Components as Spares Along with Mold</strong>
-          <div class="pd-subpoints">
-            ${moldSparesItems.map(l=>`<div class="pd-subpoint">${esc(l.trim())}</div>`).join('')}
+          <div class="qh-header-right">
+            <strong>Hexamech Technology Pvt Ltd</strong>
+            01, Mahavir Industrial Park-2, Kathwada Singarva Road<br>
+            Ahmedabad-382430, Gujarat, INDIA<br>
+            +91 ${esc(companyPhone).replace(/^\+91\s*/, '')} &nbsp;|&nbsp; ${esc(companyEmail)}<br>
+            GST: ${companyGst} &nbsp;|&nbsp; www.hexamech.com
           </div>
-        </li>` : ''}
-      </ul></div>
-      <div class="pd-company-page">
-        <div class="pd-sec-title" style="margin-top:0;"><strong>Company &amp; Bank Details</strong></div>
-        <div class="pd-bank-wrap">
-          <div class="pd-bi"><div class="pbk">Account Name</div><div class="pbv">Hexamech Technology Pvt. Ltd.</div></div>
-          <div class="pd-bi"><div class="pbk">Bank Name</div><div class="pbv">ICICI Bank Ltd</div></div>
-          <div class="pd-bi"><div class="pbk">Branch</div><div class="pbv">Hebatpur</div></div>
-          <div class="pd-bi"><div class="pbk">Account No</div><div class="pbv">439705000097</div></div>
-          <div class="pd-bi"><div class="pbk">IFSC</div><div class="pbv">ICIC0004397</div></div>
-          <div class="pd-bi"><div class="pbk">GST No</div><div class="pbv">24AAECH5305E1Z3</div></div>
         </div>
-        <div class="pd-footer">
-          <div>
-            <div class="pfv">${esc(documentNumber === '-' ? '' : documentNumber)} - ${fmtDateShort(d.quoteDate)}</div>
-            <div style="margin-top:3px;font-size:10px;">www.hexamech.com | office@hexamech.com</div>
-            <div style="margin-top:3px;font-size:10px;color:var(--muted);">Created by: ${esc(d.savedBy || currentUser?.displayName || currentUser?.username || 'Unknown')}</div>
+        <div class="qh-title-bar">
+          <h2>${cfg.documentTitle}</h2>
+          <div class="qh-title-meta">
+            <div class="qh-meta-item"><span>${cfg.numberLabel}</span><strong class="hl">${esc(documentNumber)}</strong></div>
+            <div class="qh-meta-item"><span>Date</span><strong>${esc(metaDate)}</strong></div>
+            <div class="qh-meta-item"><span>Validity</span><strong>${validityText}</strong></div>
           </div>
-          <div><div class="pd-sig-line">Authorised Signatory - Hexamech Technology Pvt Ltd</div></div>
+        </div>
+        <div class="qh-body">
+          <div class="qh-info-grid">
+            <div class="qh-info-card">
+              <h4>Customer Details</h4>
+              <div class="qh-info-row"><span class="qh-info-label">Company</span><span class="qh-info-value">${esc(d.custCompany||'-')}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">Contact</span><span class="qh-info-value">${esc(d.custName||'-')}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">Address</span><span class="qh-info-value">${esc(d.custAddress||'-')}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">GST No.</span><span class="qh-info-value">${esc(d.custGST||'-')}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">Phone</span><span class="qh-info-value">${esc(d.custPhone||'-')}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">Email</span><span class="qh-info-value">${esc(d.custEmail||'-')}</span></div>
+            </div>
+            <div class="qh-info-card">
+              <h4>${cfg.infoTitle}</h4>
+              <div class="qh-info-row"><span class="qh-info-label">${cfg.numberLabel}</span><span class="qh-info-value" style="color:#a07d55;font-weight:700;">${esc(documentNumber)}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">Date</span><span class="qh-info-value">${esc(infoDate)}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">Valid For</span><span class="qh-info-value">${validityText}</span></div>
+              <div class="qh-info-row"><span class="qh-info-label">GST No.</span><span class="qh-info-value">${companyGst}</span></div>
+            </div>
+          </div>
+          <table class="qh-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Product Specification</th>
+                <th style="width:80px;">Cavities</th>
+                <th style="width:120px;">Rate / Cavity</th>
+                <th style="width:100px;">Total (&#8377;)</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+          <div class="qh-totals-wrap">
+            <div class="qh-total-box">
+              <div class="qh-total-row"><span>Sub-Total</span><span>&#8377;${fmtNum(sub)}</span></div>
+              <div class="qh-total-row"><span>GST @ ${gstRate}%</span><span>&#8377;${fmtNum(gst)}</span></div>
+              <div class="qh-total-row grand"><span>Grand Total</span><span>&#8377;${fmtNum(grand)}</span></div>
+            </div>
+          </div>
+          <div class="qh-bottom-row">
+            <div class="qh-bank-box">
+              <h5>Bank Details</h5>
+              <div class="qh-bank-row"><span>Bank</span><span>ICICI Bank Ltd - Hebatpur</span></div>
+              <div class="qh-bank-row"><span>A/C No.</span><span>439705000097</span></div>
+              <div class="qh-bank-row"><span>IFSC</span><span>ICIC0004397</span></div>
+              <div class="qh-bank-row"><span>GST</span><span>${companyGst}</span></div>
+            </div>
+            <div class="qh-sign">
+              <div class="qh-sign-gap"></div>
+              <div class="qh-sign-line">
+                <p class="name">Hexamech Technology Pvt Ltd</p>
+                <p>Authorised Signatory</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="qh-footer">
+          <p>www.hexamech.com &nbsp;|&nbsp; office@hexamech.com</p>
+          <p>Valid for <strong>${validityText}</strong></p>
+        </div>
+      </div>
+
+      <div class="qh-page">
+        <div class="qh-header">
+          <div class="qh-brand-block">
+            <div class="qh-logo-box">
+              <img src="${CORNER_LOGO_SRC}" alt="Hexamech mark">
+            </div>
+            <div class="qh-brand-name">HEXAMECH</div>
+          </div>
+          <div class="qh-header-right">
+            <strong>${cfg.documentTitle}</strong>
+            ${esc(documentNumber)} &nbsp;|&nbsp; ${esc(metaDate)}<br>
+            GST: ${companyGst} &nbsp;|&nbsp; www.hexamech.com
+          </div>
+        </div>
+        <div class="qh-second-body">
+          <div class="qh-section-card">
+            <div class="qh-section-head">Special Features Inclusive with Mould</div>
+            <div class="qh-section-body">
+              <ul class="qh-list">
+                <li>We design preform according to clients' specifications.</li>
+                <li>Channels for cooling water are designed to flow turbulently.</li>
+                <li>Assembled stack parts for the hot runner system sourced internationally.</li>
+                <li>The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.</li>
+                <li>We use Unbrako or TVS fasteners.</li>
+                <li><strong>Mould material specification</strong>
+                  <div class="qh-subpoints">
+                    <div class="qh-subpoint">Cavity: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.</div>
+                    <div class="qh-subpoint">Core: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel.</div>
+                    <div class="qh-subpoint">Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.</div>
+                    <div class="qh-subpoint">Hot Runner Plates: 1.2085 corrosion resistance steel.</div>
+                    <div class="qh-subpoint">Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.</div>
+                    <div class="qh-subpoint">All mould base plates are electroless nickel plated (ENP).</div>
+                    <div class="qh-subpoint">Advanced profile heaters are used for smooth mould operation start-up.</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="qh-section-card">
+            <div class="qh-section-head">Terms &amp; Conditions</div>
+            <div class="qh-section-body">
+              <ul class="qh-list">
+                <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is ${gstRate}%.</li>
+                <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||'')}</li>
+                <li><strong>Payment Terms:</strong> ${esc(d.tcPayment||'')}</li>
+                <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
+                <li><strong>Delivery &amp; Transportation:</strong> The customer shall take delivery of the goods Ex-Works from the company facility. All expenses and risk of loss or damage during transportation shall be borne by the customer.</li>
+                <li><strong>Mould Trial &amp; Training:</strong> Each mould is subjected to in-house mould trial. Your engineer may witness the trial at our factory, and training during the trial is free of cost. Travel, local transport and hotel stay are to be borne by you.</li>
+                <li><strong>Mould Commissioning:</strong> Our engineer will commission the mould at your factory for no charge up to 2 days per mould. After that, installation charges of &#8377;5,000 per day (domestic) apply. Travel, local transport and accommodation are to be arranged and borne by you.</li>
+                <li><strong>Packaging &amp; Freight Forwarding:</strong> Exclusive.</li>
+                <li><strong>Delayed Payments:</strong> Delay in balance payment beyond 1 week from the date of mould readiness will attract interest @ 1% per week on the due payment.</li>
+                <li><strong>Factory Environment at Customer Place:</strong> To achieve best output, productivity and quality, maintain dust-free conditions and shop-floor temperature of 25 C.</li>
+                <li><strong>Rejection of Non-Conforming Goods:</strong> The customer must notify the company of any rejection of goods as non-conforming within five days after delivery.</li>
+                <li><strong>Order Cancellation:</strong> The order once placed cannot be cancelled without our written consent and payment of cancellation charges depending on the manufacturing progress. Full mould price shall be recovered once all mould parts are manufactured.</li>
+                <li><strong>Insurance:</strong> If insurance is required, it will be handled by the client.</li>
+                <li><strong>Jurisdiction:</strong> The Gujarat courts have jurisdiction only with respect to correspondence orders against this offer.</li>
+                <li><strong>Copyright:</strong> Customer will be liable for design and product copyright.</li>
+                <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
+                ${moldSparesItems.length ? `<li><strong>Mold Components as Spares Along with Mold</strong>
+                  <div class="qh-subpoints">
+                    ${moldSparesItems.map(l=>`<div class="qh-subpoint">${esc(l.trim())}</div>`).join('')}
+                  </div>
+                </li>` : ''}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="qh-second-footer">
+          <p>Created by: ${esc(d.savedBy || currentUser?.displayName || currentUser?.username || 'Unknown')}</p>
+          <p><strong>Hexamech Technology Pvt Ltd</strong> &nbsp;|&nbsp; www.hexamech.com</p>
         </div>
       </div>
     </div>`;
