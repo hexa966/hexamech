@@ -346,7 +346,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .qh-page + .qh-page{margin-top:16px;page-break-before:always;break-before:page;}
 .qh-header{background:#c09b72;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
 .qh-brand-block{display:flex;align-items:center;gap:15px;min-width:0;}
-.qh-logo-box{width:72px;height:72px;background:transparent;border-radius:0;display:flex;align-items:center;justify-content:center;flex:0 0 72px;overflow:visible;}
+.qh-logo-box{width:72px;height:72px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;flex:0 0 72px;overflow:hidden;padding:6px;box-sizing:border-box;}
 .qh-logo-box canvas{width:100%;height:100%;display:block;}
 .qh-brand-name{color:#111;font-size:21px;font-weight:800;letter-spacing:.03em;line-height:1;}
 .qh-header-right{text-align:right;color:rgba(17,17,17,.76);font-size:9.6px;line-height:1.8;}
@@ -3254,19 +3254,6 @@ function renderPrintDoc(d, mode='quotation'){
       </div>
 
       <div class="qh-page">
-        <div class="qh-header">
-          <div class="qh-brand-block">
-            <div class="qh-logo-box">
-              <canvas class="qh-logo-canvas" width="360" height="360" aria-label="Hexamech mark"></canvas>
-            </div>
-            <div class="qh-brand-name">HEXAMECH</div>
-          </div>
-          <div class="qh-header-right">
-            <strong>${cfg.documentTitle}</strong>
-            ${esc(documentNumber)} &nbsp;|&nbsp; ${esc(metaDate)}<br>
-            GST: ${companyGst} &nbsp;|&nbsp; www.hexamech.com
-          </div>
-        </div>
         <div class="qh-second-body">
           <div class="qh-section-card">
             <div class="qh-section-head">Special Features Inclusive with Mould</div>
