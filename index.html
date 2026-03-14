@@ -3105,6 +3105,7 @@ async function drawPdfLogoCanvases(root) {
           pixels[i] = 255;
           pixels[i + 1] = 255;
           pixels[i + 2] = 255;
+          pixels[i + 3] = 0;
         }
       }
       ctx.putImageData(imageData, 0, 0);
