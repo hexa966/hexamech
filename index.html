@@ -346,7 +346,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .qh-page + .qh-page{margin-top:16px;page-break-before:always;break-before:page;}
 .qh-header{background:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #e7ded4;}
 .qh-brand-block{display:flex;align-items:center;gap:15px;min-width:0;}
-.qh-logo-box{width:72px;height:72px;background:#fff;border:1px solid #e7ded4;border-radius:3px;display:flex;align-items:center;justify-content:center;flex:0 0 72px;overflow:hidden;padding:6px;box-sizing:border-box;}
+.qh-logo-box{width:72px;height:72px;background:transparent;border:none;border-radius:0;display:flex;align-items:center;justify-content:center;flex:0 0 72px;overflow:visible;padding:0;box-sizing:border-box;}
 .qh-logo-box canvas{width:100%;height:100%;display:block;}
 .qh-brand-name{color:#111;font-size:21px;font-weight:800;letter-spacing:.03em;line-height:1;}
 .qh-header-right{text-align:right;color:rgba(17,17,17,.76);font-size:9.6px;line-height:1.8;}
@@ -3090,7 +3090,9 @@ async function drawPdfLogoCanvases(root) {
       const ctx = canvas.getContext('2d');
       if (!ctx) { resolve(); return; }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.92;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 1;
       const drawWidth = img.width * scale;
       const drawHeight = img.height * scale;
       const x = (canvas.width - drawWidth) / 2;
