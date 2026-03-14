@@ -1442,6 +1442,7 @@ function renderCustomersView() {
       <td>${esc(c.address || '-')}</td>
       <td class="cacts">
         <button class="btn-edit-s" onclick="openCustomerModal('edit','${esc(c.id)}')">&#9998; Edit</button>
+        <button class="btn-del" onclick="confirmDeleteCustomer('${esc(c.id)}','${esc(c.company || c.name || 'this customer')}')">&#128465;</button>
       </td>
     </tr>`).join('');
 }
@@ -2863,6 +2864,23 @@ function confirmDeleteQ(id,qno){
       if(!ok) showNotif('Deleted locally. Cloud sync failed - check internet.','error');
     }
     closeConfirm();renderDB();showNotif('Quotation deleted.','info');
+  };
+}
+function confirmDeleteCustomer(id, customerName){
+  pendingDelId=id;
+  document.getElementById('confirmTitle').textContent='Delete Customer?';
+  document.getElementById('confirmMsg').textContent=`Delete "${customerName}" from saved customers? This cannot be undone.`;
+  document.getElementById('confirmOkBtn').textContent='Delete';
+  document.getElementById('confirmModal').classList.add('open');
+  document.getElementById('confirmOkBtn').onclick=async function(){
+    const customers = customersLoad().filter(c => c.id !== pendingDelId);
+    if ((document.getElementById('selectedCustomerId')?.value || '') === pendingDelId) {
+      clearCustomerSelection();
+      fillCustomerFormFields({});
+    }
+    customersSave(customers);
+    closeConfirm();
+    showNotif('Customer deleted.','info');
   };
 }
 function closeConfirm(){pendingDelId=null;document.getElementById('confirmModal').classList.remove('open');}
