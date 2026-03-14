@@ -446,10 +446,13 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   .db-stats{grid-template-columns:1fr;}.login-card{width:100%;padding:28px 20px;}
 }
 @media print{
-  @page{margin:14mm 16mm;size:A4 portrait;}
+  @page{margin:4mm;size:A4 portrait;}
+  html,body{margin:0 !important;padding:0 !important;}
   body>*{display:none !important;}
   body.printing>#printContainer{display:block !important;}
-  #printContainer{display:none;position:static;width:100%;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
+  #printContainer{display:none;position:static;width:100%;margin:0;padding:0;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
+  #printContainer .qh-page{width:100%;box-sizing:border-box;}
+  #printContainer .qh-page + .qh-page{margin-top:0;}
   #printContainer .pd-sec-title{page-break-after:auto;break-after:auto;}
   #printContainer .pd-box,#printContainer .pd-bank-wrap{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-box-flow{page-break-inside:auto;break-inside:auto;}
