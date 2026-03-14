@@ -273,7 +273,8 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .pm-topbar h4{font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:15px;font-weight:700;}
 
 /* PRINT DOC */
-#printDoc,.pdf-render-doc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
+#printDoc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
+.pdf-render-doc{padding:10px 10px 8px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-host{position:fixed;top:0;left:-230mm;width:210mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:hidden;border:0;opacity:1;}
 .pd-corner-logo{position:absolute;top:12px;right:6px;display:block;}
 .pd-corner-logo img{height:46px;width:auto;display:block;object-fit:contain;}
@@ -3063,7 +3064,7 @@ async function downloadPdfForRecord(record, mode='quotation'){
   try {
     await waitForPdfRender(frame, source);
     await html2pdf().set({
-      margin: [8, 8, 8, 8],
+      margin: [2, 2, 2, 2],
       filename: filename,
       image: { type: 'jpeg', quality: 0.92 },
       html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 },
