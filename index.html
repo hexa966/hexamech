@@ -2999,11 +2999,16 @@ function openPreview(mode='quotation', record=null){
   document.getElementById('printModal').classList.add('open');
 }
 function closePreview(){document.getElementById('printModal').classList.remove('open');}
-function doPrint(){
+async function doPrint(){
   const src=document.getElementById('printDoc');
   let pc=document.getElementById('printContainer');
   if(!pc){pc=document.createElement('div');pc.id='printContainer';document.body.appendChild(pc);}
   pc.innerHTML=src.innerHTML;
+  await drawPdfLogoCanvases(pc);
+  if (document.fonts?.ready) {
+    try { await document.fonts.ready; } catch (_) {}
+  }
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const cfg=getPrintModeConfig(currentPrintMode);
   const originalTitle=document.title;
   const quoteNo=(currentPrintRecord?.quoteNo||'').trim();
