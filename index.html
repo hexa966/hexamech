@@ -2787,7 +2787,7 @@ function updateSrNos(){document.querySelectorAll('#productRows tr').forEach((tr,
 function recalcRow(rid){
   const row=document.getElementById('row_'+rid);if(!row)return;
   const ins=row.querySelectorAll('input[type=number]');
-  document.getElementById('rowTotal_'+rid).textContent='?'+fmtNum((parseFloat(ins[0].value)||0)*(parseFloat(ins[1].value)||0));
+  document.getElementById('rowTotal_'+rid).textContent=fmtMoney((parseFloat(ins[0].value)||0)*(parseFloat(ins[1].value)||0));
   recalcTotals();
 }
 function recalcTotals(){
@@ -2798,12 +2798,13 @@ function recalcTotals(){
   });
   const gstRate=parseFloat(document.getElementById('gstRate').value)||0;
   const gst=sub*gstRate/100;
-  document.getElementById('subTotal').textContent='?'+fmtNum(sub);
-  document.getElementById('gstAmount').textContent='?'+fmtNum(gst);
-  document.getElementById('grandTotal').textContent='?'+fmtNum(sub+gst);
+  document.getElementById('subTotal').textContent=fmtMoney(sub);
+  document.getElementById('gstAmount').textContent=fmtMoney(gst);
+  document.getElementById('grandTotal').textContent=fmtMoney(sub+gst);
   document.getElementById('gstRateLabel').textContent=gstRate;
 }
 function fmtNum(n){return(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});}
+function fmtMoney(n){return String.fromCodePoint(0x20B9)+fmtNum(n);}
 
 function gatherData(){
   const rows=[];
@@ -2879,7 +2880,7 @@ function renderDB(){
   const statValueEl=document.getElementById('statValue');
   if(statValueEl){
     const totalVal=records.reduce((a,r)=>a+(r.subTotal||0),0);
-    statValueEl.textContent='?'+fmtNum(totalVal);
+    statValueEl.textContent=fmtMoney(totalVal);
   }
   const tbody=document.getElementById('dbTableBody');
   const empty=document.getElementById('dbEmpty');
