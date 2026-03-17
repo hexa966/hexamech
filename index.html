@@ -275,6 +275,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 /* PRINT DOC */
 #printDoc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-doc{padding:10px 10px 8px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
+.pdf-render-doc .qh-page + .qh-page{margin-top:0;page-break-before:always;break-before:page;}
 .pdf-render-host{position:fixed;top:0;left:-230mm;width:210mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:hidden;border:0;opacity:1;}
 .pd-corner-logo{position:absolute;top:12px;right:6px;display:block;}
 .pd-corner-logo img{height:46px;width:auto;display:block;object-fit:contain;}
@@ -345,6 +346,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .qh-doc{font-family:'Segoe UI',Arial,sans-serif;color:#2e2e2e;}
 .qh-page{background:#fff;border:1px solid #e0d8cf;border-radius:4px;overflow:hidden;}
 .qh-page + .qh-page{margin-top:16px;page-break-before:always;break-before:page;}
+.qh-page-break{page-break-before:always;break-before:page;}
 .qh-header{background:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #e7ded4;}
 .qh-brand-block{display:flex;align-items:center;gap:15px;min-width:0;}
 .qh-logo-box{width:72px;height:72px;background:transparent;border:none;border-radius:0;display:flex;align-items:center;justify-content:center;flex:0 0 72px;overflow:visible;padding:0;box-sizing:border-box;}
@@ -3073,7 +3075,7 @@ async function downloadPdfForRecord(record, mode='quotation'){
       image: { type: 'jpeg', quality: 0.92 },
       html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      pagebreak: { mode: ['css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'], before: '.qh-page-break' }
     }).from(source).save();
     showNotif('PDF downloaded.');
   } catch (e) {
@@ -3271,7 +3273,7 @@ function renderPrintDoc(d, mode='quotation'){
         </div>
       </div>
 
-      <div class="qh-page">
+      <div class="qh-page qh-page-break">
         <div class="qh-second-body">
           <div class="qh-section-card">
             <div class="qh-section-head">Special Features Inclusive with Mould</div>
