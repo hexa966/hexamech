@@ -286,7 +286,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 #printDoc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-doc{padding:10px 10px 8px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-doc .qh-page + .qh-page{margin-top:0;}
-.pdf-render-host{position:fixed;top:0;left:-10000px;width:210mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:visible;border:0;opacity:0;}
+.pdf-render-host{position:fixed;top:0;left:0;width:210mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:visible;border:0;}
 .pd-corner-logo{position:absolute;top:12px;right:6px;display:block;}
 .pd-corner-logo img{height:46px;width:auto;display:block;object-fit:contain;}
 .pd-second-page .pd-sec-title{margin-top:10px;padding:6px 11px;font-size:12px;}
@@ -592,7 +592,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
             <table class="product-table">
               <thead><tr>
                 <th style="text-align:center;">Sr.</th><th>Product Specification / Description</th>
-                <th style="text-align:right;">No. of Cavity</th><th style="text-align:right;">Rate Per Cavity (&#8377;)</th>
+                <th style="text-align:right;">No. of Cavity / Qty.</th><th style="text-align:right;">Rate Per Cavity (&#8377;)</th>
                 <th style="text-align:right;">Total (&#8377;)</th><th style="width:32px;"></th>
               </tr></thead>
               <tbody id="productRows"></tbody>
@@ -2245,7 +2245,7 @@ function exportDataToExcel() {
       buildQuotationExportRows()
     ),
     buildExcelWorksheet('Quotation Items',
-      ['Quote No', 'Sr', 'Description', 'No. Of Cavity', 'Rate Per Cavity', 'Line Total'],
+      ['Quote No', 'Sr', 'Description', 'No. of Cavity / Qty.', 'Rate Per Cavity', 'Line Total'],
       buildQuotationItemRows()
     ),
     buildExcelWorksheet('Customers',
@@ -3656,7 +3656,7 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
               <tr>
                 <th>#</th>
                 <th>Product Specification</th>
-                <th style="width:80px;">Cavities</th>
+                <th style="width:80px;">No. of Cavity / Qty.</th>
                 <th style="width:120px;">Rate / Cavity</th>
                 <th style="width:100px;">Total (&#8377;)</th>
               </tr>
