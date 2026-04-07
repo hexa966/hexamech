@@ -98,6 +98,13 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .section-header{background:var(--navy);padding:14px 20px;display:flex;align-items:center;gap:9px;}
 .section-header h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.9);}
 .s-num{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;color:var(--navy);}
+.section-header-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn-section-remove{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16);padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;transition:.18s;}
+.btn-section-remove:hover{background:rgba(192,57,43,.18);border-color:rgba(192,57,43,.35);color:#ffd9d4;}
+.section-restore-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;margin-bottom:18px;background:#fff;border:1px dashed var(--border);border-radius:12px;box-shadow:var(--shadow);}
+.section-restore-bar span{font-size:12px;color:var(--muted);font-weight:600;}
+.btn-restore-section{background:rgba(232,160,32,.12);color:var(--navy);border:1px solid rgba(232,160,32,.3);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;transition:.18s;}
+.btn-restore-section:hover{background:var(--accent);color:var(--navy);}
 .section-body{padding:20px;}
 
 /* FORM */
@@ -156,17 +163,19 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 
 /* SPECS/TERMS */
 .specs-list,.terms-list{list-style:none;counter-reset:lc;}
-.specs-list li,.terms-list li{counter-increment:lc;padding:7px 0 7px 26px;position:relative;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);line-height:1.5;}
+.specs-list li,.terms-list li{counter-increment:lc;padding:10px 0 10px 30px;position:relative;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);line-height:1.5;}
 .specs-list li:last-child,.terms-list li:last-child{border-bottom:none;}
-.specs-list li::before,.terms-list li::before{content:counter(lc);position:absolute;left:0;top:9px;width:17px;height:17px;border-radius:50%;font-size:9px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.specs-list li::before,.terms-list li::before{content:counter(lc);position:absolute;left:0;top:12px;width:17px;height:17px;border-radius:50%;font-size:9px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;font-weight:700;}
 .specs-list li::before{background:var(--steel);color:#fff;}
 .terms-list li::before{background:var(--accent);color:var(--navy);}
-.terms-editable-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.terms-editable-input{background:rgba(232,160,32,.08);border:1.5px solid var(--accent);border-radius:6px;padding:3px 9px;font-size:14px;font-family:'Barlow',sans-serif;color:var(--navy);outline:none;font-weight:500;min-width:220px;}
-.terms-editable-badge{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--accent);background:rgba(232,160,32,.12);padding:2px 6px;border-radius:4px;white-space:nowrap;}
-.spec-subpoints{margin-top:7px;display:grid;gap:4px;}
-.spec-subpoint{padding-left:14px;position:relative;color:var(--text);}
-.spec-subpoint::before{content:'\2022';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;}
+.point-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.point-badge{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--accent);background:rgba(232,160,32,.12);padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.point-title-input,.point-textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-family:'Barlow',sans-serif;color:var(--text);outline:none;transition:border-color .18s,box-shadow .18s;}
+.point-title-input{padding:8px 10px;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.point-textarea{padding:10px 12px;font-size:14px;line-height:1.55;resize:vertical;min-height:52px;}
+.point-textarea.point-textarea-group{min-height:120px;}
+.point-title-input:focus,.point-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,160,32,.08);}
+.point-helper{margin-top:6px;font-size:11px;color:var(--muted);}
 .spec-note{margin-top:8px;font-size:12px;color:var(--muted);font-style:italic;}
 .bank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .bank-item .bk{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;}
@@ -601,69 +610,19 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           </div>
         </div>
       </div>
-      <div class="section-card">
-        <div class="section-header"><div class="s-num">4</div><h3>Special Features Inclusive with Mould</h3></div>
+      <div id="sectionRestoreBar" class="section-restore-bar"></div>
+      <div class="section-card" id="specialFeaturesSection">
+        <div class="section-header"><div class="s-num">4</div><h3>Special Features Inclusive with Mould</h3><div class="section-header-actions"><button class="btn-section-remove" type="button" onclick="deleteOptionalSection('specialFeatures')">Delete Section</button></div></div>
         <div class="section-body">
-          <ul class="specs-list">
-            <li>We design preform according to clients' specifications.</li>
-            <li>Channels for cooling water are designed to flow turbulently.</li>
-            <li>Assembled stack parts for the hot runner system sourced internationally.</li>
-            <li>The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.</li>
-            <li>We use Unbrako or TVS fasteners.</li>
-            <li>
-              <strong>Mould material specification</strong>
-              <div class="spec-subpoints">
-                <div class="spec-subpoint">Cavity: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.</div>
-                <div class="spec-subpoint">Core: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel.</div>
-                <div class="spec-subpoint">Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.</div>
-                <div class="spec-subpoint">Hot Runner Plates: 1.2085 corrosion resistance steel.</div>
-                <div class="spec-subpoint">Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.</div>
-                <div class="spec-subpoint">All mould base plates are electroless nickel plated (ENP).</div>
-                <div class="spec-subpoint">Advanced profile heaters are used for smooth mould operation start-up.</div>
-              </div>
-            </li>
-          </ul>
+          <ul class="specs-list" id="specialFeaturesList"></ul>
+          <div class="spec-note">All points are editable. Use Delete to omit any point from the quotation and PDF, and the numbering will update automatically.</div>
         </div>
       </div>
-      <div class="section-card">
-        <div class="section-header"><div class="s-num">5</div><h3>Terms & Conditions</h3></div>
+      <div class="section-card" id="termsConditionsSection">
+        <div class="section-header"><div class="s-num">5</div><h3>Terms & Conditions</h3><div class="section-header-actions"><button class="btn-section-remove" type="button" onclick="deleteOptionalSection('termsConditions')">Delete Section</button></div></div>
         <div class="section-body">
-          <ul class="terms-list">
-            <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is 18%.</li>
-            <li><strong>Delivery Period:</strong> <span class="terms-editable-wrap"><input class="terms-editable-input" id="tcDelivery" value="35-40 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval."><span class="terms-editable-badge">Editable</span></span></li>
-            <li><strong>Payment Terms:</strong> <span class="terms-editable-wrap"><input class="terms-editable-input" id="tcPayment" value="50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory."><span class="terms-editable-badge">Editable</span></span></li>
-            <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
-            <li><strong>Delivery &amp; Transportation:</strong> Goods are supplied Ex-Works from our facility. All transportation expenses and risk of loss or damage are to be borne by the customer.</li>
-            <li><strong>Mould Trial &amp; Training:</strong> In-house mould trial can be witnessed by your engineer. Training during mould trial at our factory is free of cost; travel, local transport and hotel stay are to be borne by you.</li>
-            <li><strong>Mould Commissioning:</strong> Commissioning support up to 2 days per mould is free. After that, &#8377;5,000 per day (domestic) applies. Travel, local transport and accommodation are to be arranged and borne by the customer.</li>
-            <li><strong>Packaging &amp; Freight Forwarding:</strong> Exclusive.</li>
-            <li><strong>Delayed Payments:</strong> Delay in balance payment beyond 1 week from mould readiness will attract interest @ 1% per week on due payment.</li>
-            <li><strong>Factory Environment:</strong> To achieve best output, productivity and quality, maintain dust-free conditions and 25 C shop-floor temperature.</li>
-            <li><strong>Rejection of Non-Conforming Goods:</strong> Notify the company within five days after delivery.</li>
-            <li><strong>Warranty:</strong> The mould is under warranty for one year from dispatch against manufacturing defects or faulty workmanship.</li>
-            <li><strong>Warranty Excludes:</strong> Misuse, improper installation, accidental damage, and unauthorised repair or alteration.</li>
-            <li><strong>Order Cancellation:</strong> Order once placed cannot be cancelled without written consent and cancellation charges based on manufacturing progress. Full mould price is recoverable once all mould parts are manufactured.</li>
-            <li><strong>Insurance:</strong> If required, it will be handled by the client.</li>
-            <li><strong>Jurisdiction:</strong> Gujarat courts have jurisdiction only.</li>
-            <li><strong>Copyright:</strong> Customer is liable for design and product copyright.</li>
-            <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
-            <li><strong>Mold Components as Spares:</strong>
-              <span class="terms-editable-badge" style="margin-left:8px;">Editable</span>
-              <textarea id="moldSpares" rows="6" placeholder="Leave this blank to remove point 19 from the quotation/PDF" style="width:100%;margin-top:8px;padding:8px;border:1px solid #dde3ec;border-radius:8px;font-family:Barlow,sans-serif;font-size:13px;color:#1a2a3a;resize:vertical;line-height:1.6;">Thermocouple - 2 Nos
-Core, Cavity and Neck - 1 Set
-Tip Insulator - 2 Nos
-Nozzle Heaters - 2 Nos
-Fasteners - Sufficient
-Ejector Rods - 1 Set
-Teflon Tape - 2 Nos
-Latch Plate - 1 Set
-Heaters - 2 Nos
-Baffle O-Ring - 1 Set
-Hot Runner Standard Seal - 2 Nos
-Toolbox (Bolts, Keys, etc.) - 1 No</textarea>
-            </li>
-          </ul>
-          <div class="spec-note">Delivery Period, Payment Terms, and Mold Components as Spares are editable. Leave the spares box blank to remove point 19 from the quotation/PDF.</div>
+          <ul class="terms-list" id="termsConditionsList"></ul>
+          <div class="spec-note">All points are editable. Use Delete to omit any point from the quotation and PDF, and the numbering will update automatically.</div>
         </div>
       </div>
       <div class="section-card">
@@ -1040,6 +999,139 @@ Heaters - 2 Nos
 Baffle O-Ring - 1 Set
 Hot Runner Standard Seal - 2 Nos
 Toolbox (Bolts, Keys, etc.) - 1 No`;
+function buildTaxPointText(gstRate = null) {
+  const rateText = String(gstRate ?? document.getElementById('gstRate')?.value ?? '18').trim() || '18';
+  return `As applicable extra at the time of dispatch. At present GST is ${rateText}%.`;
+}
+function getDefaultSpecialFeaturesItems() {
+  return [
+    { kind:'text', text:"We design preform according to clients' specifications." },
+    { kind:'text', text:'Channels for cooling water are designed to flow turbulently.' },
+    { kind:'text', text:'Assembled stack parts for the hot runner system sourced internationally.' },
+    { kind:'text', text:'The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.' },
+    { kind:'text', text:'We use Unbrako or TVS fasteners.' },
+    {
+      kind:'group',
+      title:'Mould material specification',
+      subpoints:[
+        'Cavity: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.',
+        'Core: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel.',
+        'Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.',
+        'Hot Runner Plates: 1.2085 corrosion resistance steel.',
+        'Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.',
+        'All mould base plates are electroless nickel plated (ENP).',
+        'Advanced profile heaters are used for smooth mould operation start-up.'
+      ]
+    }
+  ];
+}
+function getDefaultTermsItems(gstRate = null) {
+  return [
+    { kind:'text', title:'Tax', text:buildTaxPointText(gstRate), autoSyncGst:true },
+    { kind:'text', title:'Delivery Period', text:'35-40 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval.' },
+    { kind:'text', title:'Payment Terms', text:'50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory.' },
+    { kind:'text', title:'Charges', text:'Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.' },
+    { kind:'text', title:'Delivery & Transportation', text:'Goods are supplied Ex-Works from our facility. All transportation expenses and risk of loss or damage are to be borne by the customer.' },
+    { kind:'text', title:'Mould Trial & Training', text:'In-house mould trial can be witnessed by your engineer. Training during mould trial at our factory is free of cost; travel, local transport and hotel stay are to be borne by you.' },
+    { kind:'text', title:'Mould Commissioning', text:'Commissioning support up to 2 days per mould is free. After that, \u20B95,000 per day (domestic) applies. Travel, local transport and accommodation are to be arranged and borne by the customer.' },
+    { kind:'text', title:'Packaging & Freight Forwarding', text:'Exclusive.' },
+    { kind:'text', title:'Delayed Payments', text:'Delay in balance payment beyond 1 week from mould readiness will attract interest @ 1% per week on due payment.' },
+    { kind:'text', title:'Factory Environment', text:'To achieve best output, productivity and quality, maintain dust-free conditions and 25 C shop-floor temperature.' },
+    { kind:'text', title:'Rejection of Non-Conforming Goods', text:'Notify the company within five days after delivery.' },
+    { kind:'text', title:'Warranty', text:'The mould is under warranty for one year from dispatch against manufacturing defects or faulty workmanship.' },
+    { kind:'text', title:'Warranty Excludes', text:'Misuse, improper installation, accidental damage, and unauthorised repair or alteration.' },
+    { kind:'text', title:'Order Cancellation', text:'Order once placed cannot be cancelled without written consent and cancellation charges based on manufacturing progress. Full mould price is recoverable once all mould parts are manufactured.' },
+    { kind:'text', title:'Insurance', text:'If required, it will be handled by the client.' },
+    { kind:'text', title:'Jurisdiction', text:'Gujarat courts have jurisdiction only.' },
+    { kind:'text', title:'Copyright', text:'Customer is liable for design and product copyright.' },
+    { kind:'text', title:'Validity', text:'Quotation is valid for 30 days from the offer date.' },
+    { kind:'group', title:'Mold Components as Spares', subpoints:DEFAULT_SPARES.split('\n') }
+  ];
+}
+function normalizeEditablePoint(item) {
+  if (!item || typeof item !== 'object') return null;
+  const kind = item.kind === 'group' ? 'group' : 'text';
+  const normalized = { kind };
+  if (item.title != null) normalized.title = String(item.title);
+  if (kind === 'group') normalized.subpoints = Array.isArray(item.subpoints) ? item.subpoints.map(line => String(line ?? '')) : [];
+  else normalized.text = String(item.text ?? '');
+  if (item.autoSyncGst) normalized.autoSyncGst = true;
+  return normalized;
+}
+function splitPointLines(value, trimLines = false) {
+  const lines = String(value ?? '').split(/\r?\n/);
+  return trimLines ? lines.map(line => line.trim()).filter(Boolean) : lines;
+}
+function normalizeSpecialFeaturesItems(items) {
+  if (!Array.isArray(items)) return getDefaultSpecialFeaturesItems();
+  return items.map(normalizeEditablePoint).filter(Boolean);
+}
+function normalizeTermsItems(source) {
+  if (Array.isArray(source)) return source.map(normalizeEditablePoint).filter(Boolean);
+  const record = source || {};
+  const items = getDefaultTermsItems(record.gstRate);
+  if (record.tcDelivery != null) items[1].text = String(record.tcDelivery ?? '');
+  if (record.tcPayment != null) items[2].text = String(record.tcPayment ?? '');
+  if (Object.prototype.hasOwnProperty.call(record, 'moldSpares')) {
+    const sparesLines = splitPointLines(record.moldSpares, true);
+    if (sparesLines.length) items[items.length - 1].subpoints = sparesLines;
+    else items.pop();
+  }
+  return items;
+}
+function normalizeOptionalSections(record = {}) {
+  const visibility = { specialFeatures:true, termsConditions:true };
+  const source = record?.optionalSections;
+  if (source && typeof source === 'object') {
+    visibility.specialFeatures = source.specialFeatures !== false;
+    visibility.termsConditions = source.termsConditions !== false;
+  }
+  const hiddenSections = Array.isArray(record?.hiddenSections) ? record.hiddenSections.map(key => String(key)) : [];
+  if (hiddenSections.includes('specialFeatures')) visibility.specialFeatures = false;
+  if (hiddenSections.includes('termsConditions')) visibility.termsConditions = false;
+  return visibility;
+}
+function normalizeQuotationRecord(record = {}) {
+  const normalized = Object.assign({}, record || {});
+  normalized.specialFeaturesItems = normalizeSpecialFeaturesItems(normalized.specialFeaturesItems);
+  const sourceTerms = normalized.termsItems ?? normalized.termsConditionsItems;
+  normalized.termsItems = normalizeTermsItems(sourceTerms ?? normalized);
+  normalized.optionalSections = normalizeOptionalSections(normalized);
+  return normalized;
+}
+function renderPointText(value) {
+  return esc(String(value ?? '')).replace(/\r?\n/g, '<br>');
+}
+function renderPrintListItem(item) {
+  const point = normalizeEditablePoint(item);
+  if (!point) return '';
+  if (point.kind === 'group') {
+    const heading = point.title ? `<strong>${esc(point.title)}</strong>` : '';
+    const subpoints = (point.subpoints || []).filter(line => String(line).trim()).map(line => `<div class="qh-subpoint">${renderPointText(String(line).trim())}</div>`).join('');
+    if (!heading && !subpoints) return '<li></li>';
+    return `<li>${heading}${subpoints ? `<div class="qh-subpoints">${subpoints}</div>` : ''}</li>`;
+  }
+  const textHtml = renderPointText(point.text || '');
+  if (point.title) return `<li><strong>${esc(point.title)}:</strong>${textHtml ? ` ${textHtml}` : ''}</li>`;
+  return `<li>${textHtml}</li>`;
+}
+function renderPrintList(items) {
+  return (Array.isArray(items) ? items : []).map(renderPrintListItem).join('');
+}
+function findTermItemByTitle(items, title) {
+  const needle = String(title || '').trim().toLowerCase();
+  return (Array.isArray(items) ? items : []).find(item => String(item?.title || '').trim().toLowerCase() === needle) || null;
+}
+function getLegacyTermsSnapshot(items) {
+  const delivery = findTermItemByTitle(items, 'Delivery Period');
+  const payment = findTermItemByTitle(items, 'Payment Terms');
+  const spares = findTermItemByTitle(items, 'Mold Components as Spares');
+  return {
+    tcDelivery: delivery?.text || '',
+    tcPayment: payment?.text || '',
+    moldSpares: spares?.kind === 'group' ? (spares.subpoints || []).join('\n') : ''
+  };
+}
 const CUSTOMERS_KEY = 'hx_customers';
 const PROJECTS_KEY = 'hx_projects';
 const DEFAULT_USERS = [
@@ -2731,12 +2823,142 @@ function setAutoQuotationNumber(dateLike = new Date()) {
   quoteNoEl.value = generateQuotationNumber(dateLike, editingId);
   quoteNoEl.dataset.autoGenerated = 'true';
 }
+let specialFeaturesState = getDefaultSpecialFeaturesItems();
+let termsConditionsState = getDefaultTermsItems('18');
+let optionalSectionsState = normalizeOptionalSections();
+function getSectionState(section) {
+  return section === 'special' ? specialFeaturesState : termsConditionsState;
+}
+function setSectionState(section, items) {
+  if (section === 'special') specialFeaturesState = items;
+  else termsConditionsState = items;
+}
+function getOptionalSectionMeta() {
+  return {
+    specialFeatures: { cardId:'specialFeaturesSection', restoreLabel:'Restore Special Features' },
+    termsConditions: { cardId:'termsConditionsSection', restoreLabel:'Restore Terms & Conditions' }
+  };
+}
+function renumberVisibleSections() {
+  let sectionNo = 0;
+  document.querySelectorAll('#newView .section-card').forEach(card => {
+    if (card.style.display === 'none') return;
+    sectionNo += 1;
+    const numEl = card.querySelector('.section-header .s-num');
+    if (numEl) numEl.textContent = sectionNo;
+  });
+}
+function updateOptionalSectionsUI() {
+  const meta = getOptionalSectionMeta();
+  Object.keys(meta).forEach(key => {
+    const card = document.getElementById(meta[key].cardId);
+    if (card) card.style.display = optionalSectionsState[key] === false ? 'none' : '';
+  });
+  const restoreBar = document.getElementById('sectionRestoreBar');
+  if (restoreBar) {
+    const hiddenKeys = Object.keys(meta).filter(key => optionalSectionsState[key] === false);
+    restoreBar.style.display = hiddenKeys.length ? 'flex' : 'none';
+    restoreBar.innerHTML = hiddenKeys.length
+      ? `<span>Restore omitted sections:</span>${hiddenKeys.map(key => `<button class="btn-restore-section" type="button" onclick="restoreOptionalSection('${key}')">${meta[key].restoreLabel}</button>`).join('')}`
+      : '';
+  }
+  renumberVisibleSections();
+}
+function resetOptionalSections() {
+  optionalSectionsState = normalizeOptionalSections();
+  updateOptionalSectionsUI();
+}
+function deleteOptionalSection(key) {
+  if (!Object.prototype.hasOwnProperty.call(optionalSectionsState, key)) return;
+  optionalSectionsState[key] = false;
+  updateOptionalSectionsUI();
+}
+function restoreOptionalSection(key) {
+  if (!Object.prototype.hasOwnProperty.call(optionalSectionsState, key)) return;
+  optionalSectionsState[key] = true;
+  updateOptionalSectionsUI();
+}
+function renderEditablePointEditor(item, index, section) {
+  const point = normalizeEditablePoint(item);
+  if (!point) return '';
+  const toolbar = `
+    <div class="point-toolbar">
+      <span class="point-badge">Editable</span>
+      <button class="btn-del" type="button" onclick="deleteSectionPoint('${section}', ${index})">Delete</button>
+    </div>`;
+  const titleField = point.title != null
+    ? `<input class="point-title-input" type="text" value="${esc(point.title || '')}" oninput="updateSectionPointTitle('${section}', ${index}, this.value)">`
+    : '';
+  const bodyField = point.kind === 'group'
+    ? `<textarea class="point-textarea point-textarea-group" rows="${Math.max(6, (point.subpoints || []).length || 1)}" oninput="updateSectionPointLines('${section}', ${index}, this.value); autoGrow(this)">${esc((point.subpoints || []).join('\n'))}</textarea>
+       <div class="point-helper">Use one line for each sub-point.</div>`
+    : `<textarea class="point-textarea" rows="${Math.max(2, String(point.text || '').split(/\r?\n/).length)}" oninput="updateSectionPointText('${section}', ${index}, this.value); autoGrow(this)">${esc(point.text || '')}</textarea>`;
+  return `<li>${toolbar}${titleField}${bodyField}</li>`;
+}
+function renderSpecialFeaturesEditor() {
+  const list = document.getElementById('specialFeaturesList');
+  if (!list) return;
+  list.innerHTML = specialFeaturesState.map((item, index) => renderEditablePointEditor(item, index, 'special')).join('');
+  list.querySelectorAll('textarea').forEach(autoGrow);
+}
+function renderTermsEditor() {
+  const list = document.getElementById('termsConditionsList');
+  if (!list) return;
+  list.innerHTML = termsConditionsState.map((item, index) => renderEditablePointEditor(item, index, 'terms')).join('');
+  list.querySelectorAll('textarea').forEach(autoGrow);
+}
+function renderSectionEditors() {
+  renderSpecialFeaturesEditor();
+  renderTermsEditor();
+}
+function resetEditableSections() {
+  specialFeaturesState = getDefaultSpecialFeaturesItems();
+  termsConditionsState = getDefaultTermsItems();
+  renderSectionEditors();
+}
+function updateSectionPointTitle(section, index, value) {
+  const items = getSectionState(section);
+  if (!items[index]) return;
+  items[index].title = value;
+}
+function updateSectionPointText(section, index, value) {
+  const items = getSectionState(section);
+  if (!items[index]) return;
+  items[index].text = value;
+  if (section === 'terms' && (items[index].autoSyncGst || String(items[index].title || '').trim().toLowerCase() === 'tax')) {
+    items[index].autoSyncGst = value === buildTaxPointText();
+  }
+}
+function updateSectionPointLines(section, index, value) {
+  const items = getSectionState(section);
+  if (!items[index] || items[index].kind !== 'group') return;
+  items[index].subpoints = splitPointLines(value);
+}
+function deleteSectionPoint(section, index) {
+  const items = getSectionState(section);
+  if (!items[index]) return;
+  items.splice(index, 1);
+  setSectionState(section, items);
+  if (section === 'special') renderSpecialFeaturesEditor();
+  else renderTermsEditor();
+}
+function syncAutoTermsGstText() {
+  let changed = false;
+  termsConditionsState.forEach(item => {
+    if (item?.autoSyncGst) {
+      const nextText = buildTaxPointText();
+      if (item.text !== nextText) {
+        item.text = nextText;
+        changed = true;
+      }
+    }
+  });
+  if (changed) renderTermsEditor();
+}
 function newQuotation() {
   editingId = null;
   document.getElementById('formTitle').textContent = 'New Quotation';
   clearForm();
-  const sparesEl = document.getElementById('moldSpares');
-  if (sparesEl) sparesEl.value = DEFAULT_SPARES;
   const now = new Date();
   document.getElementById('quoteDate').valueAsDate = now;
   setAutoQuotationNumber(now);
@@ -2751,13 +2973,12 @@ function clearForm() {
   ['quoteNo','quoteDate','custCompany','custName','custPhone','custAddress','custGST','custEmail','selectedCustomerId'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
-  const _sp=document.getElementById('moldSpares'); if(_sp) _sp.value=DEFAULT_SPARES;
   const quoteNoEl=document.getElementById('quoteNo');
   if(quoteNoEl) quoteNoEl.dataset.autoGenerated='true';
   renderCustomerDropdown('');
   document.getElementById('gstRate').value='18';
-  document.getElementById('tcPayment').value='50% advance payment and balance payment with taxes and duties 1 week prior to shipment of mould from our factory.';
-  document.getElementById('tcDelivery').value='35\u201340 days from the date of receipt of confirmed order along with advance payment. Delivery schedule to be considered upon receipt of purchase order, advance payment and preform drawing approval.';
+  resetEditableSections();
+  resetOptionalSections();
   recalcTotals();
 }
 
@@ -2804,6 +3025,7 @@ function recalcTotals(){
   document.getElementById('gstAmount').textContent=fmtMoney(gst);
   document.getElementById('grandTotal').textContent=fmtMoney(sub+gst);
   document.getElementById('gstRateLabel').textContent=gstRate;
+  syncAutoTermsGstText();
 }
 function fmtNum(n){return(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});}
 function fmtMoney(n){return String.fromCodePoint(0x20B9)+fmtNum(n);}
@@ -2817,6 +3039,9 @@ function gatherData(){
   });
   let sub=0;rows.forEach(r=>{sub+=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);});
   const gstRate=parseFloat(document.getElementById('gstRate').value)||0;
+  const specialFeaturesItems = normalizeSpecialFeaturesItems(specialFeaturesState);
+  const termsItems = normalizeTermsItems(termsConditionsState);
+  const legacyTerms = getLegacyTermsSnapshot(termsItems);
   return {
     id:editingId||('id_'+Date.now()),
     quoteNo:document.getElementById('quoteNo').value.trim(),
@@ -2829,28 +3054,36 @@ function gatherData(){
     custEmail:document.getElementById('custEmail').value,
     customerId:document.getElementById('selectedCustomerId')?.value || '',
     gstRate:String(gstRate),
-    tcPayment:document.getElementById('tcPayment').value,
-    tcDelivery:document.getElementById('tcDelivery').value,
+    tcPayment:legacyTerms.tcPayment,
+    tcDelivery:legacyTerms.tcDelivery,
+    optionalSections:Object.assign({}, optionalSectionsState),
+    specialFeaturesItems,
+    termsItems,
     rows, subTotal:sub, grandTotal:sub+(sub*gstRate/100),
     savedAt:new Date().toISOString(),
     savedBy: currentUser?.displayName || currentUser?.username || 'Unknown',
     savedByGroup: currentUser?.group || '',
     userPhone: currentUser?.contactPhone || '',
     userEmail: currentUser?.contactEmail || '',
-    moldSpares: document.getElementById('moldSpares')?.value || ''
+    moldSpares: legacyTerms.moldSpares
   };
 }
 
 function loadData(d){
   clearForm();
+  const data = normalizeQuotationRecord(d);
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  set('quoteNo',d.quoteNo);set('quoteDate',d.quoteDate);set('custCompany',d.custCompany);
-  set('custName',d.custName);set('custPhone',d.custPhone);set('custAddress',d.custAddress);
-  set('custGST',d.custGST);set('custEmail',d.custEmail);set('selectedCustomerId', d.customerId || '');renderCustomerDropdown(d.customerId || '');set('gstRate',d.gstRate||'18');
-  set('tcPayment',d.tcPayment);set('tcDelivery',d.tcDelivery);const msEl=document.getElementById('moldSpares');if(msEl) msEl.value=d.moldSpares ?? DEFAULT_SPARES;
+  set('quoteNo',data.quoteNo);set('quoteDate',data.quoteDate);set('custCompany',data.custCompany);
+  set('custName',data.custName);set('custPhone',data.custPhone);set('custAddress',data.custAddress);
+  set('custGST',data.custGST);set('custEmail',data.custEmail);set('selectedCustomerId', data.customerId || '');renderCustomerDropdown(data.customerId || '');set('gstRate',data.gstRate||'18');
+  optionalSectionsState = normalizeOptionalSections(data);
+  specialFeaturesState = normalizeSpecialFeaturesItems(data.specialFeaturesItems);
+  termsConditionsState = normalizeTermsItems(data.termsItems);
+  renderSectionEditors();
+  updateOptionalSectionsUI();
   const quoteNoEl=document.getElementById('quoteNo');
   if(quoteNoEl) quoteNoEl.dataset.autoGenerated='false';
-  (d.rows||[]).forEach(r=>addProductRow(r.desc,r.cavity,r.rate));
+  (data.rows||[]).forEach(r=>addProductRow(r.desc,r.cavity,r.rate));
   recalcTotals();
 }
 
@@ -2912,10 +3145,7 @@ function editQ(id){
 }
 function previewFromDB(id, mode='quotation'){
   const r=dbFind(id);if(!r)return;
-  // Each record carries its own spares - never touch the form textarea
-  const previewRecord = Object.assign({}, r);
-  previewRecord.moldSpares = r.moldSpares ?? DEFAULT_SPARES;
-  openPreview(mode, previewRecord);
+  openPreview(mode, r);
 }
 function fmtDateShort(s){
   if(!s)return'-';
@@ -2991,13 +3221,9 @@ function getPrintModeConfig(mode='quotation'){
 function openPreview(mode='quotation', record=null){
   currentPrintMode=mode==='proforma'?'proforma':'quotation';
   if (record) {
-    // Saved record: use a clean copy, never touch or read the form textarea
-    currentPrintRecord = Object.assign({}, record);
-    currentPrintRecord.moldSpares = record.moldSpares ?? DEFAULT_SPARES;
+    currentPrintRecord = normalizeQuotationRecord(record);
   } else {
-    // Current form: read live textarea value
     currentPrintRecord = gatherData();
-    if (currentPrintRecord.moldSpares == null) currentPrintRecord.moldSpares = DEFAULT_SPARES;
   }
   const cfg=getPrintModeConfig(currentPrintMode);
   const titleEl=document.getElementById('printModalTitle');
@@ -3033,8 +3259,7 @@ async function downloadPdfForRecord(record, mode='quotation'){
     return;
   }
   const cfg = getPrintModeConfig(mode);
-  const cleanRecord = Object.assign({}, record || {});
-  cleanRecord.moldSpares = cleanRecord.moldSpares ?? DEFAULT_SPARES;
+  const cleanRecord = normalizeQuotationRecord(record || {});
   const html = renderPrintDoc(cleanRecord, mode);
   const frame = document.createElement('iframe');
   frame.className = 'pdf-render-host';
@@ -3147,12 +3372,12 @@ async function downloadPdfFromDB(id, mode='quotation'){
     showNotif('Quotation not found.', 'error');
     return;
   }
-  const record = Object.assign({}, r);
-  record.moldSpares = r.moldSpares ?? DEFAULT_SPARES;
+  const record = normalizeQuotationRecord(r);
   await downloadPdfForRecord(record, mode);
 }
 
 function renderPrintDoc(d, mode='quotation'){
+  d = normalizeQuotationRecord(d);
   const cfg=getPrintModeConfig(mode);
   let sub=0;(d.rows||[]).forEach(r=>{sub+=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);});
   const gstRate=parseFloat(d.gstRate)||0;const gst=sub*gstRate/100;const grand=sub+gst;
@@ -3172,6 +3397,10 @@ function renderPrintDoc(d, mode='quotation'){
   const infoDate = quoteDateValue && !Number.isNaN(quoteDateValue.getTime())
     ? quoteDateValue.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})
     : '-';
+  const showSpecialFeatures = d.optionalSections?.specialFeatures !== false;
+  const showTermsConditions = d.optionalSections?.termsConditions !== false;
+  const specialFeaturesHtml = renderPrintList(d.specialFeaturesItems);
+  const termsHtml = renderPrintList(d.termsItems);
   const rowsHtml=(d.rows||[]).map((r,i)=>{
     const t=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);
     const descLines=String(r.desc||'-').split('\n').filter(Boolean);
@@ -3185,7 +3414,6 @@ function renderPrintDoc(d, mode='quotation'){
       <td>&#8377;${fmtNum(t)}</td>
     </tr>`;
   }).join('');
-  const moldSparesItems = String(d.moldSpares ?? '').split('\n').filter(l=>l.trim());
   const html=`
     <div class="qh-doc">
       <div class="qh-page">
@@ -3275,58 +3503,19 @@ function renderPrintDoc(d, mode='quotation'){
 
       <div class="qh-page qh-page-break">
         <div class="qh-second-body">
-          <div class="qh-section-card">
+          ${showSpecialFeatures ? `<div class="qh-section-card">
             <div class="qh-section-head">Special Features Inclusive with Mould</div>
             <div class="qh-section-body">
-              <ul class="qh-list">
-                <li>We design preform according to clients' specifications.</li>
-                <li>Channels for cooling water are designed to flow turbulently.</li>
-                <li>Assembled stack parts for the hot runner system sourced internationally.</li>
-                <li>The mould is designed for fully automatic operation with tail-free components, pneumatic shut-off valves, and a balanced hot runner system.</li>
-                <li>We use Unbrako or TVS fasteners.</li>
-                <li><strong>Mould material specification</strong>
-                  <div class="qh-subpoints">
-                    <div class="qh-subpoint">Cavity: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel with vacuum hardening up to 46-48 HRC and grinding for long life.</div>
-                    <div class="qh-subpoint">Core: DIN 1.2316 ESR - Bohler (German Make), corrosion resistance steel.</div>
-                    <div class="qh-subpoint">Neck Ring: DIN 1.2316 ESR with vacuum hardening up to 45-48 HRC and grinding for long life.</div>
-                    <div class="qh-subpoint">Hot Runner Plates: 1.2085 corrosion resistance steel.</div>
-                    <div class="qh-subpoint">Mould base plates: P20 (1.2311), pre-hardened with 30 HRC hardness.</div>
-                    <div class="qh-subpoint">All mould base plates are electroless nickel plated (ENP).</div>
-                    <div class="qh-subpoint">Advanced profile heaters are used for smooth mould operation start-up.</div>
-                  </div>
-                </li>
-              </ul>
+              <ul class="qh-list">${specialFeaturesHtml}</ul>
             </div>
-          </div>
+          </div>` : ''}
 
-          <div class="qh-section-card">
+          ${showTermsConditions ? `<div class="qh-section-card">
             <div class="qh-section-head">Terms &amp; Conditions</div>
             <div class="qh-section-body">
-              <ul class="qh-list">
-                <li><strong>Tax:</strong> As applicable extra at the time of dispatch. At present GST is ${gstRate}%.</li>
-                <li><strong>Delivery Period:</strong> ${esc(d.tcDelivery||'')}</li>
-                <li><strong>Payment Terms:</strong> ${esc(d.tcPayment||'')}</li>
-                <li><strong>Charges:</strong> Any modification requested after product drawing approval and commencement of mould manufacturing will incur additional charges. Revised price and timeline will be communicated in writing.</li>
-                <li><strong>Delivery &amp; Transportation:</strong> The customer shall take delivery of the goods Ex-Works from the company facility. All expenses and risk of loss or damage during transportation shall be borne by the customer.</li>
-                <li><strong>Mould Trial &amp; Training:</strong> Each mould is subjected to in-house mould trial. Your engineer may witness the trial at our factory, and training during the trial is free of cost. Travel, local transport and hotel stay are to be borne by you.</li>
-                <li><strong>Mould Commissioning:</strong> Our engineer will commission the mould at your factory for no charge up to 2 days per mould. After that, installation charges of &#8377;5,000 per day (domestic) apply. Travel, local transport and accommodation are to be arranged and borne by you.</li>
-                <li><strong>Packaging &amp; Freight Forwarding:</strong> Exclusive.</li>
-                <li><strong>Delayed Payments:</strong> Delay in balance payment beyond 1 week from the date of mould readiness will attract interest @ 1% per week on the due payment.</li>
-                <li><strong>Factory Environment at Customer Place:</strong> To achieve best output, productivity and quality, maintain dust-free conditions and shop-floor temperature of 25 C.</li>
-                <li><strong>Rejection of Non-Conforming Goods:</strong> The customer must notify the company of any rejection of goods as non-conforming within five days after delivery.</li>
-                <li><strong>Order Cancellation:</strong> The order once placed cannot be cancelled without our written consent and payment of cancellation charges depending on the manufacturing progress. Full mould price shall be recovered once all mould parts are manufactured.</li>
-                <li><strong>Insurance:</strong> If insurance is required, it will be handled by the client.</li>
-                <li><strong>Jurisdiction:</strong> The Gujarat courts have jurisdiction only with respect to correspondence orders against this offer.</li>
-                <li><strong>Copyright:</strong> Customer will be liable for design and product copyright.</li>
-                <li><strong>Validity:</strong> Quotation is valid for 30 days from the offer date.</li>
-                ${moldSparesItems.length ? `<li><strong>Mold Components as Spares Along with Mold</strong>
-                  <div class="qh-subpoints">
-                    ${moldSparesItems.map(l=>`<div class="qh-subpoint">${esc(l.trim())}</div>`).join('')}
-                  </div>
-                </li>` : ''}
-              </ul>
+              <ul class="qh-list">${termsHtml}</ul>
             </div>
-          </div>
+          </div>` : ''}
         </div>
         <div class="qh-second-footer">
           <p>Created by: ${esc(d.savedBy || currentUser?.displayName || currentUser?.username || 'Unknown')}</p>
@@ -3421,6 +3610,7 @@ async function startup() {
   clearStoredAppData();
 
   wireCustomerFieldListeners();
+  resetEditableSections();
   const quoteNoEl = document.getElementById('quoteNo');
   const quoteDateEl = document.getElementById('quoteDate');
   if (quoteNoEl && !quoteNoEl.dataset.quoteNoWired) {
