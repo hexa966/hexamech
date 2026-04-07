@@ -8,6 +8,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
   --navy:#0d1b2a;--steel:#1b3a5c;--accent:#e8a020;--accent2:#f0c060;
@@ -744,6 +745,20 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
           </div>
         </div>
 
+        <div class="settings-card" id="adminPdfExportCard" style="display:none;">
+          <div class="settings-card-header"><h3>Quotation PDF Export</h3></div>
+          <div class="settings-card-body">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Admin can download all quotation PDFs for one financial year in a single ZIP file.</div>
+            <div class="fg2" style="margin-bottom:12px;">
+              <label>Financial Year</label>
+              <select id="pdfExportFinancialYear" onchange="updateBulkQuotationPdfSummary()"></select>
+            </div>
+            <div id="pdfExportYearSummary" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Select a financial year to see how many quotations will be exported.</div>
+            <button class="btn-main btn-gold" style="width:100%;justify-content:center;" onclick="exportQuotationPdfsByFinancialYear()" id="btnExportYearPdfs">Download PDF ZIP</button>
+            <div id="pdfExportStatus" style="font-size:12px;color:var(--muted);margin-top:12px;min-height:18px;"></div>
+          </div>
+        </div>
+
         <!-- OneDrive -->
         <div class="settings-card" style="grid-column:span 2;">
           <div class="settings-card-header"><h3>&#9729; Cloud Storage</h3></div>
@@ -1298,9 +1313,12 @@ function syncAdminControls() {
   const btnAddUser = document.getElementById('btnAddUser');
   const btnExportExcel = document.getElementById('btnExportExcel');
   const adminExportCard = document.getElementById('adminExportCard');
+  const adminPdfExportCard = document.getElementById('adminPdfExportCard');
   if (btnAddUser) btnAddUser.style.display = isAdmin ? 'flex' : 'none';
   if (btnExportExcel) btnExportExcel.style.display = isAdmin ? 'flex' : 'none';
   if (adminExportCard) adminExportCard.style.display = isAdmin ? 'block' : 'none';
+  if (adminPdfExportCard) adminPdfExportCard.style.display = isAdmin ? 'block' : 'none';
+  if (isAdmin) renderBulkQuotationPdfExportOptions();
 }
 function renderMyContactDetails() {
   const profile = getCurrentUserProfile() || currentUser || {};
@@ -2033,6 +2051,75 @@ function downloadTextFile(content, filename, mimeType='text/plain;charset=utf-8'
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
+function downloadBlobFile(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function formatFinancialYearLabel(startYear) {
+  const year = parseInt(startYear, 10);
+  if (!Number.isFinite(year)) return '';
+  return year + '-' + String((year + 1) % 100).padStart(2, '0');
+}
+function getAvailableQuotationFinancialYears() {
+  const years = Array.from(new Set(
+    dbLoad()
+      .map(record => getFinancialYearStart(record?.quoteDate || record?.savedAt))
+      .filter(year => Number.isFinite(year))
+  )).sort((a, b) => b - a);
+  if (!years.length) years.push(getFinancialYearStart(new Date()));
+  return years;
+}
+function getQuotationsForFinancialYear(startYear) {
+  const targetYear = parseInt(startYear, 10);
+  return dbLoad().filter(record => getFinancialYearStart(record?.quoteDate || record?.savedAt) === targetYear);
+}
+let bulkQuotationPdfExportRunning = false;
+function setBulkQuotationPdfExportBusy(isBusy, statusText='') {
+  bulkQuotationPdfExportRunning = !!isBusy;
+  const button = document.getElementById('btnExportYearPdfs');
+  const select = document.getElementById('pdfExportFinancialYear');
+  const status = document.getElementById('pdfExportStatus');
+  if (button) button.textContent = isBusy ? 'Preparing PDF ZIP...' : 'Download PDF ZIP';
+  if (button) button.disabled = !!isBusy;
+  if (select) select.disabled = !!isBusy;
+  if (status) status.textContent = statusText || '';
+  if (!isBusy) updateBulkQuotationPdfSummary();
+}
+function renderBulkQuotationPdfExportOptions() {
+  const select = document.getElementById('pdfExportFinancialYear');
+  if (!select) return;
+  const years = getAvailableQuotationFinancialYears();
+  const previous = parseInt(select.value, 10);
+  const currentYear = getFinancialYearStart(new Date());
+  const selectedYear = years.includes(previous) ? previous : (years.includes(currentYear) ? currentYear : years[0]);
+  select.innerHTML = years.map(year => `<option value="${year}">${formatFinancialYearLabel(year)}</option>`).join('');
+  select.value = String(selectedYear);
+  updateBulkQuotationPdfSummary();
+}
+function updateBulkQuotationPdfSummary() {
+  const select = document.getElementById('pdfExportFinancialYear');
+  const summary = document.getElementById('pdfExportYearSummary');
+  const button = document.getElementById('btnExportYearPdfs');
+  if (!select || !summary || !button) return;
+  const selectedYear = parseInt(select.value, 10);
+  if (!Number.isFinite(selectedYear)) {
+    summary.textContent = 'No financial year is available for export yet.';
+    if (!bulkQuotationPdfExportRunning) button.disabled = true;
+    return;
+  }
+  const fyLabel = formatFinancialYearLabel(selectedYear);
+  const count = getQuotationsForFinancialYear(selectedYear).length;
+  summary.textContent = count
+    ? `${count} quotation${count === 1 ? '' : 's'} found for FY ${fyLabel}.`
+    : `No quotations found for FY ${fyLabel}.`;
+  if (!bulkQuotationPdfExportRunning) button.disabled = count === 0;
+}
 
 function excelXmlEscape(value) {
   return String(value == null ? '' : value)
@@ -2179,6 +2266,62 @@ function exportDataToExcel() {
   downloadTextFile(workbook, fileName, 'application/vnd.ms-excel;charset=utf-8');
   showNotif('Excel export downloaded.');
 }
+async function exportQuotationPdfsByFinancialYear() {
+  if (!currentUser || currentUser.role !== 'admin') {
+    showNotif('Only admin can export quotation PDFs.', 'error');
+    return;
+  }
+  if (typeof html2pdf === 'undefined') {
+    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
+    return;
+  }
+  if (typeof JSZip === 'undefined') {
+    showNotif('ZIP tool did not load. Please refresh and try again.', 'error');
+    return;
+  }
+  const select = document.getElementById('pdfExportFinancialYear');
+  if (!select) return;
+  const selectedYear = parseInt(select.value, 10);
+  if (!Number.isFinite(selectedYear)) {
+    showNotif('Please select a financial year.', 'error');
+    return;
+  }
+  const fyLabel = formatFinancialYearLabel(selectedYear);
+  const records = getQuotationsForFinancialYear(selectedYear).sort((a, b) => {
+    const dateA = new Date(a?.quoteDate || a?.savedAt || 0).getTime();
+    const dateB = new Date(b?.quoteDate || b?.savedAt || 0).getTime();
+    if (dateA !== dateB) return dateA - dateB;
+    return String(a?.quoteNo || '').localeCompare(String(b?.quoteNo || ''), undefined, { numeric: true, sensitivity: 'base' });
+  });
+  if (!records.length) {
+    showNotif('No quotations found for FY ' + fyLabel + '.', 'error');
+    return;
+  }
+
+  setBulkQuotationPdfExportBusy(true, `Preparing 1 of ${records.length} PDFs for FY ${fyLabel}...`);
+  try {
+    const zip = new JSZip();
+    for (let i = 0; i < records.length; i++) {
+      const record = normalizeQuotationRecord(records[i]);
+      const quoteLabel = record.quoteNo || `Quotation-${i + 1}`;
+      setBulkQuotationPdfExportBusy(true, `Preparing PDF ${i + 1} of ${records.length}: ${quoteLabel}`);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      const pdfBlob = await buildPdfBlobForRecord(record, 'quotation');
+      const pdfName = safeDownloadName(`${quoteLabel}-${record.custCompany || 'Quotation'}`) + '.pdf';
+      zip.file(pdfName, pdfBlob);
+    }
+    setBulkQuotationPdfExportBusy(true, `Creating ZIP file for FY ${fyLabel}...`);
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const zipName = safeDownloadName(`Hexamech-Quotations-FY-${fyLabel}`) + '.zip';
+    downloadBlobFile(zipBlob, zipName);
+    setBulkQuotationPdfExportBusy(false, `Downloaded ${records.length} quotation PDF${records.length === 1 ? '' : 's'} for FY ${fyLabel}.`);
+    showNotif(`Downloaded ${records.length} quotation PDF${records.length === 1 ? '' : 's'} for FY ${fyLabel}.`);
+  } catch (e) {
+    console.error('Bulk quotation PDF export failed:', e);
+    setBulkQuotationPdfExportBusy(false, '');
+    showNotif('Could not export quotation PDFs.', 'error');
+  }
+}
 
 function exportConfiguredApp() {
   const clientId = localStorage.getItem('hx_od_clientid');
@@ -2239,9 +2382,9 @@ async function odReadData() { return await cloudRead(); }
 async function odWriteData(data) { return await cloudWrite(data); }
 
 async function syncFromOneDrive() {
-  if (backendMode) { await loadStateFromBackend(); renderDB(); renderUserList(); renderCustomerDropdown(); renderCustomersView(); showNotif('Synced.'); return; }
+  if (backendMode) { await loadStateFromBackend(); renderDB(); renderUserList(); renderCustomerDropdown(); renderCustomersView(); renderBulkQuotationPdfExportOptions(); showNotif('Synced.'); return; }
   const ok = await cloudSync();
-  if (ok) { if (document.getElementById('dbView').style.display !== 'none') renderDB(); renderUserList(); renderCustomerDropdown(); renderCustomersView(); showNotif('Synced from cloud.'); }
+  if (ok) { if (document.getElementById('dbView').style.display !== 'none') renderDB(); renderUserList(); renderCustomerDropdown(); renderCustomersView(); renderBulkQuotationPdfExportOptions(); showNotif('Synced from cloud.'); }
   else showNotif('Sync failed - check internet.', 'error');
 }
 
@@ -3252,12 +3395,17 @@ async function doPrint(){
   document.title=originalTitle;
   pc.innerHTML='';
 }
-
-async function downloadPdfForRecord(record, mode='quotation'){
-  if (typeof html2pdf === 'undefined') {
-    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
-    return;
-  }
+function getPdfRenderOptions(filename) {
+  return {
+    margin: [2, 2, 2, 2],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.92 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+    pagebreak: { mode: ['css', 'legacy'], before: '.qh-page-break' }
+  };
+}
+async function preparePdfRenderFrame(record, mode='quotation') {
   const cfg = getPrintModeConfig(mode);
   const cleanRecord = normalizeQuotationRecord(record || {});
   const html = renderPrintDoc(cleanRecord, mode);
@@ -3269,8 +3417,7 @@ async function downloadPdfForRecord(record, mode='quotation'){
   const frameDoc = frame.contentDocument || frame.contentWindow?.document;
   if (!frameDoc) {
     frame.remove();
-    showNotif('Could not prepare PDF document.', 'error');
-    return;
+    throw new Error('PDF_PREPARE_FAILED');
   }
 
   const styles = Array.from(document.querySelectorAll('style')).map(tag => tag.textContent || '').join('\n');
@@ -3282,11 +3429,46 @@ async function downloadPdfForRecord(record, mode='quotation'){
   const source = frameDoc.getElementById('pdfRoot');
   if (!source) {
     frame.remove();
-    showNotif('Could not render PDF content.', 'error');
-    return;
+    throw new Error('PDF_RENDER_FAILED');
   }
   source.innerHTML = html;
   await drawPdfLogoCanvases(source);
+  return { cfg, cleanRecord, frame, source };
+}
+async function buildPdfBlobForRecord(record, mode='quotation'){
+  if (typeof html2pdf === 'undefined') throw new Error('PDF_TOOL_MISSING');
+  const { frame, source } = await preparePdfRenderFrame(record, mode);
+  try {
+    await waitForPdfRender(frame, source);
+    try {
+      return await html2pdf()
+        .set(getPdfRenderOptions('bulk-export.pdf'))
+        .from(source)
+        .toPdf()
+        .get('pdf')
+        .then(pdf => pdf.output('blob'));
+    } catch (_) {
+      return await html2pdf().set(getPdfRenderOptions('bulk-export.pdf')).from(source).outputPdf('blob');
+    }
+  } finally {
+    frame.remove();
+  }
+}
+async function downloadPdfForRecord(record, mode='quotation'){
+  if (typeof html2pdf === 'undefined') {
+    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
+    return;
+  }
+  let prepared;
+  try {
+    prepared = await preparePdfRenderFrame(record, mode);
+  } catch (e) {
+    if (e.message === 'PDF_PREPARE_FAILED') showNotif('Could not prepare PDF document.', 'error');
+    else if (e.message === 'PDF_RENDER_FAILED') showNotif('Could not render PDF content.', 'error');
+    else showNotif('Could not download PDF.', 'error');
+    return;
+  }
+  const { cfg, cleanRecord, frame, source } = prepared;
   const documentNumber = cfg.mode === 'proforma'
     ? String(cleanRecord.quoteNo || 'Document').replace(/^Q/i, 'PI')
     : String(cleanRecord.quoteNo || 'Document');
@@ -3294,14 +3476,7 @@ async function downloadPdfForRecord(record, mode='quotation'){
 
   try {
     await waitForPdfRender(frame, source);
-    await html2pdf().set({
-      margin: [2, 2, 2, 2],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.92 },
-      html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      pagebreak: { mode: ['css', 'legacy'], before: '.qh-page-break' }
-    }).from(source).save();
+    await html2pdf().set(getPdfRenderOptions(filename)).from(source).save();
     showNotif('PDF downloaded.');
   } catch (e) {
     console.error('PDF download failed:', e);
