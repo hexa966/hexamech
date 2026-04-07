@@ -466,9 +466,15 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
   html,body{margin:0 !important;padding:0 !important;}
   body>*{display:none !important;}
   body.printing>#printContainer{display:block !important;}
-  #printContainer{display:none;position:static;width:100%;margin:0;padding:0;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
-  #printContainer .qh-page{width:100%;box-sizing:border-box;}
+  #printContainer{display:none;position:static;width:210mm;margin:0 auto;padding:0;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
+  #printContainer .qh-doc{width:100%;}
+  #printContainer .qh-page{width:100%;box-sizing:border-box;page-break-inside:avoid;break-inside:avoid;}
+  #printContainer .qh-page:first-child{min-height:286mm;height:286mm;display:flex;flex-direction:column;overflow:hidden;}
+  #printContainer .qh-page.qh-page-break{min-height:286mm;display:flex;flex-direction:column;}
   #printContainer .qh-page + .qh-page{margin-top:0;}
+  #printContainer .qh-body,#printContainer .qh-second-body{flex:1 1 auto;min-height:0;}
+  #printContainer .qh-footer,#printContainer .qh-second-footer{margin-top:auto;}
+  #printContainer .qh-page-break{page-break-before:always;break-before:page;}
   #printContainer .pd-sec-title{page-break-after:auto;break-after:auto;}
   #printContainer .pd-box,#printContainer .pd-bank-wrap{page-break-inside:avoid;break-inside:avoid;}
   #printContainer .pd-box-flow{page-break-inside:auto;break-inside:auto;}
@@ -2276,7 +2282,7 @@ async function exportQuotationPdfsByFinancialYear() {
     return;
   }
   try {
-    await ensurePdfMakeLoaded();
+    await ensurePdfLibrariesLoaded();
   } catch (_) {
     showNotif('PDF tool did not load. Please refresh and try again.', 'error');
     return;
@@ -3423,12 +3429,7 @@ function getPdfFilename(record, mode='quotation') {
   return safeDownloadName(documentNumber + '-' + cfg.fileLabel) + '.pdf';
 }
 async function doPrint(){
-  const record = currentPrintRecord ? normalizeQuotationRecord(currentPrintRecord) : gatherData();
-  currentPrintRecord = record;
-  const ok = await openPdfPreviewForRecord(record, currentPrintMode);
-  if (!ok) {
-    await doBrowserPrint();
-  }
+  await doBrowserPrint();
 }
 function getPdfLibraries() {
   const jsPdfCtor = window.jspdf?.jsPDF || window.jsPDF || null;
@@ -4004,20 +4005,15 @@ function createPdfMakeDocument(record, mode='quotation') {
   if (!pdfMake) throw new Error('PDF_TOOL_MISSING');
   return pdfMake.createPdf(buildPdfMakeDocumentDefinition(record, mode));
 }
-function pdfDocToBlob(pdfDoc) {
-  return new Promise((resolve, reject) => {
-    try {
-      pdfDoc.getBlob(blob => resolve(blob));
-    } catch (error) {
-      reject(error);
-    }
-  });
+function pdfToBlob(pdf){
+  const arrayBuffer = pdf.output('arraybuffer');
+  return new Blob([arrayBuffer], { type:'application/pdf' });
 }
 async function buildPdfBlobForRecord(record, mode='quotation'){
-  await ensurePdfMakeLoaded();
+  await ensurePdfLibrariesLoaded();
   const cleanRecord = normalizeQuotationRecord(record || {});
-  const pdfDoc = createPdfMakeDocument(cleanRecord, mode);
-  return await pdfDocToBlob(pdfDoc);
+  const pdf = await buildJsPdfForRecord(cleanRecord, mode);
+  return pdfToBlob(pdf);
 }
 async function openPdfPreviewForRecord(record, mode='quotation') {
   const previewWindow = window.open('', '_blank');
@@ -4042,11 +4038,17 @@ async function openPdfPreviewForRecord(record, mode='quotation') {
   }
 }
 async function downloadPdfForRecord(record, mode='quotation'){
+  try {
+    await ensurePdfLibrariesLoaded();
+  } catch (_) {
+    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
+    return false;
+  }
   const cleanRecord = normalizeQuotationRecord(record || {});
   const filename = getPdfFilename(cleanRecord, mode);
   try {
-    const blob = await buildPdfBlobForRecord(cleanRecord, mode);
-    downloadBlobFile(blob, filename);
+    const pdf = await buildJsPdfForRecord(cleanRecord, mode);
+    pdf.save(filename);
     showNotif('PDF downloaded.');
     return true;
   } catch (e) {
