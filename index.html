@@ -285,8 +285,8 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 /* PRINT DOC */
 #printDoc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-doc{padding:10px 10px 8px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
-.pdf-render-doc .qh-page + .qh-page{margin-top:0;page-break-before:always;break-before:page;}
-.pdf-render-host{position:fixed;top:0;left:-230mm;width:210mm;height:297mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:hidden;border:0;opacity:1;}
+.pdf-render-doc .qh-page + .qh-page{margin-top:0;}
+.pdf-render-host{position:fixed;top:0;left:-10000px;width:210mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:visible;border:0;opacity:0;}
 .pd-corner-logo{position:absolute;top:12px;right:6px;display:block;}
 .pd-corner-logo img{height:46px;width:auto;display:block;object-fit:contain;}
 .pd-second-page .pd-sec-title{margin-top:10px;padding:6px 11px;font-size:12px;}
@@ -355,7 +355,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 /* GOLD PDF LAYOUT */
 .qh-doc{font-family:'Segoe UI',Arial,sans-serif;color:#2e2e2e;}
 .qh-page{background:#fff;border:1px solid #e0d8cf;border-radius:4px;overflow:hidden;}
-.qh-page + .qh-page{margin-top:16px;page-break-before:always;break-before:page;}
+.qh-page + .qh-page{margin-top:16px;}
 .qh-page-break{page-break-before:always;break-before:page;}
 .qh-header{background:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #e7ded4;}
 .qh-brand-block{display:flex;align-items:center;gap:15px;min-width:0;}
@@ -3395,14 +3395,28 @@ async function doPrint(){
   document.title=originalTitle;
   pc.innerHTML='';
 }
-function getPdfRenderOptions(filename) {
+function getPdfRenderOptions(filename, sourceEl=null) {
+  const canvasOptions = {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    logging: false,
+    imageTimeout: 0,
+    scrollX: 0,
+    scrollY: 0
+  };
+  if (sourceEl) {
+    canvasOptions.windowWidth = Math.max(794, Math.ceil(sourceEl.scrollWidth || 0));
+    canvasOptions.windowHeight = Math.max(1123, Math.ceil(sourceEl.scrollHeight || 0));
+  }
   return {
     margin: [2, 2, 2, 2],
     filename: filename,
     image: { type: 'jpeg', quality: 0.92 },
-    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 },
+    html2canvas: canvasOptions,
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-    pagebreak: { mode: ['css', 'legacy'] }
+    pagebreak: { mode: ['css'] }
   };
 }
 async function preparePdfRenderFrame(record, mode='quotation') {
@@ -3425,6 +3439,8 @@ async function preparePdfRenderFrame(record, mode='quotation') {
   frameDoc.open();
   frameDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8">' + stylesheetLinks + '<style>body{margin:0;background:#fff;}' + styles + '</style></head><body><div id="pdfRoot" class="pdf-render-doc"></div></body></html>');
   frameDoc.close();
+  if (frameDoc.documentElement) frameDoc.documentElement.style.overflow = 'visible';
+  if (frameDoc.body) frameDoc.body.style.overflow = 'visible';
 
   const source = frameDoc.getElementById('pdfRoot');
   if (!source) {
@@ -3432,6 +3448,9 @@ async function preparePdfRenderFrame(record, mode='quotation') {
     throw new Error('PDF_RENDER_FAILED');
   }
   source.innerHTML = html;
+  const requiredHeight = Math.max(1123, Math.ceil((source.scrollHeight || 0) + 40));
+  frame.style.height = requiredHeight + 'px';
+  try { frame.contentWindow?.scrollTo(0, 0); } catch (_) {}
   await drawPdfLogoCanvases(source);
   return { cfg, cleanRecord, frame, source };
 }
@@ -3440,7 +3459,9 @@ async function buildPdfBlobForRecord(record, mode='quotation'){
   const { frame, source } = await preparePdfRenderFrame(record, mode);
   try {
     await waitForPdfRender(frame, source);
-    return await html2pdf().set(getPdfRenderOptions('bulk-export.pdf')).from(source).outputPdf('blob');
+    const worker = html2pdf().set(getPdfRenderOptions('bulk-export.pdf', source)).from(source).toPdf();
+    const pdf = await worker.get('pdf');
+    return pdf.output('blob');
   } finally {
     frame.remove();
   }
@@ -3467,7 +3488,7 @@ async function downloadPdfForRecord(record, mode='quotation'){
 
   try {
     await waitForPdfRender(frame, source);
-    await html2pdf().set(getPdfRenderOptions(filename)).from(source).save();
+    await html2pdf().set(getPdfRenderOptions(filename, source)).from(source).save();
     showNotif('PDF downloaded.');
   } catch (e) {
     console.error('PDF download failed:', e);
@@ -3517,6 +3538,11 @@ async function drawPdfLogoCanvases(root) {
 async function waitForPdfRender(frame, root){
   const frameWindow = frame.contentWindow;
   const frameDoc = frame.contentDocument || frameWindow?.document;
+  if (root) {
+    root.scrollTop = 0;
+    root.scrollLeft = 0;
+  }
+  try { frameWindow?.scrollTo(0, 0); } catch (_) {}
   if (frameDoc?.fonts?.ready) {
     try { await frameDoc.fonts.ready; } catch (_) {}
   }
