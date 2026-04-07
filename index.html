@@ -286,7 +286,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 #printDoc{padding:36px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-doc{padding:10px 10px 8px;font-family:'Barlow',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;position:relative;}
 .pdf-render-doc .qh-page + .qh-page{margin-top:0;page-break-before:always;break-before:page;}
-.pdf-render-host{position:fixed;top:0;left:-230mm;width:210mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:hidden;border:0;opacity:1;}
+.pdf-render-host{position:fixed;top:0;left:-230mm;width:210mm;height:297mm;min-height:297mm;pointer-events:none;z-index:-1;background:#fff;overflow:hidden;border:0;opacity:1;}
 .pd-corner-logo{position:absolute;top:12px;right:6px;display:block;}
 .pd-corner-logo img{height:46px;width:auto;display:block;object-fit:contain;}
 .pd-second-page .pd-sec-title{margin-top:10px;padding:6px 11px;font-size:12px;}
@@ -3402,13 +3402,13 @@ function getPdfRenderOptions(filename) {
     image: { type: 'jpeg', quality: 0.92 },
     html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-    pagebreak: { mode: ['css', 'legacy'], before: '.qh-page-break' }
+    pagebreak: { mode: ['css', 'legacy'] }
   };
 }
 async function preparePdfRenderFrame(record, mode='quotation') {
   const cfg = getPrintModeConfig(mode);
   const cleanRecord = normalizeQuotationRecord(record || {});
-  const html = renderPrintDoc(cleanRecord, mode);
+  const html = renderPrintDoc(cleanRecord, mode, false);
   const frame = document.createElement('iframe');
   frame.className = 'pdf-render-host';
   frame.setAttribute('title', 'PDF Render Frame');
@@ -3440,16 +3440,7 @@ async function buildPdfBlobForRecord(record, mode='quotation'){
   const { frame, source } = await preparePdfRenderFrame(record, mode);
   try {
     await waitForPdfRender(frame, source);
-    try {
-      return await html2pdf()
-        .set(getPdfRenderOptions('bulk-export.pdf'))
-        .from(source)
-        .toPdf()
-        .get('pdf')
-        .then(pdf => pdf.output('blob'));
-    } catch (_) {
-      return await html2pdf().set(getPdfRenderOptions('bulk-export.pdf')).from(source).outputPdf('blob');
-    }
+    return await html2pdf().set(getPdfRenderOptions('bulk-export.pdf')).from(source).outputPdf('blob');
   } finally {
     frame.remove();
   }
@@ -3551,7 +3542,7 @@ async function downloadPdfFromDB(id, mode='quotation'){
   await downloadPdfForRecord(record, mode);
 }
 
-function renderPrintDoc(d, mode='quotation'){
+function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
   d = normalizeQuotationRecord(d);
   const cfg=getPrintModeConfig(mode);
   let sub=0;(d.rows||[]).forEach(r=>{sub+=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);});
@@ -3698,8 +3689,10 @@ function renderPrintDoc(d, mode='quotation'){
         </div>
       </div>
     </div>`;
-  document.getElementById('printDoc').innerHTML=html;
-  void drawPdfLogoCanvases(document.getElementById('printDoc'));
+  if (syncPreviewDom) {
+    document.getElementById('printDoc').innerHTML=html;
+    void drawPdfLogoCanvases(document.getElementById('printDoc'));
+  }
   return html;
 }
 
