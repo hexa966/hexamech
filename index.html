@@ -139,6 +139,10 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .product-table{width:100%;border-collapse:collapse;font-size:14px;}
 .product-table thead tr{background:var(--steel);}
 .product-table thead th{padding:10px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.9);text-align:left;white-space:nowrap;}
+.product-table thead th.header-editable-cell{padding-top:6px;padding-bottom:6px;}
+.product-table-head-input{width:100%;min-width:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:6px 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:#fff;text-align:center;outline:none;transition:border-color .18s,background .18s;box-sizing:border-box;}
+.product-table-head-input::placeholder{color:rgba(255,255,255,.45);}
+.product-table-head-input:focus{border-color:rgba(232,160,32,.75);background:rgba(255,255,255,.12);}
 .product-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
 .product-table tbody tr:hover{background:#f9fafc;}
 .product-table tbody td{padding:8px 12px;vertical-align:top;}
@@ -598,22 +602,11 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       <div class="section-card">
         <div class="section-header"><div class="s-num">3</div><h3>Product Specifications & Pricing</h3></div>
         <div class="section-body">
-          <div class="meta-row" style="grid-template-columns:1fr 1fr;margin-bottom:16px;">
-            <div class="field-group">
-              <label>PDF / Preview Qty Header</label>
-              <input type="text" id="pdfQtyHeader" value="No. of Cavity / Qty." placeholder="No. of Cavity / Qty.">
-            </div>
-            <div class="field-group">
-              <label>PDF / Preview Rate Header</label>
-              <input type="text" id="pdfRateHeader" value="Rate / Cavity" placeholder="Rate / Cavity">
-            </div>
-          </div>
-          <div class="customer-db-hint" style="margin-bottom:14px;">These two labels appear in quotation preview and PDF. New quotations keep the default wording unless you change it.</div>
           <div class="product-table-wrap">
             <table class="product-table">
               <thead><tr>
                 <th style="text-align:center;">Sr.</th><th>Product Specification / Description</th>
-                <th style="text-align:right;">No. of Cavity / Qty.</th><th style="text-align:right;">Rate Per Cavity (&#8377;)</th>
+                <th class="header-editable-cell" style="text-align:right;width:170px;"><input type="text" id="pdfQtyHeader" class="product-table-head-input" value="No. of Cavity / Qty." placeholder="No. of Cavity / Qty."></th><th class="header-editable-cell" style="text-align:right;width:170px;"><input type="text" id="pdfRateHeader" class="product-table-head-input" value="Rate / Cavity" placeholder="Rate / Cavity"></th>
                 <th style="text-align:right;">Total (&#8377;)</th><th style="width:32px;"></th>
               </tr></thead>
               <tbody id="productRows"></tbody>
