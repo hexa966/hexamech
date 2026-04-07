@@ -2271,7 +2271,8 @@ async function exportQuotationPdfsByFinancialYear() {
     showNotif('Only admin can export quotation PDFs.', 'error');
     return;
   }
-  if (typeof html2pdf === 'undefined') {
+  const { jsPdfCtor, canvasLib } = getPdfLibraries();
+  if (!jsPdfCtor || !canvasLib) {
     showNotif('PDF tool did not load. Please refresh and try again.', 'error');
     return;
   }
@@ -2301,21 +2302,34 @@ async function exportQuotationPdfsByFinancialYear() {
   setBulkQuotationPdfExportBusy(true, `Preparing 1 of ${records.length} PDFs for FY ${fyLabel}...`);
   try {
     const zip = new JSZip();
+    const failedQuotes = [];
     for (let i = 0; i < records.length; i++) {
       const record = normalizeQuotationRecord(records[i]);
       const quoteLabel = record.quoteNo || `Quotation-${i + 1}`;
       setBulkQuotationPdfExportBusy(true, `Preparing PDF ${i + 1} of ${records.length}: ${quoteLabel}`);
       await new Promise(resolve => setTimeout(resolve, 0));
-      const pdfBlob = await buildPdfBlobForRecord(record, 'quotation');
-      const pdfName = safeDownloadName(`${quoteLabel}-${record.custCompany || 'Quotation'}`) + '.pdf';
-      zip.file(pdfName, pdfBlob);
+      try {
+        const pdfBlob = await buildPdfBlobForRecord(record, 'quotation');
+        const pdfName = safeDownloadName(`${quoteLabel}-${record.custCompany || 'Quotation'}`) + '.pdf';
+        zip.file(pdfName, pdfBlob);
+      } catch (recordError) {
+        console.error('Quotation PDF export failed for', quoteLabel, recordError);
+        failedQuotes.push(quoteLabel);
+      }
+    }
+    if (!Object.keys(zip.files).length) {
+      throw new Error('PDF_EXPORT_ALL_FAILED');
     }
     setBulkQuotationPdfExportBusy(true, `Creating ZIP file for FY ${fyLabel}...`);
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const zipName = safeDownloadName(`Hexamech-Quotations-FY-${fyLabel}`) + '.zip';
     downloadBlobFile(zipBlob, zipName);
     setBulkQuotationPdfExportBusy(false, `Downloaded ${records.length} quotation PDF${records.length === 1 ? '' : 's'} for FY ${fyLabel}.`);
-    showNotif(`Downloaded ${records.length} quotation PDF${records.length === 1 ? '' : 's'} for FY ${fyLabel}.`);
+    if (failedQuotes.length) {
+      showNotif(`Downloaded ${records.length - failedQuotes.length} PDFs. Failed: ${failedQuotes.join(', ')}`, 'error');
+    } else {
+      showNotif(`Downloaded ${records.length} quotation PDF${records.length === 1 ? '' : 's'} for FY ${fyLabel}.`);
+    }
   } catch (e) {
     console.error('Bulk quotation PDF export failed:', e);
     setBulkQuotationPdfExportBusy(false, '');
@@ -3457,6 +3471,7 @@ async function buildJsPdfForRecord(record, mode='quotation') {
         windowWidth: captureWidth,
         windowHeight: captureHeight
       });
+      if (!canvas || !canvas.width || !canvas.height) throw new Error('PDF_CANVAS_EMPTY');
       const sliceHeight = Math.max(1, Math.floor(canvas.width * targetSliceRatio));
 
       for (let offsetY = 0; offsetY < canvas.height; offsetY += sliceHeight) {
@@ -3487,7 +3502,11 @@ async function buildJsPdfForRecord(record, mode='quotation') {
         const y = margin;
 
         if (pdfPageIndex > 0) pdf.addPage();
-        pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, y, renderWidth, renderHeight, undefined, 'FAST');
+        try {
+          pdf.addImage(sliceCanvas, 'JPEG', x, y, renderWidth, renderHeight, undefined, 'FAST');
+        } catch (_) {
+          pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, y, renderWidth, renderHeight, undefined, 'FAST');
+        }
         pdfPageIndex += 1;
       }
     }
@@ -3496,9 +3515,13 @@ async function buildJsPdfForRecord(record, mode='quotation') {
     prepared.host.remove();
   }
 }
+function pdfToBlob(pdf){
+  const arrayBuffer = pdf.output('arraybuffer');
+  return new Blob([arrayBuffer], { type:'application/pdf' });
+}
 async function buildPdfBlobForRecord(record, mode='quotation'){
   const pdf = await buildJsPdfForRecord(record, mode);
-  return pdf.output('blob');
+  return pdfToBlob(pdf);
 }
 async function downloadPdfForRecord(record, mode='quotation'){
   const { jsPdfCtor, canvasLib } = getPdfLibraries();
