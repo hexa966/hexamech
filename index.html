@@ -10,6 +10,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
@@ -2274,7 +2276,7 @@ async function exportQuotationPdfsByFinancialYear() {
     return;
   }
   try {
-    await ensurePdfLibrariesLoaded();
+    await ensurePdfMakeLoaded();
   } catch (_) {
     showNotif('PDF tool did not load. Please refresh and try again.', 'error');
     return;
@@ -3423,7 +3425,7 @@ function getPdfFilename(record, mode='quotation') {
 async function doPrint(){
   const record = currentPrintRecord ? normalizeQuotationRecord(currentPrintRecord) : gatherData();
   currentPrintRecord = record;
-  const ok = await downloadPdfForRecord(record, currentPrintMode);
+  const ok = await openPdfPreviewForRecord(record, currentPrintMode);
   if (!ok) {
     await doBrowserPrint();
   }
@@ -3433,11 +3435,19 @@ function getPdfLibraries() {
   const canvasLib = window.html2canvas || null;
   return { jsPdfCtor, canvasLib };
 }
+function getPdfMakeInstance() {
+  return window.pdfMake && typeof window.pdfMake.createPdf === 'function' ? window.pdfMake : null;
+}
 const PDF_LIBRARY_URLS = {
   html2canvas: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
   jspdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 };
+const PDFMAKE_LIBRARY_URLS = {
+  pdfmake: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js',
+  vfs: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js'
+};
 let pdfLibraryLoadPromise = null;
+let pdfMakeLoadPromise = null;
 function loadExternalScript(src) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -3466,6 +3476,24 @@ async function ensurePdfLibrariesLoaded() {
   const loadedLibraries = await pdfLibraryLoadPromise;
   if (!loadedLibraries.jsPdfCtor || !loadedLibraries.canvasLib) throw new Error('PDF_TOOL_MISSING');
   return loadedLibraries;
+}
+async function ensurePdfMakeLoaded() {
+  const currentPdfMake = getPdfMakeInstance();
+  if (currentPdfMake && currentPdfMake.vfs) return currentPdfMake;
+  if (!pdfMakeLoadPromise) {
+    pdfMakeLoadPromise = (async () => {
+      if (!getPdfMakeInstance()) await loadExternalScript(PDFMAKE_LIBRARY_URLS.pdfmake);
+      const loadedPdfMake = getPdfMakeInstance();
+      if (!loadedPdfMake?.vfs) await loadExternalScript(PDFMAKE_LIBRARY_URLS.vfs);
+      return getPdfMakeInstance();
+    })().catch(error => {
+      pdfMakeLoadPromise = null;
+      throw error;
+    });
+  }
+  const loadedPdfMake = await pdfMakeLoadPromise;
+  if (!loadedPdfMake || !loadedPdfMake.vfs) throw new Error('PDF_TOOL_MISSING');
+  return loadedPdfMake;
 }
 function createPdfCaptureRoot() {
   const host = document.createElement('div');
@@ -3568,27 +3596,457 @@ async function buildJsPdfForRecord(record, mode='quotation') {
     prepared.host.remove();
   }
 }
-function pdfToBlob(pdf){
-  const arrayBuffer = pdf.output('arraybuffer');
-  return new Blob([arrayBuffer], { type:'application/pdf' });
+function pdfTextValue(value, fallback='-') {
+  const text = String(value ?? '').trim();
+  return text || fallback;
+}
+function buildPdfMetaCell(label, value, highlight=false) {
+  return {
+    stack: [
+      { text: String(label || '').toUpperCase(), style:'pdfMetaLabel', alignment:'right' },
+      { text: pdfTextValue(value), style: highlight ? 'pdfMetaValueHighlight' : 'pdfMetaValue', alignment:'right' }
+    ],
+    fillColor:'#f4f4f4',
+    border:[false,false,false,false]
+  };
+}
+function buildPdfInfoCard(title, rows) {
+  return {
+    table: {
+      widths:[78, '*'],
+      body: [
+        [{ text:title, colSpan:2, style:'pdfCardTitle' }, {}],
+        ...rows.map(([label, value]) => [
+          { text: String(label || ''), style:'pdfInfoLabel' },
+          { text: pdfTextValue(value), style:'pdfInfoValue' }
+        ])
+      ]
+    },
+    layout: {
+      hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length ? 1 : 0),
+      vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length ? 1 : 0),
+      hLineColor: () => '#e0d8cf',
+      vLineColor: () => '#e0d8cf',
+      paddingLeft: () => 12,
+      paddingRight: () => 12,
+      paddingTop: i => i === 0 ? 12 : 4,
+      paddingBottom: (i, node) => i === 0 ? 8 : (i === node.table.body.length - 1 ? 12 : 4)
+    }
+  };
+}
+function buildPdfListItems(items) {
+  const normalizedItems = (Array.isArray(items) ? items : []).map(normalizeEditablePoint).filter(Boolean);
+  const listItems = normalizedItems.map(item => {
+    if (item.kind === 'group') {
+      const title = String(item.title || '').trim();
+      const subpoints = (item.subpoints || []).map(line => String(line ?? '').trim()).filter(Boolean);
+      const stack = [];
+      if (title) stack.push({ text:title, bold:true, color:'#2e2e2e', margin:[0,0,0,4] });
+      if (subpoints.length) {
+        stack.push({
+          ul: subpoints.map(line => ({ text:line, style:'pdfBulletText' })),
+          margin:[8,0,0,0]
+        });
+      }
+      return stack.length ? { stack, margin:[0,0,0,2] } : { text:'-', margin:[0,0,0,2] };
+    }
+    const title = String(item.title || '').trim();
+    const text = String(item.text || '').trim();
+    if (title) {
+      return {
+        text: [
+          { text:title + ': ', bold:true, color:'#2e2e2e' },
+          { text:text || '-' }
+        ],
+        margin:[0,0,0,2]
+      };
+    }
+    return { text:text || '-', margin:[0,0,0,2] };
+  });
+  return listItems.length ? listItems : [{ text:'-', margin:[0,0,0,2] }];
+}
+function buildPdfSectionCard(title, items, pageBreakBefore=false) {
+  return {
+    table: {
+      widths:['*'],
+      body: [[{
+        stack: [
+          { text:title, style:'pdfSectionHeader' },
+          { ol: buildPdfListItems(items), margin:[0,8,0,0] }
+        ]
+      }]]
+    },
+    layout: {
+      hLineWidth: () => 1,
+      vLineWidth: () => 1,
+      hLineColor: () => '#e0d8cf',
+      vLineColor: () => '#e0d8cf',
+      paddingLeft: () => 14,
+      paddingRight: () => 14,
+      paddingTop: () => 10,
+      paddingBottom: () => 10
+    },
+    pageBreak: pageBreakBefore ? 'before' : undefined,
+    margin:[0,0,0,14]
+  };
+}
+function getPdfDocumentData(record, mode='quotation') {
+  const d = normalizeQuotationRecord(record || {});
+  const cfg = getPrintModeConfig(mode);
+  let sub = 0;
+  (d.rows || []).forEach(r => { sub += (parseFloat(r.cavity) || 0) * (parseFloat(r.rate) || 0); });
+  const gstRate = parseFloat(d.gstRate) || 0;
+  const gst = sub * gstRate / 100;
+  const grand = sub + gst;
+  const userPhone = String(d.userPhone || currentUser?.contactPhone || '').trim();
+  const userEmail = String(d.userEmail || currentUser?.contactEmail || '').trim();
+  const companyPhone = userPhone || '+91 8866693972';
+  const companyEmail = userEmail || 'office@hexamech.com';
+  const companyGst = '24AAECH5305E1Z3';
+  const validityText = '15 days from date';
+  const documentNumber = cfg.mode === 'proforma'
+    ? String(d.quoteNo || '-').replace(/^Q/i, 'PI')
+    : String(d.quoteNo || '-');
+  const quoteDateValue = d.quoteDate ? new Date(String(d.quoteDate) + 'T00:00:00') : null;
+  const metaDate = quoteDateValue && !Number.isNaN(quoteDateValue.getTime())
+    ? quoteDateValue.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+    : '-';
+  const infoDate = quoteDateValue && !Number.isNaN(quoteDateValue.getTime())
+    ? quoteDateValue.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})
+    : '-';
+  return {
+    d,
+    cfg,
+    sub,
+    gstRate,
+    gst,
+    grand,
+    companyPhone,
+    companyEmail,
+    companyGst,
+    validityText,
+    documentNumber,
+    metaDate,
+    infoDate,
+    showSpecialFeatures: d.optionalSections?.specialFeatures !== false,
+    showTermsConditions: d.optionalSections?.termsConditions !== false,
+    createdBy: String(d.savedBy || currentUser?.displayName || currentUser?.username || 'Unknown').trim() || 'Unknown'
+  };
+}
+function buildPdfMakeDocumentDefinition(record, mode='quotation') {
+  const model = getPdfDocumentData(record, mode);
+  const { d, cfg } = model;
+  const rupeeSymbol = String.fromCodePoint(0x20B9);
+  const productTableBody = [[
+    { text:'#', style:'pdfTableHeader', alignment:'center', fillColor:'#c09b72' },
+    { text:'Product Specification', style:'pdfTableHeader', fillColor:'#c09b72' },
+    { text:'No. of Cavity / Qty.', style:'pdfTableHeader', alignment:'center', fillColor:'#c09b72' },
+    { text:'Rate / Cavity', style:'pdfTableHeader', alignment:'center', fillColor:'#c09b72' },
+    { text:'Total (' + rupeeSymbol + ')', style:'pdfTableHeader', alignment:'right', fillColor:'#c09b72' }
+  ]];
+  (d.rows || []).forEach((row, index) => {
+    const descLines = String(row?.desc || '-').split(/\r?\n/).filter(Boolean);
+    const mainDesc = descLines.shift() || '-';
+    const note = descLines.join('\n');
+    const lineTotal = (parseFloat(row?.cavity) || 0) * (parseFloat(row?.rate) || 0);
+    productTableBody.push([
+      { text:String(index + 1), style:'pdfTableCellMono', alignment:'center' },
+      {
+        stack: [
+          { text:mainDesc, style:'pdfTableCellStrong' },
+          ...(note ? [{ text:note, style:'pdfTableNote', margin:[0,3,0,0] }] : [])
+        ],
+        style:'pdfTableCell'
+      },
+      { text:pdfTextValue(row?.cavity, '0'), style:'pdfTableCell', alignment:'center' },
+      { text:rupeeSymbol + fmtNum(parseFloat(row?.rate) || 0), style:'pdfTableCell', alignment:'center' },
+      { text:rupeeSymbol + fmtNum(lineTotal), style:'pdfTableCellTotal', alignment:'right' }
+    ]);
+  });
+
+  const content = [
+    {
+      columns: [
+        {
+          width:'*',
+          columns: [
+            { image:PDF_MARK_SRC, width:42, margin:[0,0,12,0] },
+            { text:'HEXAMECH', style:'pdfBrandName', margin:[0,8,0,0] }
+          ],
+          columnGap:10
+        },
+        {
+          width:250,
+          stack: [
+            { text:'Hexamech Technology Pvt Ltd', style:'pdfCompanyName', alignment:'right' },
+            { text:'01, Mahavir Industrial Park-2, Kathwada Singarva Road', style:'pdfCompanyInfo', alignment:'right' },
+            { text:'Ahmedabad-382430, Gujarat, INDIA', style:'pdfCompanyInfo', alignment:'right' },
+            { text:'+91 ' + String(model.companyPhone).replace(/^\+91\s*/, '') + '  |  ' + model.companyEmail, style:'pdfCompanyInfo', alignment:'right' },
+            { text:'GST: ' + model.companyGst + '  |  www.hexamech.com', style:'pdfCompanyInfo', alignment:'right' }
+          ]
+        }
+      ],
+      margin:[0,0,0,12]
+    },
+    {
+      table: {
+        widths:['*', 90, 68, 78],
+        body: [[
+          { text:cfg.documentTitle, style:'pdfDocumentTitle', fillColor:'#f4f4f4', border:[false,false,false,false] },
+          buildPdfMetaCell(cfg.numberLabel, model.documentNumber, true),
+          buildPdfMetaCell('Date', model.metaDate),
+          buildPdfMetaCell('Validity', model.validityText)
+        ]]
+      },
+      layout: {
+        hLineWidth: i => i === 1 ? 1.5 : 0,
+        hLineColor: () => '#c09b72',
+        vLineWidth: () => 0,
+        paddingLeft: i => i === 0 ? 12 : 8,
+        paddingRight: () => 8,
+        paddingTop: () => 10,
+        paddingBottom: () => 10
+      },
+      margin:[0,0,0,14]
+    },
+    {
+      columns: [
+        buildPdfInfoCard('Customer Details', [
+          ['Company', d.custCompany || '-'],
+          ['Contact', d.custName || '-'],
+          ['Address', d.custAddress || '-'],
+          ['GST No.', d.custGST || '-'],
+          ['Phone', d.custPhone || '-'],
+          ['Email', d.custEmail || '-']
+        ]),
+        buildPdfInfoCard(cfg.infoTitle, [
+          [cfg.numberLabel, model.documentNumber],
+          ['Date', model.infoDate],
+          ['Valid For', model.validityText],
+          ['GST No.', model.companyGst]
+        ])
+      ],
+      columnGap:14,
+      margin:[0,0,0,14]
+    },
+    {
+      table: {
+        headerRows:1,
+        widths:[18, '*', 58, 70, 60],
+        body: productTableBody
+      },
+      layout: {
+        hLineWidth: i => i === 0 ? 0 : 1,
+        hLineColor: i => i === 1 ? '#c09b72' : '#e0d8cf',
+        vLineWidth: () => 0,
+        paddingLeft: () => 10,
+        paddingRight: () => 10,
+        paddingTop: i => i === 0 ? 9 : 10,
+        paddingBottom: i => i === 0 ? 9 : 10
+      },
+      margin:[0,0,0,12]
+    },
+    {
+      columns: [
+        { width:'*', text:'' },
+        {
+          width:220,
+          table: {
+            widths:['*', 'auto'],
+            body: [
+              [{ text:'Sub-Total', style:'pdfTotalLabel' }, { text:rupeeSymbol + fmtNum(model.sub), style:'pdfTotalValue', alignment:'right' }],
+              [{ text:'GST @ ' + model.gstRate + '%', style:'pdfTotalLabel' }, { text:rupeeSymbol + fmtNum(model.gst), style:'pdfTotalValue', alignment:'right' }],
+              [{ text:'Grand Total', style:'pdfGrandLabel' }, { text:rupeeSymbol + fmtNum(model.grand), style:'pdfGrandValue', alignment:'right' }]
+            ]
+          },
+          layout: {
+            hLineWidth: i => i === 2 ? 1.5 : (i === 3 ? 0 : 1),
+            hLineColor: i => i === 2 ? '#c09b72' : '#e0d8cf',
+            vLineWidth: () => 0,
+            paddingLeft: () => 0,
+            paddingRight: () => 0,
+            paddingTop: i => i === 2 ? 10 : 6,
+            paddingBottom: () => 6
+          }
+        }
+      ],
+      margin:[0,0,0,18]
+    },
+    {
+      columns: [
+        {
+          width:240,
+          table: {
+            widths:[68, '*'],
+            body: [
+              [{ text:'BANK DETAILS', colSpan:2, style:'pdfBankTitle' }, {}],
+              [{ text:'Bank', style:'pdfBankLabel' }, { text:'ICICI Bank Ltd - Hebatpur', style:'pdfBankValue' }],
+              [{ text:'A/C No.', style:'pdfBankLabel' }, { text:'439705000097', style:'pdfBankValue' }],
+              [{ text:'IFSC', style:'pdfBankLabel' }, { text:'ICIC0004397', style:'pdfBankValue' }],
+              [{ text:'GST', style:'pdfBankLabel' }, { text:model.companyGst, style:'pdfBankValue' }]
+            ]
+          },
+          layout: {
+            hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length ? 1 : 0),
+            vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length ? 1 : 0),
+            hLineColor: () => '#e0d8cf',
+            vLineColor: () => '#e0d8cf',
+            paddingLeft: () => 12,
+            paddingRight: () => 12,
+            paddingTop: i => i === 0 ? 10 : 3,
+            paddingBottom: (i, node) => i === 0 ? 8 : (i === node.table.body.length - 1 ? 10 : 3)
+          }
+        },
+        {
+          width:'*',
+          stack: [
+            { text:' ', margin:[0,20,0,0] },
+            {
+              canvas:[{ type:'line', x1:40, y1:0, x2:180, y2:0, lineWidth:1, lineColor:'#c09b72' }],
+              margin:[0,22,0,6]
+            },
+            { text:'Hexamech Technology Pvt Ltd', style:'pdfSignName', alignment:'center' },
+            { text:'Authorised Signatory', style:'pdfSignCaption', alignment:'center' }
+          ]
+        }
+      ],
+      columnGap:24
+    }
+  ];
+
+  let startedSecondPage = false;
+  if (model.showSpecialFeatures) {
+    content.push(buildPdfSectionCard('SPECIAL FEATURES INCLUSIVE WITH MOULD', d.specialFeaturesItems, !startedSecondPage));
+    startedSecondPage = true;
+  }
+  if (model.showTermsConditions) {
+    content.push(buildPdfSectionCard('TERMS & CONDITIONS', d.termsItems, !startedSecondPage));
+  }
+
+  return {
+    pageSize:'A4',
+    pageMargins:[24,24,24,30],
+    footer: currentPage => {
+      if (currentPage === 1) {
+        return {
+          margin:[24,0,24,12],
+          table: {
+            widths:['*', 'auto'],
+            body: [[
+              { text:'www.hexamech.com   |   office@hexamech.com', style:'pdfFooterBarText', fillColor:'#c09b72', border:[false,false,false,false] },
+              { text:'Valid for ' + model.validityText, style:'pdfFooterBarText', alignment:'right', fillColor:'#c09b72', border:[false,false,false,false] }
+            ]]
+          },
+          layout: {
+            hLineWidth: () => 0,
+            vLineWidth: () => 0,
+            paddingLeft: () => 12,
+            paddingRight: () => 12,
+            paddingTop: () => 7,
+            paddingBottom: () => 7
+          }
+        };
+      }
+      return {
+        margin:[24,0,24,12],
+        table: {
+          widths:['*', 'auto'],
+          body: [[
+            { text:'Created by: ' + model.createdBy, style:'pdfFooterMuted', border:[false,false,false,false] },
+            { text:'Hexamech Technology Pvt Ltd  |  www.hexamech.com', style:'pdfFooterMuted', alignment:'right', border:[false,false,false,false] }
+          ]]
+        },
+        layout:'noBorders'
+      };
+    },
+    content,
+    defaultStyle: {
+      font:'Roboto',
+      fontSize:10,
+      color:'#2e2e2e',
+      lineHeight:1.22
+    },
+    styles: {
+      pdfBrandName: { fontSize:20, bold:true, color:'#111111' },
+      pdfCompanyName: { fontSize:12.5, bold:true, color:'#111111' },
+      pdfCompanyInfo: { fontSize:9.6, color:'#666666', lineHeight:1.4 },
+      pdfDocumentTitle: { fontSize:17, bold:true, color:'#c09b72', characterSpacing:4 },
+      pdfMetaLabel: { fontSize:7.5, color:'#888888', characterSpacing:1 },
+      pdfMetaValue: { fontSize:10.5, bold:true, color:'#2e2e2e' },
+      pdfMetaValueHighlight: { fontSize:10.5, bold:true, color:'#a07d55' },
+      pdfCardTitle: { fontSize:8.5, bold:true, color:'#c09b72', characterSpacing:1.5 },
+      pdfInfoLabel: { fontSize:9.3, color:'#888888' },
+      pdfInfoValue: { fontSize:9.7, color:'#2e2e2e' },
+      pdfTableHeader: { fontSize:8.7, bold:true, color:'#ffffff' },
+      pdfTableCell: { fontSize:9.4, color:'#2e2e2e' },
+      pdfTableCellMono: { fontSize:9.2, color:'#6b6b6b' },
+      pdfTableCellStrong: { fontSize:9.4, bold:true, color:'#2e2e2e' },
+      pdfTableCellTotal: { fontSize:9.4, bold:true, color:'#a07d55' },
+      pdfTableNote: { fontSize:8.1, color:'#888888' },
+      pdfTotalLabel: { fontSize:9.4, color:'#6b6b6b' },
+      pdfTotalValue: { fontSize:9.4, color:'#6b6b6b' },
+      pdfGrandLabel: { fontSize:13, bold:true, color:'#2e2e2e' },
+      pdfGrandValue: { fontSize:13, bold:true, color:'#c09b72' },
+      pdfBankTitle: { fontSize:8.5, bold:true, color:'#a07d55', characterSpacing:1.4 },
+      pdfBankLabel: { fontSize:8.8, color:'#888888' },
+      pdfBankValue: { fontSize:8.8, color:'#666666' },
+      pdfSignName: { fontSize:9.4, bold:true, color:'#2e2e2e' },
+      pdfSignCaption: { fontSize:8.8, color:'#6b6b6b' },
+      pdfSectionHeader: { fontSize:9.8, bold:true, color:'#a07d55', characterSpacing:1.4 },
+      pdfBulletText: { fontSize:9.2, color:'#6b6b6b' },
+      pdfFooterBarText: { fontSize:8.4, color:'#ffffff' },
+      pdfFooterMuted: { fontSize:8.3, color:'#6b6b6b' }
+    }
+  };
+}
+function createPdfMakeDocument(record, mode='quotation') {
+  const pdfMake = getPdfMakeInstance();
+  if (!pdfMake) throw new Error('PDF_TOOL_MISSING');
+  return pdfMake.createPdf(buildPdfMakeDocumentDefinition(record, mode));
+}
+function pdfDocToBlob(pdfDoc) {
+  return new Promise((resolve, reject) => {
+    try {
+      pdfDoc.getBlob(blob => resolve(blob));
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 async function buildPdfBlobForRecord(record, mode='quotation'){
-  const pdf = await buildJsPdfForRecord(record, mode);
-  return pdfToBlob(pdf);
+  await ensurePdfMakeLoaded();
+  const cleanRecord = normalizeQuotationRecord(record || {});
+  const pdfDoc = createPdfMakeDocument(cleanRecord, mode);
+  return await pdfDocToBlob(pdfDoc);
 }
-async function downloadPdfForRecord(record, mode='quotation'){
-  try {
-    await ensurePdfLibrariesLoaded();
-  } catch (_) {
-    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
+async function openPdfPreviewForRecord(record, mode='quotation') {
+  const previewWindow = window.open('', '_blank');
+  if (!previewWindow) {
+    showNotif('Allow pop-ups to preview the PDF.', 'error');
     return false;
   }
+  previewWindow.document.write('<title>Preparing PDF...</title><div style="font-family:Segoe UI,Arial,sans-serif;padding:24px;color:#1a2535;">Preparing PDF preview...</div>');
+  previewWindow.document.close();
+  try {
+    const cleanRecord = normalizeQuotationRecord(record || {});
+    const blob = await buildPdfBlobForRecord(cleanRecord, mode);
+    const url = URL.createObjectURL(blob);
+    previewWindow.location.href = url;
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    return true;
+  } catch (e) {
+    console.error('PDF preview failed:', e);
+    try { previewWindow.close(); } catch (_) {}
+    showNotif('Could not open PDF preview.', 'error');
+    return false;
+  }
+}
+async function downloadPdfForRecord(record, mode='quotation'){
   const cleanRecord = normalizeQuotationRecord(record || {});
   const filename = getPdfFilename(cleanRecord, mode);
-
   try {
-    const pdf = await buildJsPdfForRecord(cleanRecord, mode);
-    pdf.save(filename);
+    const blob = await buildPdfBlobForRecord(cleanRecord, mode);
+    downloadBlobFile(blob, filename);
     showNotif('PDF downloaded.');
     return true;
   } catch (e) {
