@@ -3392,7 +3392,7 @@ function openPreview(mode='quotation', record=null){
   document.getElementById('printModal').classList.add('open');
 }
 function closePreview(){document.getElementById('printModal').classList.remove('open');}
-async function doPrint(){
+async function doBrowserPrint(){
   const src=document.getElementById('printDoc');
   let pc=document.getElementById('printContainer');
   if(!pc){pc=document.createElement('div');pc.id='printContainer';document.body.appendChild(pc);}
@@ -3411,6 +3411,22 @@ async function doPrint(){
   document.body.classList.remove('printing');
   document.title=originalTitle;
   pc.innerHTML='';
+}
+function getPdfFilename(record, mode='quotation') {
+  const cleanRecord = normalizeQuotationRecord(record || {});
+  const cfg = getPrintModeConfig(mode);
+  const documentNumber = cfg.mode === 'proforma'
+    ? String(cleanRecord.quoteNo || 'Document').replace(/^Q/i, 'PI')
+    : String(cleanRecord.quoteNo || 'Document');
+  return safeDownloadName(documentNumber + '-' + cfg.fileLabel) + '.pdf';
+}
+async function doPrint(){
+  const record = currentPrintRecord ? normalizeQuotationRecord(currentPrintRecord) : gatherData();
+  currentPrintRecord = record;
+  const ok = await downloadPdfForRecord(record, currentPrintMode);
+  if (!ok) {
+    await doBrowserPrint();
+  }
 }
 function getPdfLibraries() {
   const jsPdfCtor = window.jspdf?.jsPDF || window.jsPDF || null;
@@ -3565,22 +3581,20 @@ async function downloadPdfForRecord(record, mode='quotation'){
     await ensurePdfLibrariesLoaded();
   } catch (_) {
     showNotif('PDF tool did not load. Please refresh and try again.', 'error');
-    return;
+    return false;
   }
   const cleanRecord = normalizeQuotationRecord(record || {});
-  const cfg = getPrintModeConfig(mode);
-  const documentNumber = cfg.mode === 'proforma'
-    ? String(cleanRecord.quoteNo || 'Document').replace(/^Q/i, 'PI')
-    : String(cleanRecord.quoteNo || 'Document');
-  const filename = safeDownloadName(documentNumber + '-' + cfg.fileLabel) + '.pdf';
+  const filename = getPdfFilename(cleanRecord, mode);
 
   try {
     const pdf = await buildJsPdfForRecord(cleanRecord, mode);
     pdf.save(filename);
     showNotif('PDF downloaded.');
+    return true;
   } catch (e) {
     console.error('PDF download failed:', e);
     showNotif('Could not download PDF.', 'error');
+    return false;
   }
 }
 
