@@ -8,6 +8,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
@@ -2271,8 +2273,9 @@ async function exportQuotationPdfsByFinancialYear() {
     showNotif('Only admin can export quotation PDFs.', 'error');
     return;
   }
-  const { jsPdfCtor, canvasLib } = getPdfLibraries();
-  if (!jsPdfCtor || !canvasLib) {
+  try {
+    await ensurePdfLibrariesLoaded();
+  } catch (_) {
     showNotif('PDF tool did not load. Please refresh and try again.', 'error');
     return;
   }
@@ -3414,6 +3417,40 @@ function getPdfLibraries() {
   const canvasLib = window.html2canvas || null;
   return { jsPdfCtor, canvasLib };
 }
+const PDF_LIBRARY_URLS = {
+  html2canvas: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  jspdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+};
+let pdfLibraryLoadPromise = null;
+function loadExternalScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('SCRIPT_LOAD_FAILED'));
+    document.head.appendChild(script);
+  });
+}
+async function ensurePdfLibrariesLoaded() {
+  const currentLibraries = getPdfLibraries();
+  if (currentLibraries.jsPdfCtor && currentLibraries.canvasLib) return currentLibraries;
+  if (!pdfLibraryLoadPromise) {
+    pdfLibraryLoadPromise = (async () => {
+      const loaders = [];
+      if (!window.html2canvas) loaders.push(loadExternalScript(PDF_LIBRARY_URLS.html2canvas));
+      if (!(window.jspdf?.jsPDF || window.jsPDF)) loaders.push(loadExternalScript(PDF_LIBRARY_URLS.jspdf));
+      await Promise.all(loaders);
+      return getPdfLibraries();
+    })().catch(error => {
+      pdfLibraryLoadPromise = null;
+      throw error;
+    });
+  }
+  const loadedLibraries = await pdfLibraryLoadPromise;
+  if (!loadedLibraries.jsPdfCtor || !loadedLibraries.canvasLib) throw new Error('PDF_TOOL_MISSING');
+  return loadedLibraries;
+}
 function createPdfCaptureRoot() {
   const host = document.createElement('div');
   host.className = 'pdf-render-host';
@@ -3439,7 +3476,7 @@ async function preparePdfCapture(record, mode='quotation') {
   return { cfg, cleanRecord, host, root, pages };
 }
 async function buildJsPdfForRecord(record, mode='quotation') {
-  const { jsPdfCtor, canvasLib } = getPdfLibraries();
+  const { jsPdfCtor, canvasLib } = await ensurePdfLibrariesLoaded();
   if (!jsPdfCtor || !canvasLib) throw new Error('PDF_TOOL_MISSING');
   const prepared = await preparePdfCapture(record, mode);
   try {
@@ -3524,8 +3561,9 @@ async function buildPdfBlobForRecord(record, mode='quotation'){
   return pdfToBlob(pdf);
 }
 async function downloadPdfForRecord(record, mode='quotation'){
-  const { jsPdfCtor, canvasLib } = getPdfLibraries();
-  if (!jsPdfCtor || !canvasLib) {
+  try {
+    await ensurePdfLibrariesLoaded();
+  } catch (_) {
     showNotif('PDF tool did not load. Please refresh and try again.', 'error');
     return;
   }
