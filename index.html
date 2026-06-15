@@ -669,7 +669,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       </div>
       <div class="db-stats" style="grid-template-columns:repeat(2,1fr);">
         <div class="db-stat"><div class="dsl">Total Quotations</div><div class="dsv" id="statTotal">0</div></div>
-        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Syncing...</div><div class="dssub" id="statStorageSub">Connecting to Firebase...</div></div>
+        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Cloud ready</div><div class="dssub" id="statStorageSub">Secure backend connected</div></div>
       </div>
       <div class="db-table-wrap">
         <table class="db-table">
@@ -1246,6 +1246,14 @@ function hideOneDriveUiForBackend() {
   }
 }
 
+function showBackendReadyStatus() {
+  updateSyncBadge('synced');
+  const ss = document.getElementById('statStorage');
+  const sss = document.getElementById('statStorageSub');
+  if (ss) ss.textContent = 'Cloud ready';
+  if (sss) sss.textContent = 'Secure backend connected';
+}
+
 async function detectBackendMode() {
   if (backendChecked) return backendMode;
   backendChecked = true;
@@ -1263,7 +1271,10 @@ async function detectBackendMode() {
   } catch (e) {
     backendMode = false;
   }
-  if (backendMode) hideOneDriveUiForBackend();
+  if (backendMode) {
+    hideOneDriveUiForBackend();
+    showBackendReadyStatus();
+  }
   return backendMode;
 }
 
@@ -1273,6 +1284,7 @@ async function syncStateToBackend() {
     method: 'PUT',
     body: JSON.stringify(getStateSnapshot())
   });
+  showBackendReadyStatus();
   return true;
 }
 
@@ -1280,6 +1292,7 @@ async function loadStateFromBackend() {
   if (!backendMode || !apiAuthToken) return false;
   const data = await apiRequest('/api/state', { method: 'GET' });
   applyStateSnapshot(data.state || {});
+  showBackendReadyStatus();
   return true;
 }
 async function restoreBackendSession() {
@@ -1782,6 +1795,7 @@ function launchApp() {
   renderUserList();
   // Auto-sync from cloud on every login
   if (backendMode) {
+    showBackendReadyStatus();
     if (!backendRefreshTimer) {
       backendRefreshTimer = setInterval(async () => {
         const ok = await loadStateFromBackend();
@@ -4373,6 +4387,7 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
 // -------------------------------------------
 
 function showReconnectBar() {
+  if (backendMode) return;
   if (document.getElementById('reconnectBar')) return;
   const bar = document.createElement('div');
   bar.id = 'reconnectBar';
