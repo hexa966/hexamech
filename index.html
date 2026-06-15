@@ -1180,6 +1180,8 @@ let customerSuggestionCloseTimer = null;
 let backendMode = false;
 let backendChecked = false;
 let apiAuthToken = localStorage.getItem('hx_api_token') || '';
+const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || '').replace(/\/+$/, '');
+let backendRefreshTimer = null;
 
 function getStateSnapshot() {
   return {
@@ -1205,7 +1207,7 @@ function shouldSeedCloudUsers(remoteState) {
 async function apiRequest(path, options = {}, includeAuth = true) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (includeAuth && apiAuthToken) headers.Authorization = 'Bearer ' + apiAuthToken;
-  const response = await fetch(path, { ...options, headers });
+  const response = await fetch((BACKEND_API_BASE || '') + path, { ...options, headers });
   const text = await response.text();
   let data = {};
   try { data = text ? JSON.parse(text) : {}; } catch (e) {}
@@ -1243,13 +1245,12 @@ function hideOneDriveUiForBackend() {
 async function detectBackendMode() {
   if (backendChecked) return backendMode;
   backendChecked = true;
-  // On GitHub Pages / static hosting there is no backend server
-  // Skip the health check entirely - always use OneDrive mode
+  // Static hosts need BACKEND_API_BASE/localStorage hx_api_base to point to the deployed server.
   const isStatic = location.protocol === 'https:' && 
                    (location.hostname.includes('github.io') || 
                     location.hostname.includes('netlify.app') ||
                     !location.hostname.includes('localhost'));
-  if (isStatic) { backendMode = false; return false; }
+  if (isStatic && !BACKEND_API_BASE) { backendMode = false; return false; }
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 1500);
@@ -1285,6 +1286,7 @@ async function restoreBackendSession() {
     username: data.user.username,
     displayName: data.user.displayName,
     role: data.user.role,
+    group: data.user.group || '',
     canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
     contactPhone: data.user.contactPhone || '',
     contactEmail: data.user.contactEmail || ''
@@ -1681,6 +1683,33 @@ async function doLogin() {
   const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
 
+  if (await detectBackendMode()) {
+    try {
+      const data = await apiRequest('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({ username: u, password: p })
+      }, false);
+      apiAuthToken = data.token || '';
+      localStorage.setItem('hx_api_token', apiAuthToken);
+      applyStateSnapshot(data.state || {});
+      currentUser = {
+        username: data.user.username,
+        displayName: data.user.displayName,
+        role: data.user.role,
+        group: data.user.group || '',
+        canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
+        contactPhone: data.user.contactPhone || '',
+        contactEmail: data.user.contactEmail || ''
+      };
+      err.style.display = 'none';
+      launchApp();
+    } catch(e) {
+      err.textContent = e.message || 'Invalid username or password.';
+      err.style.display = 'block';
+    }
+    return;
+  }
+
   // Pull latest users from cloud (5s timeout so login is never stuck)
   try {
     await Promise.race([cloudSync(), new Promise(r => setTimeout(r, 5000))]);
@@ -1725,6 +1754,10 @@ function doLogout() {
   currentUser = null; msalAccount = null; odToken = null;
   apiAuthToken = '';
   localStorage.removeItem('hx_api_token');
+  if (backendRefreshTimer) {
+    clearInterval(backendRefreshTimer);
+    backendRefreshTimer = null;
+  }
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
@@ -1744,7 +1777,18 @@ function launchApp() {
   showView('db');
   renderUserList();
   // Auto-sync from cloud on every login
-  if (backendMode) return;
+  if (backendMode) {
+    if (!backendRefreshTimer) {
+      backendRefreshTimer = setInterval(async () => {
+        const ok = await loadStateFromBackend();
+        if (ok) {
+          if (document.getElementById('dbView').style.display !== 'none') renderDB();
+          renderUserList(); renderCustomerDropdown(); renderCustomersView(); renderBulkQuotationPdfExportOptions();
+        }
+      }, 5000);
+    }
+    return;
+  }
   (async () => {
     updateSyncBadge('syncing');
     const ok = await cloudSync();
@@ -2620,6 +2664,25 @@ async function changeMyPassword() {
   const current = document.getElementById('cpCurrent').value;
   const newPw = document.getElementById('cpNew').value;
   const confirm = document.getElementById('cpConfirm').value;
+
+  if (backendMode) {
+    if (newPw.length < 6) { showNotif('New password must be at least 6 characters.', 'error'); return; }
+    if (newPw !== confirm) { showNotif('New passwords do not match.', 'error'); return; }
+    try {
+      const data = await apiRequest('/api/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ currentPassword: current, newPassword: newPw })
+      });
+      applyStateSnapshot(data.state || getStateSnapshot());
+      document.getElementById('cpCurrent').value = '';
+      document.getElementById('cpNew').value = '';
+      document.getElementById('cpConfirm').value = '';
+      showNotif('Password changed successfully!');
+    } catch(e) {
+      showNotif(e.message || 'Password could not be changed.', 'error');
+    }
+    return;
+  }
 
   const user = findUser(currentUser.username) || findDefaultUser(currentUser.username);
   if (!user) { showNotif('User not found.', 'error'); return; }
@@ -4402,7 +4465,16 @@ async function startup() {
     });
   }
 
-  // No backend, no OAuth - just show login. Cloud syncs after sign-in.
+  const hasBackend = await detectBackendMode();
+  if (hasBackend && apiAuthToken) {
+    try {
+      await restoreBackendSession();
+      launchApp();
+    } catch(e) {
+      apiAuthToken = '';
+      localStorage.removeItem('hx_api_token');
+    }
+  }
 }
 
 // Run immediately and also on DOMContentLoaded as fallback
