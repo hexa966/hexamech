@@ -1180,7 +1180,8 @@ let customerSuggestionCloseTimer = null;
 let backendMode = false;
 let backendChecked = false;
 let apiAuthToken = localStorage.getItem('hx_api_token') || '';
-const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || '').replace(/\/+$/, '');
+const DEFAULT_BACKEND_API_BASE = 'https://hexamech-backend.onrender.com';
+const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || DEFAULT_BACKEND_API_BASE).replace(/\/+$/, '');
 let backendRefreshTimer = null;
 
 function getStateSnapshot() {
@@ -1224,9 +1225,12 @@ function hideOneDriveUiForBackend() {
   const msSignInBtn = document.getElementById('msSignInBtn');
   const loginCloudStatus = document.getElementById('loginCloudStatus');
   const loginSub = document.getElementById('loginSub');
-  if (syncBadge) syncBadge.style.display = 'none';
-  if (syncIcon) syncIcon.textContent = 'DB';
-  if (syncText) syncText.textContent = 'Server Database';
+  if (syncBadge) {
+    syncBadge.style.display = '';
+    syncBadge.className = 'sync-badge synced';
+  }
+  if (syncIcon) syncIcon.textContent = 'OK';
+  if (syncText) syncText.textContent = 'Cloud ready';
   if (odBanner) odBanner.style.display = 'none';
   if (loginDivider) loginDivider.style.display = 'none';
   if (msSignInBtn) msSignInBtn.style.display = 'none';
