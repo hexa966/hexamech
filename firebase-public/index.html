@@ -398,6 +398,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .qh-table tbody td:last-child{font-weight:700;color:#a07d55;}
 .qh-table-note{display:block;font-size:10.1px;color:#888;margin-top:4px;white-space:pre-line;}
 .qh-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:18px;}
+.qh-totals-wrap-page{margin-bottom:20px;}
 .qh-total-box{width:230px;}
 .qh-total-row{display:flex;justify-content:space-between;padding:6px 0;font-size:11.1px;border-bottom:1px solid #e0d8cf;color:#6b6b6b;}
 .qh-total-row.grand{border:none;border-top:2px solid #c09b72;padding-top:10px;font-weight:800;font-size:14.8px;color:#2e2e2e;}
@@ -4229,8 +4230,7 @@ function getPdfProductDetailMetrics(rows) {
 }
 function shouldMoveBankSectionToSecondPage(rows) {
   const metrics = getPdfProductDetailMetrics(rows);
-  const estimatedFirstPageLoad = (metrics.rowCount * 1.3) + (metrics.detailLines * 0.65) + (metrics.maxLines >= 6 ? 2 : 0);
-  return estimatedFirstPageLoad >= 21 || metrics.rowCount >= 13 || metrics.maxLines >= 7;
+  return metrics.detailLines >= 8 || metrics.rowCount >= 9 || metrics.maxLines >= 5;
 }
 function buildPdfBankDetailsBlock(model, pageBreakBefore=false) {
   return {
@@ -4584,16 +4584,9 @@ function pdfToBlob(pdf){
 }
 async function buildPdfBlobForRecord(record, mode='quotation'){
   const cleanRecord = normalizeQuotationRecord(record || {});
-  try {
-    await ensurePdfMakeLoaded();
-    const pdfDoc = createPdfMakeDocument(cleanRecord, mode);
-    return await pdfMakeDocumentToBlob(pdfDoc);
-  } catch (pdfMakeError) {
-    console.warn('Falling back to canvas PDF rendering:', pdfMakeError);
-    await ensurePdfLibrariesLoaded();
-    const pdf = await buildJsPdfForRecord(cleanRecord, mode);
-    return pdfToBlob(pdf);
-  }
+  await ensurePdfLibrariesLoaded();
+  const pdf = await buildJsPdfForRecord(cleanRecord, mode);
+  return pdfToBlob(pdf);
 }
 async function openPdfPreviewForRecord(record, mode='quotation') {
   const previewWindow = window.open('', '_blank');
@@ -4724,10 +4717,17 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
   const rateHeaderText = normalizePdfHeaderValue(d.pdfRateHeader, DEFAULT_PDF_RATE_HEADER);
   const showSpecialFeatures = d.optionalSections?.specialFeatures !== false;
   const showTermsConditions = d.optionalSections?.termsConditions !== false;
-  const moveBankSectionToSecondPage = shouldMoveBankSectionToSecondPage(d.rows);
-  const shouldRenderSecondPage = moveBankSectionToSecondPage || showSpecialFeatures || showTermsConditions;
+  const moveSummarySectionToSecondPage = shouldMoveBankSectionToSecondPage(d.rows);
+  const shouldRenderSecondPage = moveSummarySectionToSecondPage || showSpecialFeatures || showTermsConditions;
   const specialFeaturesHtml = renderPrintList(d.specialFeaturesItems);
   const termsHtml = renderPrintList(d.termsItems);
+  const buildTotalsHtml = extraClass => `<div class="qh-totals-wrap${extraClass ? ` ${extraClass}` : ''}">
+            <div class="qh-total-box">
+              <div class="qh-total-row"><span>Sub-Total</span><span>&#8377;${fmtNum(sub)}</span></div>
+              <div class="qh-total-row"><span>GST @ ${gstRate}%</span><span>&#8377;${fmtNum(gst)}</span></div>
+              <div class="qh-total-row grand"><span>Grand Total</span><span>&#8377;${fmtNum(grand)}</span></div>
+            </div>
+          </div>`;
   const buildBankDetailsHtml = extraClass => `<div class="qh-bottom-row${extraClass ? ` ${extraClass}` : ''}">
             <div class="qh-bank-box">
               <h5>Bank Details</h5>
@@ -4814,14 +4814,8 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
             </thead>
             <tbody>${rowsHtml}</tbody>
           </table>
-          <div class="qh-totals-wrap">
-            <div class="qh-total-box">
-              <div class="qh-total-row"><span>Sub-Total</span><span>&#8377;${fmtNum(sub)}</span></div>
-              <div class="qh-total-row"><span>GST @ ${gstRate}%</span><span>&#8377;${fmtNum(gst)}</span></div>
-              <div class="qh-total-row grand"><span>Grand Total</span><span>&#8377;${fmtNum(grand)}</span></div>
-            </div>
-          </div>
-          ${!moveBankSectionToSecondPage ? buildBankDetailsHtml('qh-bottom-row-inline') : ''}
+          ${!moveSummarySectionToSecondPage ? buildTotalsHtml('qh-totals-inline') : ''}
+          ${!moveSummarySectionToSecondPage ? buildBankDetailsHtml('qh-bottom-row-inline') : ''}
         </div>
         <div class="qh-footer">
           <p>www.hexamech.com &nbsp;|&nbsp; office@hexamech.com</p>
@@ -4831,7 +4825,8 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
 
       ${shouldRenderSecondPage ? `<div class="qh-page qh-page-break">
         <div class="qh-second-body">
-          ${moveBankSectionToSecondPage ? buildBankDetailsHtml('qh-bottom-row-page') : ''}
+          ${moveSummarySectionToSecondPage ? buildTotalsHtml('qh-totals-wrap-page') : ''}
+          ${moveSummarySectionToSecondPage ? buildBankDetailsHtml('qh-bottom-row-page') : ''}
           ${showSpecialFeatures ? `<div class="qh-section-card">
             <div class="qh-section-head">Special Features Inclusive with Mould</div>
             <div class="qh-section-body">
