@@ -403,6 +403,8 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .qh-total-row.grand{border:none;border-top:2px solid #c09b72;padding-top:10px;font-weight:800;font-size:14.8px;color:#2e2e2e;}
 .qh-total-row.grand span:last-child{color:#c09b72;}
 .qh-bottom-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:22px;}
+.qh-bottom-row-inline{margin-top:auto;}
+.qh-bottom-row-page{align-items:flex-start;padding-top:6px;}
 .qh-bank-box{background:#f4f4f4;border-radius:6px;padding:12px 14px;border:1px solid #e0d8cf;min-width:280px;max-width:360px;}
 .qh-bank-box h5{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#a07d55;margin-bottom:8px;}
 .qh-bank-row{font-size:10.6px;color:#6b6b6b;display:flex;gap:8px;margin-bottom:3px;}
@@ -4216,6 +4218,65 @@ function buildPdfSectionCard(title, items, pageBreakBefore=false) {
     margin:[0,0,0,14]
   };
 }
+function getPdfProductDetailMetrics(rows) {
+  return (Array.isArray(rows) ? rows : []).reduce((metrics, row) => {
+    const lineCount = Math.max(1, String(row?.desc || '-').split(/\r?\n/).filter(Boolean).length);
+    metrics.rowCount += 1;
+    metrics.detailLines += Math.max(0, lineCount - 1);
+    metrics.maxLines = Math.max(metrics.maxLines, lineCount);
+    return metrics;
+  }, { rowCount:0, detailLines:0, maxLines:0 });
+}
+function shouldMoveBankSectionToSecondPage(rows) {
+  const metrics = getPdfProductDetailMetrics(rows);
+  const estimatedFirstPageLoad = (metrics.rowCount * 1.3) + (metrics.detailLines * 0.65) + (metrics.maxLines >= 6 ? 2 : 0);
+  return estimatedFirstPageLoad >= 21 || metrics.rowCount >= 13 || metrics.maxLines >= 7;
+}
+function buildPdfBankDetailsBlock(model, pageBreakBefore=false) {
+  return {
+    columns: [
+      {
+        width:240,
+        table: {
+          widths:[68, '*'],
+          body: [
+            [{ text:'BANK DETAILS', colSpan:2, style:'pdfBankTitle' }, {}],
+            [{ text:'Bank', style:'pdfBankLabel' }, { text:'ICICI Bank Ltd - Hebatpur', style:'pdfBankValue' }],
+            [{ text:'A/C No.', style:'pdfBankLabel' }, { text:'439705000097', style:'pdfBankValue' }],
+            [{ text:'IFSC', style:'pdfBankLabel' }, { text:'ICIC0004397', style:'pdfBankValue' }],
+            [{ text:'GST', style:'pdfBankLabel' }, { text:model.companyGst, style:'pdfBankValue' }]
+          ]
+        },
+        layout: {
+          hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length ? 1 : 0),
+          vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length ? 1 : 0),
+          hLineColor: () => '#e0d8cf',
+          vLineColor: () => '#e0d8cf',
+          paddingLeft: () => 12,
+          paddingRight: () => 12,
+          paddingTop: i => i === 0 ? 10 : 3,
+          paddingBottom: (i, node) => i === 0 ? 8 : (i === node.table.body.length - 1 ? 10 : 3)
+        }
+      },
+      {
+        width:'*',
+        stack: [
+          { text:' ', margin:[0,20,0,0] },
+          {
+            canvas:[{ type:'line', x1:40, y1:0, x2:180, y2:0, lineWidth:1, lineColor:'#c09b72' }],
+            margin:[0,22,0,6]
+          },
+          { text:'Hexamech Technology Pvt Ltd', style:'pdfSignName', alignment:'center' },
+          { text:'Authorised Signatory', style:'pdfSignCaption', alignment:'center' }
+        ]
+      }
+    ],
+    columnGap:24,
+    margin:[0,0,0,14],
+    pageBreak: pageBreakBefore ? 'before' : undefined,
+    unbreakable:true
+  };
+}
 function getPdfDocumentData(record, mode='quotation') {
   const d = normalizeQuotationRecord(record || {});
   const cfg = getPrintModeConfig(mode);
@@ -4360,6 +4421,8 @@ function buildPdfMakeDocumentDefinition(record, mode='quotation') {
     {
       table: {
         headerRows:1,
+        dontBreakRows:true,
+        keepWithHeaderRows:1,
         widths:[18, '*', 58, 70, 60],
         body: productTableBody
       },
@@ -4398,62 +4461,23 @@ function buildPdfMakeDocumentDefinition(record, mode='quotation') {
           }
         }
       ],
-      margin:[0,0,0,18]
-    },
-    {
-      columns: [
-        {
-          width:240,
-          table: {
-            widths:[68, '*'],
-            body: [
-              [{ text:'BANK DETAILS', colSpan:2, style:'pdfBankTitle' }, {}],
-              [{ text:'Bank', style:'pdfBankLabel' }, { text:'ICICI Bank Ltd - Hebatpur', style:'pdfBankValue' }],
-              [{ text:'A/C No.', style:'pdfBankLabel' }, { text:'439705000097', style:'pdfBankValue' }],
-              [{ text:'IFSC', style:'pdfBankLabel' }, { text:'ICIC0004397', style:'pdfBankValue' }],
-              [{ text:'GST', style:'pdfBankLabel' }, { text:model.companyGst, style:'pdfBankValue' }]
-            ]
-          },
-          layout: {
-            hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length ? 1 : 0),
-            vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length ? 1 : 0),
-            hLineColor: () => '#e0d8cf',
-            vLineColor: () => '#e0d8cf',
-            paddingLeft: () => 12,
-            paddingRight: () => 12,
-            paddingTop: i => i === 0 ? 10 : 3,
-            paddingBottom: (i, node) => i === 0 ? 8 : (i === node.table.body.length - 1 ? 10 : 3)
-          }
-        },
-        {
-          width:'*',
-          stack: [
-            { text:' ', margin:[0,20,0,0] },
-            {
-              canvas:[{ type:'line', x1:40, y1:0, x2:180, y2:0, lineWidth:1, lineColor:'#c09b72' }],
-              margin:[0,22,0,6]
-            },
-            { text:'Hexamech Technology Pvt Ltd', style:'pdfSignName', alignment:'center' },
-            { text:'Authorised Signatory', style:'pdfSignCaption', alignment:'center' }
-          ]
-        }
-      ],
-      columnGap:24
+      margin:[0,0,0,18],
+      unbreakable:true
     }
   ];
 
-  let startedSecondPage = false;
+  content.push(buildPdfBankDetailsBlock(model));
+
   if (model.showSpecialFeatures) {
-    content.push(buildPdfSectionCard('SPECIAL FEATURES INCLUSIVE WITH MOULD', d.specialFeaturesItems, !startedSecondPage));
-    startedSecondPage = true;
+    content.push(buildPdfSectionCard('SPECIAL FEATURES INCLUSIVE WITH MOULD', d.specialFeaturesItems));
   }
   if (model.showTermsConditions) {
-    content.push(buildPdfSectionCard('TERMS & CONDITIONS', d.termsItems, !startedSecondPage));
+    content.push(buildPdfSectionCard('TERMS & CONDITIONS', d.termsItems));
   }
 
   return {
     pageSize:'A4',
-    pageMargins:[24,24,24,30],
+    pageMargins:[24,24,24,42],
     footer: currentPage => {
       if (currentPage === 1) {
         return {
@@ -4532,15 +4556,44 @@ function createPdfMakeDocument(record, mode='quotation') {
   if (!pdfMake) throw new Error('PDF_TOOL_MISSING');
   return pdfMake.createPdf(buildPdfMakeDocumentDefinition(record, mode));
 }
+function pdfMakeDocumentToBlob(pdfDoc) {
+  return new Promise((resolve, reject) => {
+    try {
+      pdfDoc.getBlob(blob => {
+        if (blob) resolve(blob);
+        else reject(new Error('PDF_BLOB_FAILED'));
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+function triggerPdfBlobDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
 function pdfToBlob(pdf){
   const arrayBuffer = pdf.output('arraybuffer');
   return new Blob([arrayBuffer], { type:'application/pdf' });
 }
 async function buildPdfBlobForRecord(record, mode='quotation'){
-  await ensurePdfLibrariesLoaded();
   const cleanRecord = normalizeQuotationRecord(record || {});
-  const pdf = await buildJsPdfForRecord(cleanRecord, mode);
-  return pdfToBlob(pdf);
+  try {
+    await ensurePdfMakeLoaded();
+    const pdfDoc = createPdfMakeDocument(cleanRecord, mode);
+    return await pdfMakeDocumentToBlob(pdfDoc);
+  } catch (pdfMakeError) {
+    console.warn('Falling back to canvas PDF rendering:', pdfMakeError);
+    await ensurePdfLibrariesLoaded();
+    const pdf = await buildJsPdfForRecord(cleanRecord, mode);
+    return pdfToBlob(pdf);
+  }
 }
 async function openPdfPreviewForRecord(record, mode='quotation') {
   const previewWindow = window.open('', '_blank');
@@ -4565,17 +4618,11 @@ async function openPdfPreviewForRecord(record, mode='quotation') {
   }
 }
 async function downloadPdfForRecord(record, mode='quotation'){
-  try {
-    await ensurePdfLibrariesLoaded();
-  } catch (_) {
-    showNotif('PDF tool did not load. Please refresh and try again.', 'error');
-    return false;
-  }
   const cleanRecord = normalizeQuotationRecord(record || {});
   const filename = getPdfFilename(cleanRecord, mode);
   try {
-    const pdf = await buildJsPdfForRecord(cleanRecord, mode);
-    pdf.save(filename);
+    const blob = await buildPdfBlobForRecord(cleanRecord, mode);
+    triggerPdfBlobDownload(blob, filename);
     showNotif('PDF downloaded.');
     return true;
   } catch (e) {
@@ -4677,8 +4724,26 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
   const rateHeaderText = normalizePdfHeaderValue(d.pdfRateHeader, DEFAULT_PDF_RATE_HEADER);
   const showSpecialFeatures = d.optionalSections?.specialFeatures !== false;
   const showTermsConditions = d.optionalSections?.termsConditions !== false;
+  const moveBankSectionToSecondPage = shouldMoveBankSectionToSecondPage(d.rows);
+  const shouldRenderSecondPage = moveBankSectionToSecondPage || showSpecialFeatures || showTermsConditions;
   const specialFeaturesHtml = renderPrintList(d.specialFeaturesItems);
   const termsHtml = renderPrintList(d.termsItems);
+  const buildBankDetailsHtml = extraClass => `<div class="qh-bottom-row${extraClass ? ` ${extraClass}` : ''}">
+            <div class="qh-bank-box">
+              <h5>Bank Details</h5>
+              <div class="qh-bank-row"><span>Bank</span><span>ICICI Bank Ltd - Hebatpur</span></div>
+              <div class="qh-bank-row"><span>A/C No.</span><span>439705000097</span></div>
+              <div class="qh-bank-row"><span>IFSC</span><span>ICIC0004397</span></div>
+              <div class="qh-bank-row"><span>GST</span><span>${companyGst}</span></div>
+            </div>
+            <div class="qh-sign">
+              <div class="qh-sign-gap"></div>
+              <div class="qh-sign-line">
+                <p class="name">Hexamech Technology Pvt Ltd</p>
+                <p>Authorised Signatory</p>
+              </div>
+            </div>
+          </div>`;
   const rowsHtml=(d.rows||[]).map((r,i)=>{
     const t=(parseFloat(r.cavity)||0)*(parseFloat(r.rate)||0);
     const descLines=String(r.desc||'-').split('\n').filter(Boolean);
@@ -4756,22 +4821,7 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
               <div class="qh-total-row grand"><span>Grand Total</span><span>&#8377;${fmtNum(grand)}</span></div>
             </div>
           </div>
-          <div class="qh-bottom-row">
-            <div class="qh-bank-box">
-              <h5>Bank Details</h5>
-              <div class="qh-bank-row"><span>Bank</span><span>ICICI Bank Ltd - Hebatpur</span></div>
-              <div class="qh-bank-row"><span>A/C No.</span><span>439705000097</span></div>
-              <div class="qh-bank-row"><span>IFSC</span><span>ICIC0004397</span></div>
-              <div class="qh-bank-row"><span>GST</span><span>${companyGst}</span></div>
-            </div>
-            <div class="qh-sign">
-              <div class="qh-sign-gap"></div>
-              <div class="qh-sign-line">
-                <p class="name">Hexamech Technology Pvt Ltd</p>
-                <p>Authorised Signatory</p>
-              </div>
-            </div>
-          </div>
+          ${!moveBankSectionToSecondPage ? buildBankDetailsHtml('qh-bottom-row-inline') : ''}
         </div>
         <div class="qh-footer">
           <p>www.hexamech.com &nbsp;|&nbsp; office@hexamech.com</p>
@@ -4779,8 +4829,9 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
         </div>
       </div>
 
-      <div class="qh-page qh-page-break">
+      ${shouldRenderSecondPage ? `<div class="qh-page qh-page-break">
         <div class="qh-second-body">
+          ${moveBankSectionToSecondPage ? buildBankDetailsHtml('qh-bottom-row-page') : ''}
           ${showSpecialFeatures ? `<div class="qh-section-card">
             <div class="qh-section-head">Special Features Inclusive with Mould</div>
             <div class="qh-section-body">
@@ -4799,7 +4850,7 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
           <p>Created by: ${esc(d.savedBy || currentUser?.displayName || currentUser?.username || 'Unknown')}</p>
           <p><strong>Hexamech Technology Pvt Ltd</strong> &nbsp;|&nbsp; www.hexamech.com</p>
         </div>
-      </div>
+      </div>` : ''}
     </div>`;
   if (syncPreviewDom) {
     document.getElementById('printDoc').innerHTML=html;
