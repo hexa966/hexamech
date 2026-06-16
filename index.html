@@ -1182,6 +1182,7 @@ let backendChecked = false;
 let apiAuthToken = localStorage.getItem('hx_api_token') || '';
 const DEFAULT_BACKEND_API_BASE = 'https://hexamech-backend.onrender.com';
 const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || DEFAULT_BACKEND_API_BASE).replace(/\/+$/, '');
+const BACKEND_REQUIRED = !!BACKEND_API_BASE;
 let backendRefreshTimer = null;
 
 function getStateSnapshot() {
@@ -1257,6 +1258,12 @@ function showBackendReadyStatus() {
 async function detectBackendMode() {
   if (backendChecked) return backendMode;
   backendChecked = true;
+  if (BACKEND_REQUIRED) {
+    backendMode = true;
+    hideOneDriveUiForBackend();
+    showBackendReadyStatus();
+    return true;
+  }
   // Static hosts need BACKEND_API_BASE/localStorage hx_api_base to point to the deployed server.
   const isStatic = location.protocol === 'https:' && 
                    (location.hostname.includes('github.io') || 
