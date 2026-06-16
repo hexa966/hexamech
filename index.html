@@ -669,7 +669,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
       </div>
       <div class="db-stats" style="grid-template-columns:repeat(2,1fr);">
         <div class="db-stat"><div class="dsl">Total Quotations</div><div class="dsv" id="statTotal">0</div></div>
-        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Cloud ready</div><div class="dssub" id="statStorageSub">Secure backend connected</div></div>
+        <div class="db-stat"><div class="dsl">Storage</div><div class="dsv" id="statStorage" style="font-size:15px;padding-top:3px;">Syncing...</div><div class="dssub" id="statStorageSub">Connecting to Firebase...</div></div>
       </div>
       <div class="db-table-wrap">
         <table class="db-table">
@@ -1180,10 +1180,6 @@ let customerSuggestionCloseTimer = null;
 let backendMode = false;
 let backendChecked = false;
 let apiAuthToken = localStorage.getItem('hx_api_token') || '';
-const DEFAULT_BACKEND_API_BASE = 'https://hexamech-backend.onrender.com';
-const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || DEFAULT_BACKEND_API_BASE).replace(/\/+$/, '');
-const BACKEND_REQUIRED = !!BACKEND_API_BASE;
-let backendRefreshTimer = null;
 
 function getStateSnapshot() {
   return {
@@ -1209,7 +1205,7 @@ function shouldSeedCloudUsers(remoteState) {
 async function apiRequest(path, options = {}, includeAuth = true) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (includeAuth && apiAuthToken) headers.Authorization = 'Bearer ' + apiAuthToken;
-  const response = await fetch((BACKEND_API_BASE || '') + path, { ...options, headers });
+  const response = await fetch(path, { ...options, headers });
   const text = await response.text();
   let data = {};
   try { data = text ? JSON.parse(text) : {}; } catch (e) {}
@@ -1226,12 +1222,9 @@ function hideOneDriveUiForBackend() {
   const msSignInBtn = document.getElementById('msSignInBtn');
   const loginCloudStatus = document.getElementById('loginCloudStatus');
   const loginSub = document.getElementById('loginSub');
-  if (syncBadge) {
-    syncBadge.style.display = '';
-    syncBadge.className = 'sync-badge synced';
-  }
-  if (syncIcon) syncIcon.textContent = 'OK';
-  if (syncText) syncText.textContent = 'Cloud ready';
+  if (syncBadge) syncBadge.style.display = 'none';
+  if (syncIcon) syncIcon.textContent = 'DB';
+  if (syncText) syncText.textContent = 'Server Database';
   if (odBanner) odBanner.style.display = 'none';
   if (loginDivider) loginDivider.style.display = 'none';
   if (msSignInBtn) msSignInBtn.style.display = 'none';
@@ -1247,29 +1240,16 @@ function hideOneDriveUiForBackend() {
   }
 }
 
-function showBackendReadyStatus() {
-  updateSyncBadge('synced');
-  const ss = document.getElementById('statStorage');
-  const sss = document.getElementById('statStorageSub');
-  if (ss) ss.textContent = 'Cloud ready';
-  if (sss) sss.textContent = 'Secure backend connected';
-}
-
 async function detectBackendMode() {
   if (backendChecked) return backendMode;
   backendChecked = true;
-  if (BACKEND_REQUIRED) {
-    backendMode = true;
-    hideOneDriveUiForBackend();
-    showBackendReadyStatus();
-    return true;
-  }
-  // Static hosts need BACKEND_API_BASE/localStorage hx_api_base to point to the deployed server.
+  // On GitHub Pages / static hosting there is no backend server
+  // Skip the health check entirely - always use OneDrive mode
   const isStatic = location.protocol === 'https:' && 
                    (location.hostname.includes('github.io') || 
                     location.hostname.includes('netlify.app') ||
                     !location.hostname.includes('localhost'));
-  if (isStatic && !BACKEND_API_BASE) { backendMode = false; return false; }
+  if (isStatic) { backendMode = false; return false; }
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 1500);
@@ -1278,10 +1258,7 @@ async function detectBackendMode() {
   } catch (e) {
     backendMode = false;
   }
-  if (backendMode) {
-    hideOneDriveUiForBackend();
-    showBackendReadyStatus();
-  }
+  if (backendMode) hideOneDriveUiForBackend();
   return backendMode;
 }
 
@@ -1291,7 +1268,6 @@ async function syncStateToBackend() {
     method: 'PUT',
     body: JSON.stringify(getStateSnapshot())
   });
-  showBackendReadyStatus();
   return true;
 }
 
@@ -1299,7 +1275,6 @@ async function loadStateFromBackend() {
   if (!backendMode || !apiAuthToken) return false;
   const data = await apiRequest('/api/state', { method: 'GET' });
   applyStateSnapshot(data.state || {});
-  showBackendReadyStatus();
   return true;
 }
 async function restoreBackendSession() {
@@ -1310,7 +1285,6 @@ async function restoreBackendSession() {
     username: data.user.username,
     displayName: data.user.displayName,
     role: data.user.role,
-    group: data.user.group || '',
     canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
     contactPhone: data.user.contactPhone || '',
     contactEmail: data.user.contactEmail || ''
@@ -1707,33 +1681,6 @@ async function doLogin() {
   const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
 
-  if (await detectBackendMode()) {
-    try {
-      const data = await apiRequest('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ username: u, password: p })
-      }, false);
-      apiAuthToken = data.token || '';
-      localStorage.setItem('hx_api_token', apiAuthToken);
-      applyStateSnapshot(data.state || {});
-      currentUser = {
-        username: data.user.username,
-        displayName: data.user.displayName,
-        role: data.user.role,
-        group: data.user.group || '',
-        canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
-        contactPhone: data.user.contactPhone || '',
-        contactEmail: data.user.contactEmail || ''
-      };
-      err.style.display = 'none';
-      launchApp();
-    } catch(e) {
-      err.textContent = e.message || 'Invalid username or password.';
-      err.style.display = 'block';
-    }
-    return;
-  }
-
   // Pull latest users from cloud (5s timeout so login is never stuck)
   try {
     await Promise.race([cloudSync(), new Promise(r => setTimeout(r, 5000))]);
@@ -1778,10 +1725,6 @@ function doLogout() {
   currentUser = null; msalAccount = null; odToken = null;
   apiAuthToken = '';
   localStorage.removeItem('hx_api_token');
-  if (backendRefreshTimer) {
-    clearInterval(backendRefreshTimer);
-    backendRefreshTimer = null;
-  }
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
@@ -1801,19 +1744,7 @@ function launchApp() {
   showView('db');
   renderUserList();
   // Auto-sync from cloud on every login
-  if (backendMode) {
-    showBackendReadyStatus();
-    if (!backendRefreshTimer) {
-      backendRefreshTimer = setInterval(async () => {
-        const ok = await loadStateFromBackend();
-        if (ok) {
-          if (document.getElementById('dbView').style.display !== 'none') renderDB();
-          renderUserList(); renderCustomerDropdown(); renderCustomersView(); renderBulkQuotationPdfExportOptions();
-        }
-      }, 5000);
-    }
-    return;
-  }
+  if (backendMode) return;
   (async () => {
     updateSyncBadge('syncing');
     const ok = await cloudSync();
@@ -2689,25 +2620,6 @@ async function changeMyPassword() {
   const current = document.getElementById('cpCurrent').value;
   const newPw = document.getElementById('cpNew').value;
   const confirm = document.getElementById('cpConfirm').value;
-
-  if (backendMode) {
-    if (newPw.length < 6) { showNotif('New password must be at least 6 characters.', 'error'); return; }
-    if (newPw !== confirm) { showNotif('New passwords do not match.', 'error'); return; }
-    try {
-      const data = await apiRequest('/api/change-password', {
-        method: 'POST',
-        body: JSON.stringify({ currentPassword: current, newPassword: newPw })
-      });
-      applyStateSnapshot(data.state || getStateSnapshot());
-      document.getElementById('cpCurrent').value = '';
-      document.getElementById('cpNew').value = '';
-      document.getElementById('cpConfirm').value = '';
-      showNotif('Password changed successfully!');
-    } catch(e) {
-      showNotif(e.message || 'Password could not be changed.', 'error');
-    }
-    return;
-  }
 
   const user = findUser(currentUser.username) || findDefaultUser(currentUser.username);
   if (!user) { showNotif('User not found.', 'error'); return; }
@@ -4394,7 +4306,6 @@ function renderPrintDoc(d, mode='quotation', syncPreviewDom=true){
 // -------------------------------------------
 
 function showReconnectBar() {
-  if (backendMode) return;
   if (document.getElementById('reconnectBar')) return;
   const bar = document.createElement('div');
   bar.id = 'reconnectBar';
@@ -4491,16 +4402,7 @@ async function startup() {
     });
   }
 
-  const hasBackend = await detectBackendMode();
-  if (hasBackend && apiAuthToken) {
-    try {
-      await restoreBackendSession();
-      launchApp();
-    } catch(e) {
-      apiAuthToken = '';
-      localStorage.removeItem('hx_api_token');
-    }
-  }
+  // No backend, no OAuth - just show login. Cloud syncs after sign-in.
 }
 
 // Run immediately and also on DOMContentLoaded as fallback
