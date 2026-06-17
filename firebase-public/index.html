@@ -730,7 +730,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
             <ul class="user-list" id="userList"></ul>
             <button class="btn-main btn-green" style="margin-top:16px;width:100%;justify-content:center;" onclick="openAddUserModal()" id="btnAddUser">+ Add New User</button>
             <button class="btn-main btn-gold" style="margin-top:10px;width:100%;justify-content:center;display:none;" onclick="exportDataToExcel()" id="btnExportExcel">Download Excel File</button>
-            <button class="btn-main btn-gold" style="margin-top:10px;width:100%;justify-content:center;display:none;" onclick="bulkUpdateSavedValidityTo90()" id="btnBulkValidity90Top">Update Validity to 90 Days</button>
           </div>
         </div>
 
@@ -774,15 +773,6 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
             <div id="pdfExportYearSummary" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Select a financial year to see how many quotations will be exported.</div>
             <button class="btn-main btn-gold" style="width:100%;justify-content:center;" onclick="exportQuotationPdfsByFinancialYear()" id="btnExportYearPdfs">Download PDF ZIP</button>
             <div id="pdfExportStatus" style="font-size:12px;color:var(--muted);margin-top:12px;min-height:18px;"></div>
-          </div>
-        </div>
-
-        <div class="settings-card" id="adminBulkUpdateCard" style="display:none;">
-          <div class="settings-card-header"><h3>Bulk Quotation Update</h3></div>
-          <div class="settings-card-body">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Admin can update old saved quotations where the Terms & Conditions validity point still says 15 or 30 days.</div>
-            <button class="btn-main btn-gold" style="width:100%;justify-content:center;" onclick="bulkUpdateSavedValidityTo90()" id="btnBulkValidity90">Update Validity to 90 Days</button>
-            <div id="bulkUpdateStatus" style="font-size:12px;color:var(--muted);margin-top:12px;min-height:18px;"></div>
           </div>
         </div>
 
@@ -1582,16 +1572,12 @@ function syncAdminControls() {
   const isAdmin = !!(currentUser && currentUser.role === 'admin');
   const btnAddUser = document.getElementById('btnAddUser');
   const btnExportExcel = document.getElementById('btnExportExcel');
-  const btnBulkValidity90Top = document.getElementById('btnBulkValidity90Top');
   const adminExportCard = document.getElementById('adminExportCard');
   const adminPdfExportCard = document.getElementById('adminPdfExportCard');
-  const adminBulkUpdateCard = document.getElementById('adminBulkUpdateCard');
   if (btnAddUser) btnAddUser.style.display = isAdmin ? 'flex' : 'none';
   if (btnExportExcel) btnExportExcel.style.display = isAdmin ? 'flex' : 'none';
-  if (btnBulkValidity90Top) btnBulkValidity90Top.style.display = isAdmin ? 'flex' : 'none';
   if (adminExportCard) adminExportCard.style.display = isAdmin ? 'block' : 'none';
   if (adminPdfExportCard) adminPdfExportCard.style.display = isAdmin ? 'block' : 'none';
-  if (adminBulkUpdateCard) adminBulkUpdateCard.style.display = isAdmin ? 'block' : 'none';
   if (isAdmin) renderBulkQuotationPdfExportOptions();
 }
 function renderMyContactDetails() {
