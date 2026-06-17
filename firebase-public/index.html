@@ -1233,6 +1233,7 @@ function stopCloudAutoRefresh() {
 }
 
 function startCloudAutoRefresh() {
+  if (!AUTO_CLOUD_REFRESH_ENABLED) return;
   if (FIREBASE_AUTH_MODE && firebaseDb && getFirebaseUser()) {
     if (firebaseUpdateRef) return;
     firebaseUpdateRef = firebaseDb.ref(FB_DATA_PATH + '/updatedAt');
@@ -1428,6 +1429,7 @@ const DEFAULT_BACKEND_API_BASE = '';
 const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || DEFAULT_BACKEND_API_BASE).replace(/\/+$/, '');
 const BACKEND_REQUIRED = !!BACKEND_API_BASE;
 let backendRefreshTimer = null;
+const AUTO_CLOUD_REFRESH_ENABLED = false;
 const CLOUD_REFRESH_MS = 5 * 60 * 1000;
 let cloudRefreshTimer = null;
 let firebaseUpdateRef = null;
