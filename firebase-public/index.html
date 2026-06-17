@@ -46,6 +46,8 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
 .fg input:focus{border-color:var(--accent);}
 .btn-login{width:100%;padding:13px;background:var(--accent);color:var(--navy);border:none;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;transition:.2s;}
 .btn-login:hover{background:var(--accent2);}
+.btn-login:disabled{opacity:.82;cursor:not-allowed;}
+.btn-login.is-loading{background:var(--accent2);}
 .login-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:rgba(255,255,255,.2);font-size:12px;}
 .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.10);}
 .btn-ms{width:100%;padding:12px;background:#fff;color:#1a1a1a;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.2s;}
@@ -518,7 +520,7 @@ body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--text);m
     <div class="login-sub" id="loginSub">Sign in to access the Quotation System</div>
     <div class="fg"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="username"></div>
     <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password"></div>
-    <button class="btn-login" onclick="doLogin()">Sign In</button>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="loginError">Invalid username or password.</div>
   </div>
 </div>
@@ -1914,106 +1916,134 @@ async function ensureUsersLoadedFromOneDrive(force = false) {
   return usersHydrationPromise;
 }
 
+let loginInProgress = false;
+
+function setLoginBusy(isBusy, label = 'Signing in...') {
+  const btn = document.getElementById('loginBtn');
+  const userInput = document.getElementById('loginUser');
+  const passInput = document.getElementById('loginPass');
+  if (btn) {
+    btn.disabled = !!isBusy;
+    btn.textContent = isBusy ? label : 'Sign In';
+    btn.classList.toggle('is-loading', !!isBusy);
+  }
+  if (userInput) userInput.disabled = !!isBusy;
+  if (passInput) passInput.disabled = !!isBusy;
+}
+
 async function doLogin() {
+  if (loginInProgress) return;
+  loginInProgress = true;
+  setLoginBusy(true);
   const u = document.getElementById('loginUser').value.trim().toLowerCase();
   const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
 
-  if (FIREBASE_AUTH_MODE) {
-    try {
-      await signInFirebaseUser(u, p);
-      const profileUser = firebaseProfileToUser(firebaseProfile, u);
-      currentUser = {
-        ...profileUser,
-        firebaseUid: getFirebaseUser()?.uid || profileUser.firebaseUid || ''
-      };
-      err.style.display = 'none';
-      const ok = await cloudSync();
-      if (!ok) throw new Error('Firebase database access failed. Check Realtime Database rules and approved users.');
-      const stateUser = findUser(u);
-      if (stateUser) {
-        currentUser = {
-          ...stateUser,
-          role: profileUser.role,
-          canProjectAccess: profileUser.role === 'admin' ? true : !!profileUser.canProjectAccess,
-          group: profileUser.role === 'admin' ? '' : (profileUser.group || stateUser.group || ''),
-          contactPhone: profileUser.contactPhone || stateUser.contactPhone || '',
-          contactEmail: profileUser.contactEmail || stateUser.contactEmail || '',
-          firebaseUid: getFirebaseUser()?.uid || ''
-        };
-      }
-      await persistCurrentFirebaseUserProfile();
-      launchApp();
-    } catch(e) {
-      err.textContent = e.message || 'Invalid username or password.';
-      err.style.display = 'block';
-      updateSyncBadge('error');
-    }
-    return;
-  }
-
-  if (await detectBackendMode()) {
-    try {
-      const data = await apiRequest('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ username: u, password: p })
-      }, false);
-      apiAuthToken = data.token || '';
-      localStorage.setItem('hx_api_token', apiAuthToken);
-      applyStateSnapshot(data.state || {});
-      currentUser = {
-        username: data.user.username,
-        displayName: data.user.displayName,
-        role: data.user.role,
-        group: data.user.group || '',
-        canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
-        contactPhone: data.user.contactPhone || '',
-        contactEmail: data.user.contactEmail || ''
-      };
-      err.style.display = 'none';
-      launchApp();
-    } catch(e) {
-      err.textContent = e.message || 'Invalid username or password.';
-      err.style.display = 'block';
-    }
-    return;
-  }
-
-  // Pull latest users from cloud (5s timeout so login is never stuck)
   try {
-    await Promise.race([cloudSync(), new Promise(r => setTimeout(r, 5000))]);
-  } catch(e) {}
-
-  let user = findUser(u);
-  let matched = user ? await isPasswordMatch(user, p) : false;
-
-  // Keep the original built-in company logins available even if shared data is out of sync.
-  if (!matched) {
-    const fallbackUser = findDefaultUser(u);
-    if (fallbackUser && await isPasswordMatch(fallbackUser, p)) {
-      user = fallbackUser;
-      matched = true;
+    if (FIREBASE_AUTH_MODE) {
+      try {
+        await signInFirebaseUser(u, p);
+        const profileUser = firebaseProfileToUser(firebaseProfile, u);
+        currentUser = {
+          ...profileUser,
+          firebaseUid: getFirebaseUser()?.uid || profileUser.firebaseUid || ''
+        };
+        err.style.display = 'none';
+        const initialSyncPromise = cloudSync();
+        initialSyncPromise.then(async ok => {
+          if (!ok || !currentUser || currentUser.username !== u) return;
+          const stateUser = findUser(u);
+          if (stateUser) {
+            currentUser = {
+              ...stateUser,
+              role: profileUser.role,
+              canProjectAccess: profileUser.role === 'admin' ? true : !!profileUser.canProjectAccess,
+              group: profileUser.role === 'admin' ? '' : (profileUser.group || stateUser.group || ''),
+              contactPhone: profileUser.contactPhone || stateUser.contactPhone || '',
+              contactEmail: profileUser.contactEmail || stateUser.contactEmail || '',
+              firebaseUid: getFirebaseUser()?.uid || ''
+            };
+            const logged = document.getElementById('loggedUser');
+            if (logged) logged.textContent = currentUser.displayName || currentUser.username;
+            syncAdminControls();
+          }
+          await persistCurrentFirebaseUserProfile();
+        }).catch(() => {});
+        launchApp(initialSyncPromise);
+      } catch(e) {
+        err.textContent = e.message || 'Invalid username or password.';
+        err.style.display = 'block';
+        updateSyncBadge('error');
+      }
+      return;
     }
-  }
 
-  if (matched && user) {
-    if (!user.passwordHash && user.password) {
-      const users = await secureUsers(getUsers());
-      saveUsers(users);
+    if (await detectBackendMode()) {
+      try {
+        const data = await apiRequest('/api/login', {
+          method: 'POST',
+          body: JSON.stringify({ username: u, password: p })
+        }, false);
+        apiAuthToken = data.token || '';
+        localStorage.setItem('hx_api_token', apiAuthToken);
+        applyStateSnapshot(data.state || {});
+        currentUser = {
+          username: data.user.username,
+          displayName: data.user.displayName,
+          role: data.user.role,
+          group: data.user.group || '',
+          canProjectAccess: data.user.role === 'admin' ? true : !!data.user.canProjectAccess,
+          contactPhone: data.user.contactPhone || '',
+          contactEmail: data.user.contactEmail || ''
+        };
+        err.style.display = 'none';
+        launchApp();
+      } catch(e) {
+        err.textContent = e.message || 'Invalid username or password.';
+        err.style.display = 'block';
+      }
+      return;
     }
-    err.style.display = 'none';
-    currentUser = {
-      username: user.username,
-      displayName: user.displayName,
-      role: user.role,
-      group: user.group || '',
-      canProjectAccess: user.role === 'admin' ? true : !!user.canProjectAccess,
-      contactPhone: user.contactPhone || '',
-      contactEmail: user.contactEmail || ''
-    };
-    launchApp();
-  } else {
-    err.style.display = 'block';
+
+    // Pull latest users from cloud (5s timeout so login is never stuck)
+    try {
+      await Promise.race([cloudSync(), new Promise(r => setTimeout(r, 5000))]);
+    } catch(e) {}
+
+    let user = findUser(u);
+    let matched = user ? await isPasswordMatch(user, p) : false;
+
+    // Keep the original built-in company logins available even if shared data is out of sync.
+    if (!matched) {
+      const fallbackUser = findDefaultUser(u);
+      if (fallbackUser && await isPasswordMatch(fallbackUser, p)) {
+        user = fallbackUser;
+        matched = true;
+      }
+    }
+
+    if (matched && user) {
+      if (!user.passwordHash && user.password) {
+        const users = await secureUsers(getUsers());
+        saveUsers(users);
+      }
+      err.style.display = 'none';
+      currentUser = {
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        group: user.group || '',
+        canProjectAccess: user.role === 'admin' ? true : !!user.canProjectAccess,
+        contactPhone: user.contactPhone || '',
+        contactEmail: user.contactEmail || ''
+      };
+      launchApp();
+    } else {
+      err.style.display = 'block';
+    }
+  } finally {
+    loginInProgress = false;
+    if (document.getElementById('loginScreen')?.style.display !== 'none') setLoginBusy(false);
   }
 }
 function doLogout() {
@@ -2034,10 +2064,11 @@ function doLogout() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
+  setLoginBusy(false);
   updateSyncBadge('local');
 }
 
-function launchApp() {
+function launchApp(initialSyncPromise = null) {
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
@@ -2064,7 +2095,12 @@ function launchApp() {
   }
   (async () => {
     updateSyncBadge('syncing');
-    const ok = await cloudSync();
+    let ok = false;
+    try {
+      ok = await (initialSyncPromise || cloudSync());
+    } catch(e) {
+      ok = false;
+    }
     if (ok) {
       if (document.getElementById('dbView').style.display !== 'none') renderDB();
       renderUserList(); renderCustomerDropdown(); renderCustomersView();
@@ -4951,26 +4987,27 @@ async function startup() {
       }
       const profileUser = firebaseProfileToUser(firebaseProfile, firebaseProfile.username);
       currentUser = { ...profileUser, firebaseUid: fbUser.uid };
-      const ok = await cloudSync();
-      if (!ok) {
-        await signOutFirebaseUser();
-        updateSyncBadge('error');
-        return;
-      }
-      const stateUser = findUser(profileUser.username);
-      if (stateUser) {
-        currentUser = {
-          ...stateUser,
-          role: profileUser.role,
-          canProjectAccess: profileUser.role === 'admin' ? true : !!profileUser.canProjectAccess,
-          group: profileUser.role === 'admin' ? '' : (profileUser.group || stateUser.group || ''),
-          contactPhone: profileUser.contactPhone || stateUser.contactPhone || '',
-          contactEmail: profileUser.contactEmail || stateUser.contactEmail || '',
-          firebaseUid: fbUser.uid
-        };
-      }
-      await persistCurrentFirebaseUserProfile();
-      launchApp();
+      const initialSyncPromise = cloudSync();
+      initialSyncPromise.then(async ok => {
+        if (!ok || !currentUser || currentUser.username !== profileUser.username) return;
+        const stateUser = findUser(profileUser.username);
+        if (stateUser) {
+          currentUser = {
+            ...stateUser,
+            role: profileUser.role,
+            canProjectAccess: profileUser.role === 'admin' ? true : !!profileUser.canProjectAccess,
+            group: profileUser.role === 'admin' ? '' : (profileUser.group || stateUser.group || ''),
+            contactPhone: profileUser.contactPhone || stateUser.contactPhone || '',
+            contactEmail: profileUser.contactEmail || stateUser.contactEmail || '',
+            firebaseUid: fbUser.uid
+          };
+          const logged = document.getElementById('loggedUser');
+          if (logged) logged.textContent = currentUser.displayName || currentUser.username;
+          syncAdminControls();
+        }
+        await persistCurrentFirebaseUserProfile();
+      }).catch(() => {});
+      launchApp(initialSyncPromise);
     } catch(e) {
       console.error('Firebase startup:', e.message);
       updateSyncBadge('error');
