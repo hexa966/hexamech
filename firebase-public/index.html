@@ -1199,6 +1199,60 @@ async function silentSync() {
   } catch(e) { return false; }
 }
 
+function refreshSyncedViews() {
+  if (document.getElementById('dbView')?.style.display !== 'none') renderDB();
+  renderUserList();
+  renderCustomerDropdown();
+  renderCustomersView();
+  renderBulkQuotationPdfExportOptions();
+  updateODStatusBox(true);
+}
+
+async function runSilentRefresh() {
+  if (silentSyncRunning) return false;
+  silentSyncRunning = true;
+  try {
+    const ok = await silentSync();
+    if (ok) refreshSyncedViews();
+    return ok;
+  } finally {
+    silentSyncRunning = false;
+  }
+}
+
+function stopCloudAutoRefresh() {
+  if (cloudRefreshTimer) {
+    clearInterval(cloudRefreshTimer);
+    cloudRefreshTimer = null;
+  }
+  if (firebaseUpdateRef) {
+    firebaseUpdateRef.off('value');
+    firebaseUpdateRef = null;
+  }
+  firebaseUpdateListenerReady = false;
+}
+
+function startCloudAutoRefresh() {
+  if (FIREBASE_AUTH_MODE && firebaseDb && getFirebaseUser()) {
+    if (firebaseUpdateRef) return;
+    firebaseUpdateRef = firebaseDb.ref(FB_DATA_PATH + '/updatedAt');
+    firebaseUpdateListenerReady = false;
+    firebaseUpdateRef.on('value', snap => {
+      if (!firebaseUpdateListenerReady) {
+        firebaseUpdateListenerReady = true;
+        return;
+      }
+      if (snap.exists()) runSilentRefresh();
+    });
+    return;
+  }
+  if (cloudRefreshTimer) return;
+  cloudRefreshTimer = setInterval(() => {
+    if (document.hidden) return;
+    runSilentRefresh();
+  }, CLOUD_REFRESH_MS);
+}
+
 // -------------------------------------------
 
 async function ghRead() { return await cloudRead(); }
@@ -1374,6 +1428,11 @@ const DEFAULT_BACKEND_API_BASE = '';
 const BACKEND_API_BASE = String(window.HEXAMECH_API_BASE || localStorage.getItem('hx_api_base') || DEFAULT_BACKEND_API_BASE).replace(/\/+$/, '');
 const BACKEND_REQUIRED = !!BACKEND_API_BASE;
 let backendRefreshTimer = null;
+const CLOUD_REFRESH_MS = 5 * 60 * 1000;
+let cloudRefreshTimer = null;
+let firebaseUpdateRef = null;
+let firebaseUpdateListenerReady = false;
+let silentSyncRunning = false;
 
 function getStateSnapshot() {
   return {
@@ -2060,6 +2119,7 @@ function doLogout() {
     clearInterval(backendRefreshTimer);
     backendRefreshTimer = null;
   }
+  stopCloudAutoRefresh();
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
@@ -2102,9 +2162,7 @@ function launchApp(initialSyncPromise = null) {
       ok = false;
     }
     if (ok) {
-      if (document.getElementById('dbView').style.display !== 'none') renderDB();
-      renderUserList(); renderCustomerDropdown(); renderCustomersView();
-      updateODStatusBox(true);
+      refreshSyncedViews();
     } else {
       updateSyncBadge('error');
       const ss2 = document.getElementById('statStorage');
@@ -2114,25 +2172,7 @@ function launchApp(initialSyncPromise = null) {
       showNotif('Cloud sync failed. Check internet or Firebase rules, then try again.', 'error');
     }
   })();
-  // Auto-refresh every 60s - all users see each other's edits/deletes in near real-time
-  setInterval(async () => {
-    const ok = await silentSync();
-    if (ok) {
-      if (document.getElementById('dbView').style.display !== 'none') renderDB();
-      renderCustomerDropdown(); renderCustomersView();
-    }
-  }, 5000);
-
-  // Auto-refresh every 5s - all users see each other's changes near-instantly
-  if (!backendMode) {
-    setInterval(async () => {
-      const ok = await silentSync();
-      if (ok) {
-        if (document.getElementById('dbView').style.display !== 'none') renderDB();
-        renderCustomerDropdown(); renderCustomersView();
-      }
-    }, 5000);
-  }
+  startCloudAutoRefresh();
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
