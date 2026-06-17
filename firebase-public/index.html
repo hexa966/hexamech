@@ -2850,7 +2850,71 @@ function projectsSave(projects) {
 }
 function projectFind(id) { return projectsLoad().find(p => p.id === id) || null; }
 
-async function dbUpsert(record) {
+async function firebaseUpsertQuotation(record, isNewRecord = false) {
+  try {
+    await ensureFirebaseReady();
+    if (!getFirebaseUser()) throw new Error('Not signed in to Firebase.');
+    let savedRecord = null;
+    let transactionError = '';
+    const ref = firebaseDb.ref(FB_DATA_PATH + '/quotations');
+    const result = await ref.transaction(current => {
+      const records = Array.isArray(current) ? current.slice() : [];
+      const idx = records.findIndex(r => r && r.id === record.id);
+      const nextRecord = normalizeQuotationRecord({ ...record });
+      const shouldAssignNumber = isNewRecord || !nextRecord.quoteNo;
+      if (shouldAssignNumber) {
+        nextRecord.quoteNo = generateQuotationNumberFromRecords(records, nextRecord.quoteDate || new Date(), nextRecord.id);
+      }
+      const duplicate = records.find(r => r && r.id !== nextRecord.id && String(r.quoteNo || '').trim().toUpperCase() === String(nextRecord.quoteNo || '').trim().toUpperCase());
+      if (duplicate) {
+        transactionError = 'Quotation number already exists. Please save again.';
+        return;
+      }
+      if (idx >= 0) records[idx] = nextRecord;
+      else records.unshift(nextRecord);
+      savedRecord = nextRecord;
+      return records;
+    });
+    if (!result.committed || !savedRecord) throw new Error(transactionError || 'Cloud save was cancelled. Please try again.');
+    await firebaseDb.ref(FB_DATA_PATH + '/updatedAt').set(firebase.database.ServerValue.TIMESTAMP);
+    Object.assign(record, savedRecord);
+    dbSave(result.snapshot.val() || []);
+    updateSyncBadge('synced');
+    return true;
+  } catch(e) {
+    console.error('firebaseUpsertQuotation:', e.message);
+    updateSyncBadge('error');
+    showNotif(e.message || 'Cloud save failed. Nothing was stored locally.', 'error');
+    return false;
+  }
+}
+
+async function firebaseDeleteQuotation(id) {
+  try {
+    await ensureFirebaseReady();
+    if (!getFirebaseUser()) throw new Error('Not signed in to Firebase.');
+    const ref = firebaseDb.ref(FB_DATA_PATH + '/quotations');
+    const result = await ref.transaction(current => {
+      const records = Array.isArray(current) ? current : [];
+      return records.filter(r => r && r.id !== id);
+    });
+    if (!result.committed) throw new Error('Cloud delete was cancelled. Please try again.');
+    await firebaseDb.ref(FB_DATA_PATH + '/updatedAt').set(firebase.database.ServerValue.TIMESTAMP);
+    dbSave(result.snapshot.val() || []);
+    updateSyncBadge('synced');
+    return true;
+  } catch(e) {
+    console.error('firebaseDeleteQuotation:', e.message);
+    updateSyncBadge('error');
+    showNotif(e.message || 'Cloud delete failed.', 'error');
+    return false;
+  }
+}
+
+async function dbUpsert(record, options = {}) {
+  if (FIREBASE_AUTH_MODE && !backendMode) {
+    return await firebaseUpsertQuotation(record, !!options.isNew);
+  }
   const recs = dbLoad();
   const idx = recs.findIndex(r => r.id === record.id);
   if (idx >= 0) recs[idx] = record; else recs.unshift(record);
@@ -3562,12 +3626,15 @@ function getQuotationSerialForRecord(record, fyStartYear) {
   if (match) return parseInt(match[1], 10) || 0;
   return 0;
 }
-function generateQuotationNumber(dateLike = new Date(), excludeId = null) {
+function generateQuotationNumberFromRecords(records, dateLike = new Date(), excludeId = null) {
   const fyStartYear = getFinancialYearStart(dateLike);
-  const fyRecords = dbLoad().filter(r => r && r.id !== excludeId && getFinancialYearStart(r.quoteDate || r.savedAt) === fyStartYear);
+  const fyRecords = (Array.isArray(records) ? records : []).filter(r => r && r.id !== excludeId && getFinancialYearStart(r.quoteDate || r.savedAt) === fyStartYear);
   const parsedMax = fyRecords.reduce((max, r) => Math.max(max, getQuotationSerialForRecord(r, fyStartYear)), 0);
   const nextSerial = Math.max(parsedMax, fyRecords.length) + 1;
   return 'Q' + getFinancialYearPrefix(dateLike) + String(nextSerial).padStart(3, '0');
+}
+function generateQuotationNumber(dateLike = new Date(), excludeId = null) {
+  return generateQuotationNumberFromRecords(dbLoad(), dateLike, excludeId);
 }
 function setAutoQuotationNumber(dateLike = new Date()) {
   const quoteNoEl = document.getElementById('quoteNo');
@@ -3849,17 +3916,22 @@ function loadData(d){
 
 async function saveQuotation(){
   const d=gatherData();
-  if(!d.quoteNo){
+  const isNewRecord = !editingId;
+  if(!d.quoteNo && !isNewRecord){
     d.quoteNo=generateQuotationNumber(d.quoteDate||new Date(), d.id);
     document.getElementById('quoteNo').value=d.quoteNo;
   }
-  const dup=dbLoad().find(r=>r.quoteNo===d.quoteNo&&r.id!==d.id);
+  const dup=!isNewRecord ? dbLoad().find(r=>r.quoteNo===d.quoteNo&&r.id!==d.id) : null;
   if(dup){showNotif('Quotation number already exists!','error');return;}
-  if(!editingId)editingId=d.id; else d.id=editingId;
-  const ok = await dbUpsert(d);
+  const ok = await dbUpsert(d, { isNew:isNewRecord });
+  if (ok === false) {
+    showNotif('Cloud save failed. Nothing was stored locally.', 'error');
+    return;
+  }
+  editingId=d.id;
+  document.getElementById('quoteNo').value=d.quoteNo;
   document.getElementById('formTitle').textContent='Editing: '+d.quoteNo;
-  if (ok === false) showNotif('Cloud save failed. Nothing was stored locally.', 'error');
-  else showNotif('Saved: '+d.quoteNo+' ? Cloud only');
+  showNotif('Saved: '+d.quoteNo+' ? Cloud only');
 }
 
 // -------------------------------------------
@@ -3924,14 +3996,20 @@ function confirmDeleteQ(id,qno){
   document.getElementById('confirmOkBtn').textContent='Delete';
   document.getElementById('confirmModal').classList.add('open');
   document.getElementById('confirmOkBtn').onclick=async function(){
-    dbDelete(pendingDelId);
+    let ok = true;
+    if (FIREBASE_AUTH_MODE && !backendMode) {
+      ok = await firebaseDeleteQuotation(pendingDelId);
+    } else {
+      dbDelete(pendingDelId);
+    }
     if(backendMode){
       await syncStateToBackend();
-    } else {
-      const ok = await cloudPush();
+    } else if (!FIREBASE_AUTH_MODE) {
+      ok = await cloudPush();
       if(!ok) showNotif('Deleted locally. Cloud sync failed - check internet.','error');
     }
-    closeConfirm();renderDB();showNotif('Quotation deleted.','info');
+    closeConfirm();renderDB();
+    if (ok) showNotif('Quotation deleted.','info');
   };
 }
 function confirmDeleteCustomer(id, customerName){
