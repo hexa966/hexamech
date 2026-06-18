@@ -4372,7 +4372,8 @@ function getPdfProductDetailMetrics(rows) {
 }
 function shouldMoveBankSectionToSecondPage(rows) {
   const metrics = getPdfProductDetailMetrics(rows);
-  return metrics.detailLines >= 8 || metrics.rowCount >= 9 || metrics.maxLines >= 5;
+  if (metrics.rowCount <= 2) return false;
+  return metrics.rowCount >= 9 || metrics.detailLines >= 14 || (metrics.rowCount >= 5 && metrics.maxLines >= 5);
 }
 function buildPdfBankDetailsBlock(model, pageBreakBefore=false) {
   return {
